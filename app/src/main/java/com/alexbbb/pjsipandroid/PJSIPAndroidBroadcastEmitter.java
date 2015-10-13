@@ -38,14 +38,14 @@ public class PJSIPAndroidBroadcastEmitter {
         mNamespace = namespace;
     }
 
-    private String getAction(BroadcastAction action) {
+    public String getAction(BroadcastAction action) {
         return mNamespace + "." + action;
     }
 
     /**
      * Emit an incoming call broadcast intent.
      * @param accountID call's account IdUri
-     * @param callID
+     * @param callID call ID number
      * @param displayName the display name of the remote party
      * @param remoteUri the IdUri of the remote party
      */
@@ -64,7 +64,7 @@ public class PJSIPAndroidBroadcastEmitter {
     /**
      * Emit a registration state broadcast intent.
      * @param accountID account IdUri
-     * @param registrationStateCode
+     * @param registrationStateCode SIP registration status code
      */
     public void registrationState(String accountID, int registrationStateCode) {
         final Intent intent = new Intent();
@@ -79,8 +79,8 @@ public class PJSIPAndroidBroadcastEmitter {
     /**
      * Emit a call state broadcast intent.
      * @param accountID call's account IdUri
-     * @param callID
-     * @param callStateCode
+     * @param callID call ID number
+     * @param callStateCode SIP call state code
      */
     public void callState(String accountID, int callID, int callStateCode) {
         final Intent intent = new Intent();
