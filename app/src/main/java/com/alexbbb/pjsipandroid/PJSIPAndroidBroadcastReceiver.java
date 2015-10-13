@@ -3,6 +3,7 @@ package com.alexbbb.pjsipandroid;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.util.Log;
 
 import com.alexbbb.pjsipandroid.PJSIPAndroidBroadcastEmitter.BroadcastParameters;
@@ -41,6 +42,32 @@ public class PJSIPAndroidBroadcastReceiver extends BroadcastReceiver {
                         intent.getIntExtra(BroadcastParameters.CALL_ID, -1),
                         intent.getIntExtra(BroadcastParameters.CALL_STATE, -1));
         }
+    }
+
+    /**
+     * Register this broadcast receiver.
+     * It's recommended to register the receiver in Activity's onResume method.
+     *
+     * @param context context in which to register this receiver
+     */
+    public void register(final Context context) {
+        PJSIPAndroidBroadcastEmitter broadcastEmitter = PJSIPAndroid.getBroadcastEmitter();
+
+        final IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(broadcastEmitter.getAction(REGISTRATION));
+        intentFilter.addAction(broadcastEmitter.getAction(INCOMING_CALL));
+        intentFilter.addAction(broadcastEmitter.getAction(CALL_STATE));
+        context.registerReceiver(this, intentFilter);
+    }
+
+    /**
+     * Unregister this broadcast receiver.
+     * It's recommended to unregister the receiver in Activity's onPause method.
+     *
+     * @param context context in which to unregister this receiver
+     */
+    public void unregister(final Context context) {
+        context.unregisterReceiver(this);
     }
 
     public void onRegistration(String accountID, int registrationStateCode) {
