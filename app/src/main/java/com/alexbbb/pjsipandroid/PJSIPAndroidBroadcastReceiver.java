@@ -8,6 +8,9 @@ import android.util.Log;
 
 import com.alexbbb.pjsipandroid.PJSIPAndroidBroadcastEmitter.BroadcastParameters;
 
+import org.pjsip.pjsua2.pjsip_inv_state;
+import org.pjsip.pjsua2.pjsip_status_code;
+
 import static com.alexbbb.pjsipandroid.PJSIPAndroidBroadcastEmitter.BroadcastAction.CALL_STATE;
 import static com.alexbbb.pjsipandroid.PJSIPAndroidBroadcastEmitter.BroadcastAction.INCOMING_CALL;
 import static com.alexbbb.pjsipandroid.PJSIPAndroidBroadcastEmitter.BroadcastAction.REGISTRATION;
@@ -34,8 +37,9 @@ public class PJSIPAndroidBroadcastReceiver extends BroadcastReceiver {
         PJSIPAndroidBroadcastEmitter broadcastEmitter = PJSIPAndroid.getBroadcastEmitter();
 
         if (action.equals(broadcastEmitter.getAction(REGISTRATION))) {
+            int stateCode = intent.getIntExtra(BroadcastParameters.CODE, -1);
             onRegistration(intent.getStringExtra(BroadcastParameters.ACCOUNT_ID),
-                           intent.getIntExtra(BroadcastParameters.CODE, -1));
+                           pjsip_status_code.swigToEnum(stateCode));
 
         } else if (action.equals(broadcastEmitter.getAction(INCOMING_CALL))) {
             onIncomingCall(intent.getStringExtra(BroadcastParameters.ACCOUNT_ID),
@@ -44,9 +48,10 @@ public class PJSIPAndroidBroadcastReceiver extends BroadcastReceiver {
                            intent.getStringExtra(BroadcastParameters.REMOTE_URI));
 
         } else if (action.equals(broadcastEmitter.getAction(CALL_STATE))) {
+            int callState = intent.getIntExtra(BroadcastParameters.CALL_STATE, -1);
             onCallState(intent.getStringExtra(BroadcastParameters.ACCOUNT_ID),
                         intent.getIntExtra(BroadcastParameters.CALL_ID, -1),
-                        intent.getIntExtra(BroadcastParameters.CALL_STATE, -1));
+                        pjsip_inv_state.swigToEnum(callState));
         }
     }
 
@@ -80,7 +85,7 @@ public class PJSIPAndroidBroadcastReceiver extends BroadcastReceiver {
         context.unregisterReceiver(this);
     }
 
-    public void onRegistration(String accountID, int registrationStateCode) {
+    public void onRegistration(String accountID, pjsip_status_code registrationStateCode) {
         Log.d(LOG_TAG, "onRegistration - accountID: " + accountID +
                        ", registrationStateCode: " + registrationStateCode);
     }
@@ -92,7 +97,7 @@ public class PJSIPAndroidBroadcastReceiver extends BroadcastReceiver {
                        ", remoteUri: " + remoteUri);
     }
 
-    public void onCallState(String accountID, int callID, int callStateCode) {
+    public void onCallState(String accountID, int callID, pjsip_inv_state callStateCode) {
         Log.d(LOG_TAG, "onIncomingCall - accountID: " + accountID +
                        ", callID: " + callID +
                        ", callStateCode: " + callStateCode);
