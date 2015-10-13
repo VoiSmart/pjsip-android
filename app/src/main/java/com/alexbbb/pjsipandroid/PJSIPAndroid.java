@@ -93,7 +93,7 @@ public class PJSIPAndroid {
 
         String accountString = account.getData().getIdUri();
 
-        if (!mSipAccounts.contains(accountString)) {
+        if (!mSipAccounts.containsKey(accountString)) {
             account.create();
             mSipAccounts.put(accountString, account);
         }
@@ -121,6 +121,17 @@ public class PJSIPAndroid {
         account.delete();
         mSipAccounts.remove(accountID);
         Log.i(LOG_TAG, "SIP account " + accountID + " successfully removed");
+    }
+
+    /**
+     * Get an active account instance, given its accountID.
+     * @param accountID (e.g. sip:user@domain.com)
+     * @return the instance of the account or null if it doesn't exist
+     */
+    public static synchronized PJSIPAndroidAccount get(String accountID) {
+        checkInitialization();
+
+        return mSipAccounts.get(accountID);
     }
 
     /**
