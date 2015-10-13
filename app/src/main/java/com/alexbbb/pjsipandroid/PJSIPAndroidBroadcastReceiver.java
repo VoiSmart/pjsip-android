@@ -98,7 +98,7 @@ public class PJSIPAndroidBroadcastReceiver extends BroadcastReceiver {
     }
 
     public void onCallState(String accountID, int callID, pjsip_inv_state callStateCode) {
-        Log.d(LOG_TAG, "onIncomingCall - accountID: " + accountID +
+        Log.d(LOG_TAG, "onCallState - accountID: " + accountID +
                        ", callID: " + callID +
                        ", callStateCode: " + callStateCode);
     }
