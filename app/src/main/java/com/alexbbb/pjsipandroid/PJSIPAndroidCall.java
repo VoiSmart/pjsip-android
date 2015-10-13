@@ -52,9 +52,9 @@ public class PJSIPAndroidCall extends Call {
         try {
             CallInfo info = getInfo();
 
-            // prepare broadcast intent parameters before doing default actions
-            int callID = info.getId();
-            int callStateCode = info.getState().swigValue();
+            PJSIPAndroid.getBroadcastEmitter()
+                        .callState(account.getData().getIdUri(),
+                                   info.getId(), info.getState().swigValue());
 
             /**
              * From: http://www.pjsip.org/docs/book-latest/html/call.html#call-disconnection
@@ -70,9 +70,6 @@ public class PJSIPAndroidCall extends Call {
             } else if (info.getState() == pjsip_inv_state.PJSIP_INV_STATE_CONFIRMED) {
                 PJSIPAndroid.stopRingTone();
             }
-
-            PJSIPAndroid.getBroadcastEmitter()
-                        .callState(account.getData().getIdUri(), callID, callStateCode);
 
         } catch (Exception exc) {
             Log.e(LOG_TAG, "onCallState: error while getting call info", exc);
