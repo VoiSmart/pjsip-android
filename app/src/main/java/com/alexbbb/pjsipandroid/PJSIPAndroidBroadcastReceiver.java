@@ -20,9 +20,15 @@ public class PJSIPAndroidBroadcastReceiver extends BroadcastReceiver {
 
     private static final String LOG_TAG = "PJSIPAndroidBR";
 
+    private Context receiverContext;
+
     @Override
     public void onReceive(Context context, Intent intent) {
         if (intent == null) return;
+
+        //save context internally for convenience in subclasses, which can get it with
+        //getReceiverContext method
+        receiverContext = context;
 
         String action = intent.getAction();
         PJSIPAndroidBroadcastEmitter broadcastEmitter = PJSIPAndroid.getBroadcastEmitter();
@@ -42,6 +48,10 @@ public class PJSIPAndroidBroadcastReceiver extends BroadcastReceiver {
                         intent.getIntExtra(BroadcastParameters.CALL_ID, -1),
                         intent.getIntExtra(BroadcastParameters.CALL_STATE, -1));
         }
+    }
+
+    protected Context getReceiverContext() {
+        return receiverContext;
     }
 
     /**
