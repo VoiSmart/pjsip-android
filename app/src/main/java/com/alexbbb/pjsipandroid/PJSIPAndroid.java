@@ -110,9 +110,7 @@ public class PJSIPAndroid {
     public static synchronized void remove(String accountID) throws Exception {
         checkInitialization();
 
-        if (accountID == null || accountID.isEmpty() || !accountID.startsWith("sip:")) {
-            throw new IllegalArgumentException("Invalid accountID! Example: sip:user@domain");
-        }
+        checkAccountID(accountID);
 
         PJSIPAndroidAccount account = mSipAccounts.get(accountID);
         if (account == null) throw new RuntimeException("No account for ID: " + accountID);
@@ -124,6 +122,12 @@ public class PJSIPAndroid {
         Log.i(LOG_TAG, "SIP account " + accountID + " successfully removed");
     }
 
+    private static void checkAccountID(String accountID) {
+        if (accountID == null || accountID.isEmpty() || !accountID.startsWith("sip:")) {
+            throw new IllegalArgumentException("Invalid accountID! Example: sip:user@domain");
+        }
+    }
+
     /**
      * Get an active account instance, given its accountID.
      * @param accountID (e.g. sip:user@domain.com)
@@ -131,6 +135,8 @@ public class PJSIPAndroid {
      */
     public static synchronized PJSIPAndroidAccount get(String accountID) {
         checkInitialization();
+
+        checkAccountID(accountID);
 
         return mSipAccounts.get(accountID);
     }
