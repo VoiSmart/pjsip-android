@@ -1,6 +1,5 @@
 package com.alexbbb.pjsipandroid;
 
-import android.content.Context;
 import android.util.Log;
 
 import org.pjsip.pjsua2.Account;
@@ -19,13 +18,11 @@ public class PJSIPAndroidAccount extends Account {
 
     private static final String LOG_TAG = "PJSIPAndroidAccount";
 
-    private Context appContext;
     private HashMap<Integer, PJSIPAndroidCall> activeCalls = new HashMap<>();
     private PJSIPAccountData data;
 
-    protected PJSIPAndroidAccount(Context context, PJSIPAccountData data) {
+    protected PJSIPAndroidAccount(PJSIPAccountData data) {
         super();
-        appContext = context;
         this.data = data;
     }
 
@@ -52,18 +49,18 @@ public class PJSIPAndroidAccount extends Account {
 
     public PJSIPAndroidCall addIncomingCall(int callId) {
 
-        PJSIPAndroidCall call = new PJSIPAndroidCall(appContext, this, callId);
+        PJSIPAndroidCall call = new PJSIPAndroidCall(this, callId);
         activeCalls.put(callId, call);
 
         return call;
     }
 
-    public PJSIPAndroidCall addOutgoingCall(final String numberToDial , final String realm) {
-        PJSIPAndroidCall call = new PJSIPAndroidCall(appContext, this);
+    public PJSIPAndroidCall addOutgoingCall(final String numberToDial) {
+        PJSIPAndroidCall call = new PJSIPAndroidCall(this);
 
         CallOpParam callOpParam = new CallOpParam();
         try {
-            call.makeCall("sip:" + numberToDial + "@" + realm, callOpParam);
+            call.makeCall("sip:" + numberToDial + "@" + data.getRealm(), callOpParam);
 
             Log.d(LOG_TAG, "New outgoing call with ID: " + call.getId());
             activeCalls.put(call.getId(), call);

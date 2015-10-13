@@ -1,6 +1,5 @@
 package com.alexbbb.pjsipandroid;
 
-import android.content.Context;
 import android.util.Log;
 
 import org.pjsip.pjsua2.AudDevManager;
@@ -27,30 +26,25 @@ public class PJSIPAndroidCall extends Call {
     private static final String LOG_TAG = "PJSIPCall";
 
     private PJSIPAndroidAccount account;
-    private Context context;
     private boolean localHold = false;
 
     /**
      * Incoming call constructor.
-     * @param context application context
      * @param account the account which own this call
      * @param callID the id of this call
      */
-    public PJSIPAndroidCall(Context context, PJSIPAndroidAccount account, int callID) {
+    public PJSIPAndroidCall(PJSIPAndroidAccount account, int callID) {
         super(account, callID);
         this.account = account;
-        this.context = context;
     }
 
     /**
      * Outgoing call constructor.
-     * @param context
-     * @param acc
+     * @param account account which owns this call
      */
-    public PJSIPAndroidCall(Context context, PJSIPAndroidAccount acc) {
-        super(acc);
-        account = acc;
-        this.context = context;
+    public PJSIPAndroidCall(PJSIPAndroidAccount account) {
+        super(account);
+        this.account = account;
     }
 
     @Override
@@ -114,7 +108,7 @@ public class PJSIPAndroidCall extends Call {
                     audioMedia.startTransmit(mgr.getPlaybackDevMedia());
                     mgr.getCaptureDevMedia().startTransmit(audioMedia);
                 } catch (Exception exc) {
-                    continue;
+                    Log.d(LOG_TAG, "Error while connecting audio media to sound device", exc);
                 }
             }
         }
