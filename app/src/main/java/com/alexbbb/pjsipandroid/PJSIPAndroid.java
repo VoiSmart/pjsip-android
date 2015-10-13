@@ -87,15 +87,16 @@ public class PJSIPAndroid {
      * @return SIP account ID string (e.g. sip:user@domain.com)
      * @throws Exception if an initialization error occurs
      */
-    public static synchronized String add(PJSIPAndroidAccount account) throws Exception {
+    public static synchronized String add(PJSIPAccountData account) throws Exception {
 
         start();
 
-        String accountString = account.getData().getIdUri();
+        String accountString = account.getIdUri();
 
         if (!mSipAccounts.containsKey(accountString)) {
-            account.create();
-            mSipAccounts.put(accountString, account);
+            PJSIPAndroidAccount pjSipAndroidAccount = new PJSIPAndroidAccount(account);
+            pjSipAndroidAccount.create();
+            mSipAccounts.put(accountString, pjSipAndroidAccount);
         }
 
         return accountString;
