@@ -51,10 +51,11 @@ public class PJSIPAndroidCall extends Call {
     public void onCallState(OnCallStateParam prm) {
         try {
             CallInfo info = getInfo();
+            int callID = info.getId();
+            pjsip_inv_state callState = info.getState();
 
             PJSIPAndroid.getBroadcastEmitter()
-                        .callState(account.getData().getIdUri(),
-                                   info.getId(), info.getState().swigValue());
+                        .callState(account.getData().getIdUri(), callID, callState.swigValue());
 
             /**
              * From: http://www.pjsip.org/docs/book-latest/html/call.html#call-disconnection
@@ -64,10 +65,10 @@ public class PJSIPAndroidCall extends Call {
              * invoked to the call object will raise error exception.
              * Thus, it is recommended to delete the call object inside the callback.
              */
-            if (info.getState() == pjsip_inv_state.PJSIP_INV_STATE_DISCONNECTED) {
+            if (callState == pjsip_inv_state.PJSIP_INV_STATE_DISCONNECTED) {
                 PJSIPAndroid.stopRingTone();
-                account.removeCall(getId());
-            } else if (info.getState() == pjsip_inv_state.PJSIP_INV_STATE_CONFIRMED) {
+                account.removeCall(callID);
+            } else if (callState == pjsip_inv_state.PJSIP_INV_STATE_CONFIRMED) {
                 PJSIPAndroid.stopRingTone();
             }
 
