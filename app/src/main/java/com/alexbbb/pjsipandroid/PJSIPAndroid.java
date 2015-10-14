@@ -142,6 +142,19 @@ public class PJSIPAndroid {
     }
 
     /**
+     * Get an active call instance, given the Account ID and the Call ID.
+     * @param accountID (e.g. sip:user@domain.com)
+     * @param callID the id of the call
+     * @return the instance of the call or null if it doesn't exist
+     */
+    public static synchronized PJSIPAndroidCall getCall(String accountID, int callID) {
+        PJSIPAndroidAccount account = get(accountID);
+        if (account == null) return null;
+
+        return account.getCall(callID);
+    }
+
+    /**
      * Starts PJSIP Stack
      * @return true if the start is successful, otherwise false.
      */
