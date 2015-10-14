@@ -89,7 +89,6 @@ public class PJSIPAndroid {
      * @throws Exception if an initialization error occurs
      */
     public static synchronized String add(PJSIPAccountData account) throws Exception {
-
         start();
 
         String accountString = account.getIdUri();
@@ -105,7 +104,7 @@ public class PJSIPAndroid {
     }
 
     /**
-     * Removes a SIP Account and performs unregistration.
+     * Removes a SIP Account and performs un-registration.
      * @param accountID SIP account ID string (e.g. sip:user@domain.com)
      * @throws Exception if an error occurs while trying to remove the account
      */
