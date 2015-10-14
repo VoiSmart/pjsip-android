@@ -8,7 +8,6 @@ import org.pjsip.pjsua2.Call;
 import org.pjsip.pjsua2.CallInfo;
 import org.pjsip.pjsua2.CallMediaInfo;
 import org.pjsip.pjsua2.CallOpParam;
-import org.pjsip.pjsua2.CallSetting;
 import org.pjsip.pjsua2.Media;
 import org.pjsip.pjsua2.OnCallMediaStateParam;
 import org.pjsip.pjsua2.OnCallStateParam;
@@ -163,9 +162,7 @@ public class PJSIPAndroidCall extends Call {
         try {
             if (localHold) {
                 PJSIPAndroid.debugLog(LOG_TAG, "un-holding call with ID " + getId());
-                CallSetting callSetting = new CallSetting();
-                callSetting.setFlag(pjsua_call_flag.PJSUA_CALL_UNHOLD.swigValue());
-                param.setOpt(callSetting);
+                param.setOptions(pjsua_call_flag.PJSUA_CALL_UNHOLD.swigValue());
                 reinvite(param);
                 localHold = false;
             } else {
