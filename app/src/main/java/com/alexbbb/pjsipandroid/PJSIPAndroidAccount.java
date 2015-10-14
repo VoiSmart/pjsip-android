@@ -38,7 +38,7 @@ public class PJSIPAndroidAccount extends Account {
         PJSIPAndroidCall call = activeCalls.get(callId);
 
         if (call != null) {
-            Log.i(LOG_TAG, "Removing call with ID: " + callId);
+            PJSIPAndroid.debugLog(LOG_TAG, "Removing call with ID: " + callId);
             activeCalls.remove(callId);
         }
     }
@@ -51,7 +51,7 @@ public class PJSIPAndroidAccount extends Account {
 
         PJSIPAndroidCall call = new PJSIPAndroidCall(this, callId);
         activeCalls.put(callId, call);
-
+        PJSIPAndroid.debugLog(LOG_TAG, "Added incoming call with ID " + callId + " to " + data.getIdUri());
         return call;
     }
 
@@ -61,9 +61,8 @@ public class PJSIPAndroidAccount extends Account {
         CallOpParam callOpParam = new CallOpParam();
         try {
             call.makeCall("sip:" + numberToDial + "@" + data.getRealm(), callOpParam);
-
-            Log.d(LOG_TAG, "New outgoing call with ID: " + call.getId());
             activeCalls.put(call.getId(), call);
+            PJSIPAndroid.debugLog(LOG_TAG, "New outgoing call with ID: " + call.getId());
 
             return call;
 
@@ -102,7 +101,7 @@ public class PJSIPAndroidAccount extends Account {
 
         if (activeCalls.size() > 1) {
             call.declineIncomingCall();
-            Log.i(LOG_TAG, "Sending busy");
+            PJSIPAndroid.debugLog(LOG_TAG, "sending busy to call ID: " + prm.getCallId());
             //TODO: notification of missed call
             return;
         }

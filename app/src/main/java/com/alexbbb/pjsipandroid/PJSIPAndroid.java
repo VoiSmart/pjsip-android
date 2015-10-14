@@ -32,6 +32,7 @@ public class PJSIPAndroid {
     private static PowerManager.WakeLock mStackWakeLock;
     private static Ringtone mRingTone;
     private static PJSIPAndroidBroadcastEmitter mBroadcastEmitter;
+    private static boolean mDebugEnabled = false;
 
     // private constructor to avoid instantiation
     private PJSIPAndroid () {}
@@ -45,21 +46,21 @@ public class PJSIPAndroid {
 
         try {
             System.loadLibrary("openh264");
-            Log.i(LOG_TAG, "OpenH264 loaded");
+            debugLog(LOG_TAG, "OpenH264 loaded");
         } catch (UnsatisfiedLinkError error) {
             Log.e(LOG_TAG, "Error while loading OpenH264 native library", error);
         }
 
         try {
             System.loadLibrary("yuv");
-            Log.i(LOG_TAG, "libyuv loaded");
+            debugLog(LOG_TAG, "libyuv loaded");
         } catch (UnsatisfiedLinkError error) {
             Log.e(LOG_TAG, "Error while loading libyuv native library", error);
         }
 
         try {
             System.loadLibrary("pjsua2");
-            Log.i(LOG_TAG, "PJSUA2 Loaded");
+            debugLog(LOG_TAG, "PJSUA2 Loaded");
         } catch (UnsatisfiedLinkError error) {
             Log.e(LOG_TAG, "Error while loading PJSUA2 native library", error);
             throw new RuntimeException(error);
@@ -97,6 +98,7 @@ public class PJSIPAndroid {
             PJSIPAndroidAccount pjSipAndroidAccount = new PJSIPAndroidAccount(account);
             pjSipAndroidAccount.create();
             mSipAccounts.put(accountString, pjSipAndroidAccount);
+            debugLog(LOG_TAG, "SIP account " + account.getIdUri() + " successfully added");
         }
 
         return accountString;
@@ -115,11 +117,11 @@ public class PJSIPAndroid {
         PJSIPAndroidAccount account = mSipAccounts.get(accountID);
         if (account == null) throw new RuntimeException("No account for ID: " + accountID);
 
-        Log.i(LOG_TAG, "Removing SIP account " + accountID);
+        debugLog(LOG_TAG, "Removing SIP account" + accountID);
         account.setRegistration(false);
         account.delete();
         mSipAccounts.remove(accountID);
-        Log.i(LOG_TAG, "SIP account " + accountID + " successfully removed");
+        debugLog(LOG_TAG, "SIP account " + accountID + " successfully removed");
     }
 
     private static void checkAccountID(String accountID) {
@@ -180,7 +182,7 @@ public class PJSIPAndroid {
             mEndpoint.transportCreate(pjsip_transport_type_e.PJSIP_TRANSPORT_TCP, tcpTransport);
             mEndpoint.libStart();
 
-            Log.i(LOG_TAG, "PJSIP started");
+            debugLog(LOG_TAG, "PJSIP started");
             mStarted = true;
             return true;
 
@@ -214,7 +216,7 @@ public class PJSIPAndroid {
             mEndpoint.libDestroy();
             mEndpoint.delete();
 
-            Log.i(LOG_TAG, "PJSIP stopped");
+            debugLog(LOG_TAG, "PJSIP stopped");
 
         } finally {
             if (mStackWakeLock != null && mStackWakeLock.isHeld()) {
@@ -239,13 +241,13 @@ public class PJSIPAndroid {
 
     public static synchronized void startRingTone() {
         checkInitialization();
-
+        debugLog(LOG_TAG, "starting ringtone");
         mRingTone.play();
     }
 
     public static synchronized void stopRingTone() {
         checkInitialization();
-
+        debugLog(LOG_TAG, "stopping ringtone");
         mRingTone.stop();
     }
 
@@ -253,5 +255,19 @@ public class PJSIPAndroid {
         checkInitialization();
 
         return mBroadcastEmitter;
+    }
+
+    /**
+     * Enables or disables library debug log.
+     * @param value true to enable debug messages, false to disable them
+     */
+    public static synchronized void setDebugEnabled(boolean value) {
+        mDebugEnabled = value;
+    }
+
+    protected static synchronized void debugLog(String tag, String message) {
+        if (!mDebugEnabled) return;
+
+        Log.d(tag, message);
     }
 }

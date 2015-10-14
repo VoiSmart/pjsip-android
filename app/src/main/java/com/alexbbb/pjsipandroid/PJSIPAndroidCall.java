@@ -107,7 +107,7 @@ public class PJSIPAndroidCall extends Call {
                     audioMedia.startTransmit(mgr.getPlaybackDevMedia());
                     mgr.getCaptureDevMedia().startTransmit(audioMedia);
                 } catch (Exception exc) {
-                    Log.d(LOG_TAG, "Error while connecting audio media to sound device", exc);
+                    Log.e(LOG_TAG, "Error while connecting audio media to sound device", exc);
                 }
             }
         }
@@ -162,14 +162,14 @@ public class PJSIPAndroidCall extends Call {
 
         try {
             if (localHold) {
-                Log.d(LOG_TAG, "un-holding call");
+                PJSIPAndroid.debugLog(LOG_TAG, "un-holding call with ID " + getId());
                 CallSetting callSetting = new CallSetting();
                 callSetting.setFlag(pjsua_call_flag.PJSUA_CALL_UNHOLD.swigValue());
                 param.setOpt(callSetting);
                 reinvite(param);
                 localHold = false;
             } else {
-                Log.d(LOG_TAG, "holding call");
+                PJSIPAndroid.debugLog(LOG_TAG, "holding call with ID " + getId());
                 setHold(param);
                 localHold = true;
             }
