@@ -8,12 +8,14 @@ import org.pjsip.pjsua2.Call;
 import org.pjsip.pjsua2.CallInfo;
 import org.pjsip.pjsua2.CallMediaInfo;
 import org.pjsip.pjsua2.CallOpParam;
+import org.pjsip.pjsua2.CallSetting;
 import org.pjsip.pjsua2.Media;
 import org.pjsip.pjsua2.OnCallMediaStateParam;
 import org.pjsip.pjsua2.OnCallStateParam;
 import org.pjsip.pjsua2.pjmedia_type;
 import org.pjsip.pjsua2.pjsip_inv_state;
 import org.pjsip.pjsua2.pjsip_status_code;
+import org.pjsip.pjsua2.pjsua_call_flag;
 import org.pjsip.pjsua2.pjsua_call_media_status;
 
 /**
@@ -160,8 +162,12 @@ public class PJSIPAndroidCall extends Call {
 
         try {
             if (localHold) {
+                // http://lists.pjsip.org/pipermail/pjsip_lists.pjsip.org/2015-March/018246.html
                 PJSIPAndroid.debugLog(LOG_TAG, "un-holding call with ID " + getId());
-                param.getOpt().setFlag(1); // PJSUA_CALL_UNHOLD = 1
+                CallSetting opt = param.getOpt();
+                opt.setAudioCount(1);
+                opt.setVideoCount(0);
+                opt.setFlag(pjsua_call_flag.PJSUA_CALL_UNHOLD.swigValue());
                 reinvite(param);
                 localHold = false;
             } else {
