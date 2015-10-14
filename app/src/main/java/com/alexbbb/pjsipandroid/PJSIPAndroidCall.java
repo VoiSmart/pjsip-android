@@ -167,7 +167,7 @@ public class PJSIPAndroidCall extends Call {
                 localHold = false;
             } else {
                 Log.d(LOG_TAG, "holding call");
-                setHold(param);
+                setHold(null);
                 localHold = true;
             }
 
