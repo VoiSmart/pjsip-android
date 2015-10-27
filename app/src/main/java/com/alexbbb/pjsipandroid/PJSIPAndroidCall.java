@@ -157,6 +157,27 @@ public class PJSIPAndroidCall extends Call {
         }
     }
 
+    /**
+     * Utility method to transfer a call to a number in the same realm as the account to
+     * which this call belongs to. If you want to transfer the call to a different realm, you
+     * have to pass the full string in this format: sip:NUMBER@REALM. E.g. sip:200@mycompany.com
+     * @param destination destination to which to transfer the call.
+     * @throws Exception if an error occurs during the call transfer
+     */
+    public void transferTo(String destination) throws Exception {
+        String transferString;
+
+        if (destination.startsWith("sip:")) {
+            transferString = destination;
+        } else {
+            transferString = "sip:" + destination + "@" + account.getData().getRealm();
+        }
+
+        CallOpParam param = new CallOpParam();
+
+        xfer(transferString, param);
+    }
+
     public void setHold(boolean hold) {
         // return immediately if we are not changing the current state
         if ((localHold && hold) || (!localHold && !hold)) return;
