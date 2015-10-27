@@ -158,7 +158,8 @@ public class PJSIPAndroidCall extends Call {
     }
 
     public void setHold(boolean hold) {
-        if (localHold && hold) return;
+        // return immediately if we are not changing the current state
+        if ((localHold && hold) || (!localHold && !hold)) return;
 
         CallOpParam param = new CallOpParam();
 
