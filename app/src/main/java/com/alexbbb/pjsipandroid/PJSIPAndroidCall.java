@@ -158,19 +158,53 @@ public class PJSIPAndroidCall extends Call {
         }
     }
 
+    /**
+     * Utility method to mute/unmute the device microphone during a call.
+     * @param mute true to mute the microphone, false to un-mute it
+     * @throws Exception if an error occurs during the mute/unmute operation
+     */
     public void setMute(boolean mute) throws Exception {
         // return immediately if we are not changing the current state
         if ((localMute && mute) || (!localMute && !mute)) return;
 
-        AudioMedia playback = PJSIPAndroid.getAudDevManager().getPlaybackDevMedia();
-
-        if (mute) {
-            PJSIPAndroid.getAudDevManager().getCaptureDevMedia().stopTransmit(playback);
-            localMute = true;
-        } else {
-            PJSIPAndroid.getAudDevManager().getCaptureDevMedia().startTransmit(playback);
-            localMute = false;
+        CallInfo info;
+        try {
+            info = getInfo();
+        } catch (Exception exc) {
+            Log.e(LOG_TAG, "setMute: error while getting call info", exc);
+            return;
         }
+
+        for (int i = 0; i < info.getMedia().size(); i++) {
+            Media media = getMedia(i);
+            CallMediaInfo mediaInfo = info.getMedia().get(i);
+
+            if (mediaInfo.getType() == pjmedia_type.PJMEDIA_TYPE_AUDIO
+                    && media != null
+                    && mediaInfo.getStatus() == pjsua_call_media_status.PJSUA_CALL_MEDIA_ACTIVE) {
+                AudioMedia audioMedia = AudioMedia.typecastFromMedia(media);
+
+                // connect or disconnect the captured audio
+                try {
+                    AudDevManager mgr = PJSIPAndroid.getAudDevManager();
+
+                    if (mute) {
+                        mgr.getCaptureDevMedia().stopTransmit(audioMedia);
+                        localMute = true;
+                    } else {
+                        mgr.getCaptureDevMedia().startTransmit(audioMedia);
+                        localMute = false;
+                    }
+
+                } catch (Exception exc) {
+                    Log.e(LOG_TAG, "setMute: error while connecting audio media to sound device", exc);
+                }
+            }
+        }
+    }
+
+    public boolean isLocalMute() {
+        return localMute;
     }
 
     /**
@@ -228,6 +262,10 @@ public class PJSIPAndroidCall extends Call {
         }
 
         setHold(true);
+        return localHold;
+    }
+
+    public boolean isLocalHold() {
         return localHold;
     }
 }
