@@ -163,7 +163,7 @@ public class PJSIPAndroidCall extends Call {
      * @param mute true to mute the microphone, false to un-mute it
      * @throws Exception if an error occurs during the mute/unmute operation
      */
-    public void setMute(boolean mute) throws Exception {
+    public void setMute(boolean mute) {
         // return immediately if we are not changing the current state
         if ((localMute && mute) || (!localMute && !mute)) return;
 
@@ -205,6 +205,16 @@ public class PJSIPAndroidCall extends Call {
 
     public boolean isLocalMute() {
         return localMute;
+    }
+
+    public boolean toggleMute() {
+        if (localMute) {
+            setMute(false);
+            return !localHold;
+        }
+
+        setMute(true);
+        return localHold;
     }
 
     /**
