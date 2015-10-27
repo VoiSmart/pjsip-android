@@ -157,11 +157,17 @@ public class PJSIPAndroidCall extends Call {
         }
     }
 
-    public boolean toggleHold() {
+    public void setHold(boolean hold) {
+        if (localHold && hold) return;
+
         CallOpParam param = new CallOpParam();
 
         try {
-            if (localHold) {
+            if (hold) {
+                PJSIPAndroid.debugLog(LOG_TAG, "holding call with ID " + getId());
+                setHold(param);
+                localHold = true;
+            } else {
                 // http://lists.pjsip.org/pipermail/pjsip_lists.pjsip.org/2015-March/018246.html
                 PJSIPAndroid.debugLog(LOG_TAG, "un-holding call with ID " + getId());
                 CallSetting opt = param.getOpt();
@@ -170,17 +176,20 @@ public class PJSIPAndroidCall extends Call {
                 opt.setFlag(pjsua_call_flag.PJSUA_CALL_UNHOLD.swigValue());
                 reinvite(param);
                 localHold = false;
-            } else {
-                PJSIPAndroid.debugLog(LOG_TAG, "holding call with ID " + getId());
-                setHold(param);
-                localHold = true;
             }
-
-            return true;
         } catch (Exception exc) {
-            String operation = localHold ? "unhold" : "hold";
+            String operation = hold ? "hold" : "unhold";
             Log.e(LOG_TAG, "Error while trying to " + operation + " call", exc);
-            return false;
         }
+    }
+
+    public boolean toggleHold() {
+        if (localHold) {
+            setHold(false);
+            return !localHold;
+        }
+
+        setHold(true);
+        return localHold;
     }
 }
