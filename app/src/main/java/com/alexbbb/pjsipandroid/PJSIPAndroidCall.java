@@ -28,6 +28,7 @@ public class PJSIPAndroidCall extends Call {
 
     private PJSIPAndroidAccount account;
     private boolean localHold = false;
+    private boolean localMute = false;
 
     /**
      * Incoming call constructor.
@@ -154,6 +155,21 @@ public class PJSIPAndroidCall extends Call {
             hangup(param);
         } catch (Exception exc) {
             Log.e(LOG_TAG, "Failed to hangUp call", exc);
+        }
+    }
+
+    public void setMute(boolean mute) throws Exception {
+        // return immediately if we are not changing the current state
+        if ((localMute && mute) || (!localMute && !mute)) return;
+
+        AudioMedia playback = PJSIPAndroid.getAudDevManager().getPlaybackDevMedia();
+
+        if (mute) {
+            PJSIPAndroid.getAudDevManager().getCaptureDevMedia().stopTransmit(playback);
+            localMute = true;
+        } else {
+            PJSIPAndroid.getAudDevManager().getCaptureDevMedia().startTransmit(playback);
+            localMute = false;
         }
     }
 
