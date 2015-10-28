@@ -18,6 +18,8 @@ import org.pjsip.pjsua2.pjsip_status_code;
 import org.pjsip.pjsua2.pjsua_call_flag;
 import org.pjsip.pjsua2.pjsua_call_media_status;
 
+import java.util.Date;
+
 /**
  * Wrapper around PJSUA2 Call object.
  * @author alexbbb (Aleksandar Gotev)
@@ -29,6 +31,7 @@ public class PJSIPAndroidCall extends Call {
     private PJSIPAndroidAccount account;
     private boolean localHold = false;
     private boolean localMute = false;
+    private long connectTimestamp = 0;
 
     /**
      * Incoming call constructor.
@@ -72,6 +75,7 @@ public class PJSIPAndroidCall extends Call {
                 account.removeCall(callID);
             } else if (callState == pjsip_inv_state.PJSIP_INV_STATE_CONFIRMED) {
                 PJSIPAndroid.stopRingTone();
+                connectTimestamp = new Date().getTime();
             }
 
         } catch (Exception exc) {
@@ -112,6 +116,15 @@ public class PJSIPAndroidCall extends Call {
                 }
             }
         }
+    }
+
+    /**
+     * Get the total duration of the call.
+     * @return the duration in milliseconds or 0 if the call is not connected.
+     */
+    public long getConnectDurationMillis() {
+        if (connectTimestamp <= 0) return 0;
+        return (new Date().getTime() - connectTimestamp);
     }
 
     public void acceptIncomingCall() {
