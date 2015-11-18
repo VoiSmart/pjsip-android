@@ -185,14 +185,14 @@ public class PJSIPAndroidCall extends Call {
 
         if (enabled) {
             try {
-                audioManager.setOutputRoute(pjmedia_aud_dev_route.PJMEDIA_AUD_DEV_ROUTE_LOUDSPEAKER);
+                audioManager.setInputRoute(pjmedia_aud_dev_route.PJMEDIA_AUD_DEV_ROUTE_LOUDSPEAKER);
                 loudspeaker = true;
             } catch (Exception exc) {
                 Log.e(LOG_TAG, "Error while enabling loudspeaker", exc);
             }
         } else {
             try {
-                audioManager.setOutputRoute(pjmedia_aud_dev_route.PJMEDIA_AUD_DEV_ROUTE_DEFAULT);
+                audioManager.setInputRoute(pjmedia_aud_dev_route.PJMEDIA_AUD_DEV_ROUTE_DEFAULT);
                 loudspeaker = false;
             } catch (Exception exc) {
                 Log.e(LOG_TAG, "Error while disabling loudspeaker", exc);
