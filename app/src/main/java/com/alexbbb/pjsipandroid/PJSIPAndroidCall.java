@@ -12,6 +12,7 @@ import org.pjsip.pjsua2.CallSetting;
 import org.pjsip.pjsua2.Media;
 import org.pjsip.pjsua2.OnCallMediaStateParam;
 import org.pjsip.pjsua2.OnCallStateParam;
+import org.pjsip.pjsua2.pjmedia_aud_dev_route;
 import org.pjsip.pjsua2.pjmedia_type;
 import org.pjsip.pjsua2.pjsip_inv_state;
 import org.pjsip.pjsua2.pjsip_status_code;
@@ -31,6 +32,7 @@ public class PJSIPAndroidCall extends Call {
     private PJSIPAndroidAccount account;
     private boolean localHold = false;
     private boolean localMute = false;
+    private boolean loudspeaker = false;
     private long connectTimestamp = 0;
 
     /**
@@ -169,6 +171,39 @@ public class PJSIPAndroidCall extends Call {
         } catch (Exception exc) {
             Log.e(LOG_TAG, "Failed to hangUp call", exc);
         }
+    }
+
+    /**
+     * Utility method to enable/disable loudspeaker.
+     * @param enabled true to enable loudspeaker, false to disable it
+     */
+    public void setLoudspeaker(boolean enabled) {
+        // return immediately if we are not changing the current state
+        if (loudspeaker == enabled) return;
+
+        AudDevManager audioManager = PJSIPAndroid.getAudDevManager();
+
+        if (enabled) {
+            try {
+                audioManager.setOutputRoute(pjmedia_aud_dev_route.PJMEDIA_AUD_DEV_ROUTE_LOUDSPEAKER);
+                loudspeaker = true;
+            } catch (Exception exc) { }
+        } else {
+            try {
+                audioManager.setOutputRoute(pjmedia_aud_dev_route.PJMEDIA_AUD_DEV_ROUTE_DEFAULT);
+                loudspeaker = false;
+            } catch (Exception exc) { }
+        }
+    }
+
+    public boolean toggleLoudspeaker() {
+        if (loudspeaker) {
+            setLoudspeaker(false);
+            return !loudspeaker;
+        }
+
+        setLoudspeaker(true);
+        return loudspeaker;
     }
 
     /**
