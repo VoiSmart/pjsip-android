@@ -117,7 +117,6 @@ public class PJSIPAndroid {
         if (account == null) throw new RuntimeException("No account for ID: " + accountID);
 
         debugLog(LOG_TAG, "Removing SIP account" + accountID);
-        account.setRegistration(false);
         account.delete();
         mSipAccounts.remove(accountID);
         debugLog(LOG_TAG, "SIP account " + accountID + " successfully removed");
