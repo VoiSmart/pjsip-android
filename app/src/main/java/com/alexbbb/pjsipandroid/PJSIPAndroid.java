@@ -179,6 +179,7 @@ public class PJSIPAndroid {
             mEndpoint.transportCreate(pjsip_transport_type_e.PJSIP_TRANSPORT_UDP, udpTransport);
             mEndpoint.transportCreate(pjsip_transport_type_e.PJSIP_TRANSPORT_TCP, tcpTransport);
             mEndpoint.libStart();
+            mEndpoint.codecSetPriority("G729/8000", (short) 255);
 
             debugLog(LOG_TAG, "PJSIP started");
             mStarted = true;
