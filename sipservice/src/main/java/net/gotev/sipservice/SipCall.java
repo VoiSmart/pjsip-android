@@ -1,4 +1,4 @@
-package com.alexbbb.pjsipandroid;
+package net.gotev.sipservice;
 
 import android.util.Log;
 
@@ -22,13 +22,13 @@ import java.util.Date;
 
 /**
  * Wrapper around PJSUA2 Call object.
- * @author alexbbb (Aleksandar Gotev)
+ * @author gotev (Aleksandar Gotev)
  */
-public class PJSIPAndroidCall extends Call {
+public class SipCall extends Call {
 
-    private static final String LOG_TAG = "PJSIPCall";
+    private static final String LOG_TAG = "SipCall";
 
-    private PJSIPAndroidAccount account;
+    private SipAccount account;
     private boolean localHold = false;
     private boolean localMute = false;
     private long connectTimestamp = 0;
@@ -38,7 +38,7 @@ public class PJSIPAndroidCall extends Call {
      * @param account the account which own this call
      * @param callID the id of this call
      */
-    public PJSIPAndroidCall(PJSIPAndroidAccount account, int callID) {
+    public SipCall(SipAccount account, int callID) {
         super(account, callID);
         this.account = account;
     }
@@ -47,7 +47,7 @@ public class PJSIPAndroidCall extends Call {
      * Outgoing call constructor.
      * @param account account which owns this call
      */
-    public PJSIPAndroidCall(PJSIPAndroidAccount account) {
+    public SipCall(SipAccount account) {
         super(account);
         this.account = account;
     }
@@ -59,8 +59,8 @@ public class PJSIPAndroidCall extends Call {
             int callID = info.getId();
             pjsip_inv_state callState = info.getState();
 
-            PJSIPAndroid.getBroadcastEmitter()
-                        .callState(account.getData().getIdUri(), callID, callState.swigValue());
+            account.getService().getBroadcastEmitter()
+                   .callState(account.getData().getIdUri(), callID, callState.swigValue());
 
             /**
              * From: http://www.pjsip.org/docs/book-latest/html/call.html#call-disconnection
@@ -71,10 +71,10 @@ public class PJSIPAndroidCall extends Call {
              * Thus, it is recommended to delete the call object inside the callback.
              */
             if (callState == pjsip_inv_state.PJSIP_INV_STATE_DISCONNECTED) {
-                PJSIPAndroid.stopRingTone();
+                account.getService().stopRingtone();
                 account.removeCall(callID);
             } else if (callState == pjsip_inv_state.PJSIP_INV_STATE_CONFIRMED) {
-                PJSIPAndroid.stopRingTone();
+                account.getService().stopRingtone();
                 connectTimestamp = new Date().getTime();
             }
 
@@ -104,11 +104,11 @@ public class PJSIPAndroidCall extends Call {
                     && mediaInfo.getStatus() == pjsua_call_media_status.PJSUA_CALL_MEDIA_ACTIVE) {
                 AudioMedia audioMedia = AudioMedia.typecastFromMedia(media);
 
-                PJSIPAndroid.stopRingTone();
+                account.getService().stopRingtone();
 
                 // connect the call audio media to sound device
                 try {
-                    AudDevManager mgr = PJSIPAndroid.getAudDevManager();
+                    AudDevManager mgr = account.getService().getAudDevManager();
                     audioMedia.startTransmit(mgr.getPlaybackDevMedia());
                     mgr.getCaptureDevMedia().startTransmit(audioMedia);
                 } catch (Exception exc) {
@@ -199,7 +199,7 @@ public class PJSIPAndroidCall extends Call {
 
                 // connect or disconnect the captured audio
                 try {
-                    AudDevManager mgr = PJSIPAndroid.getAudDevManager();
+                    AudDevManager mgr = account.getService().getAudDevManager();
 
                     if (mute) {
                         mgr.getCaptureDevMedia().stopTransmit(audioMedia);
@@ -259,12 +259,12 @@ public class PJSIPAndroidCall extends Call {
 
         try {
             if (hold) {
-                PJSIPAndroid.debugLog(LOG_TAG, "holding call with ID " + getId());
+                account.getService().debug(LOG_TAG, "holding call with ID " + getId());
                 setHold(param);
                 localHold = true;
             } else {
                 // http://lists.pjsip.org/pipermail/pjsip_lists.pjsip.org/2015-March/018246.html
-                PJSIPAndroid.debugLog(LOG_TAG, "un-holding call with ID " + getId());
+                account.getService().debug(LOG_TAG, "un-holding call with ID " + getId());
                 CallSetting opt = param.getOpt();
                 opt.setAudioCount(1);
                 opt.setVideoCount(0);

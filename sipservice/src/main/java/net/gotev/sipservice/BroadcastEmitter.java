@@ -1,16 +1,17 @@
-package com.alexbbb.pjsipandroid;
+package net.gotev.sipservice;
 
 import android.content.Context;
 import android.content.Intent;
 
 /**
  * Emits the broadcast intents.
- * @author alexbbb (Aleksandar Gotev)
+ * @author gotev (Aleksandar Gotev)
  */
-public class PJSIPAndroidBroadcastEmitter {
+public class BroadcastEmitter {
+
+    public static final String NAMESPACE = "net.gotev";
 
     private Context mContext;
-    private String mNamespace;
 
     /**
      * Enumeration of the broadcast actions
@@ -33,13 +34,12 @@ public class PJSIPAndroidBroadcastEmitter {
         public static final String CALL_STATE = "call_state";
     }
 
-    public PJSIPAndroidBroadcastEmitter(Context context, String namespace) {
+    public BroadcastEmitter(Context context) {
         mContext = context;
-        mNamespace = namespace;
     }
 
-    public String getAction(BroadcastAction action) {
-        return mNamespace + "." + action;
+    public static String getAction(BroadcastAction action) {
+        return NAMESPACE + "." + action;
     }
 
     /**

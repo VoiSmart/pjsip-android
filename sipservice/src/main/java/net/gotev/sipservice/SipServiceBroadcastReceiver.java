@@ -1,26 +1,27 @@
-package com.alexbbb.pjsipandroid;
+package net.gotev.sipservice;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.util.Log;
 
-import com.alexbbb.pjsipandroid.PJSIPAndroidBroadcastEmitter.BroadcastParameters;
+import net.gotev.sipservice.BroadcastEmitter.BroadcastParameters;
 
 import org.pjsip.pjsua2.pjsip_inv_state;
 import org.pjsip.pjsua2.pjsip_status_code;
 
-import static com.alexbbb.pjsipandroid.PJSIPAndroidBroadcastEmitter.BroadcastAction.CALL_STATE;
-import static com.alexbbb.pjsipandroid.PJSIPAndroidBroadcastEmitter.BroadcastAction.INCOMING_CALL;
-import static com.alexbbb.pjsipandroid.PJSIPAndroidBroadcastEmitter.BroadcastAction.REGISTRATION;
+import static net.gotev.sipservice.BroadcastEmitter.BroadcastAction.CALL_STATE;
+import static net.gotev.sipservice.BroadcastEmitter.BroadcastAction.INCOMING_CALL;
+import static net.gotev.sipservice.BroadcastEmitter.BroadcastAction.REGISTRATION;
 
 /**
  * Reference implementation to receive events emitted by the PJSIP Android library.
- * @author alexbbb (Aleksandar Gotev)
+ * @author gotev (Aleksandar Gotev)
  */
-public class PJSIPAndroidBroadcastReceiver extends BroadcastReceiver {
+public class SipServiceBroadcastReceiver extends BroadcastReceiver {
 
-    private static final String LOG_TAG = "PJSIPAndroidBR";
+    private static final String LOG_TAG = "SipServiceBR";
 
     private Context receiverContext;
 
@@ -33,20 +34,19 @@ public class PJSIPAndroidBroadcastReceiver extends BroadcastReceiver {
         receiverContext = context;
 
         String action = intent.getAction();
-        PJSIPAndroidBroadcastEmitter broadcastEmitter = PJSIPAndroid.getBroadcastEmitter();
 
-        if (action.equals(broadcastEmitter.getAction(REGISTRATION))) {
+        if (action.equals(BroadcastEmitter.getAction(REGISTRATION))) {
             int stateCode = intent.getIntExtra(BroadcastParameters.CODE, -1);
             onRegistration(intent.getStringExtra(BroadcastParameters.ACCOUNT_ID),
                            pjsip_status_code.swigToEnum(stateCode));
 
-        } else if (action.equals(broadcastEmitter.getAction(INCOMING_CALL))) {
+        } else if (action.equals(BroadcastEmitter.getAction(INCOMING_CALL))) {
             onIncomingCall(intent.getStringExtra(BroadcastParameters.ACCOUNT_ID),
                            intent.getIntExtra(BroadcastParameters.CALL_ID, -1),
                            intent.getStringExtra(BroadcastParameters.DISPLAY_NAME),
                            intent.getStringExtra(BroadcastParameters.REMOTE_URI));
 
-        } else if (action.equals(broadcastEmitter.getAction(CALL_STATE))) {
+        } else if (action.equals(BroadcastEmitter.getAction(CALL_STATE))) {
             int callState = intent.getIntExtra(BroadcastParameters.CALL_STATE, -1);
             onCallState(intent.getStringExtra(BroadcastParameters.ACCOUNT_ID),
                         intent.getIntExtra(BroadcastParameters.CALL_ID, -1),
@@ -65,12 +65,11 @@ public class PJSIPAndroidBroadcastReceiver extends BroadcastReceiver {
      * @param context context in which to register this receiver
      */
     public void register(final Context context) {
-        PJSIPAndroidBroadcastEmitter broadcastEmitter = PJSIPAndroid.getBroadcastEmitter();
 
         final IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(broadcastEmitter.getAction(REGISTRATION));
-        intentFilter.addAction(broadcastEmitter.getAction(INCOMING_CALL));
-        intentFilter.addAction(broadcastEmitter.getAction(CALL_STATE));
+        intentFilter.addAction(BroadcastEmitter.getAction(REGISTRATION));
+        intentFilter.addAction(BroadcastEmitter.getAction(INCOMING_CALL));
+        intentFilter.addAction(BroadcastEmitter.getAction(CALL_STATE));
         context.registerReceiver(this, intentFilter);
     }
 
@@ -85,19 +84,19 @@ public class PJSIPAndroidBroadcastReceiver extends BroadcastReceiver {
     }
 
     public void onRegistration(String accountID, pjsip_status_code registrationStateCode) {
-        PJSIPAndroid.debugLog(LOG_TAG, "onRegistration - accountID: " + accountID +
+        Log.d(LOG_TAG, "onRegistration - accountID: " + accountID +
                 ", registrationStateCode: " + registrationStateCode);
     }
 
     public void onIncomingCall(String accountID, int callID, String displayName, String remoteUri) {
-        PJSIPAndroid.debugLog(LOG_TAG, "onIncomingCall - accountID: " + accountID +
+        Log.d(LOG_TAG, "onIncomingCall - accountID: " + accountID +
                 ", callID: " + callID +
                 ", displayName: " + displayName +
                 ", remoteUri: " + remoteUri);
     }
 
     public void onCallState(String accountID, int callID, pjsip_inv_state callStateCode) {
-        PJSIPAndroid.debugLog(LOG_TAG, "onCallState - accountID: " + accountID +
+        Log.d(LOG_TAG, "onCallState - accountID: " + accountID +
                 ", callID: " + callID +
                 ", callStateCode: " + callStateCode);
     }

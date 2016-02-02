@@ -1,13 +1,16 @@
-package com.alexbbb.pjsipandroid;
+package net.gotev.sipservice;
+
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import org.pjsip.pjsua2.AccountConfig;
 import org.pjsip.pjsua2.AuthCredInfo;
 
 /**
  * Contains the account's configuration data.
- * @author alexbbb (Aleksandar Gotev)
+ * @author gotev (Aleksandar Gotev)
  */
-public class PJSIPAccountData {
+public class SipAccountData implements Parcelable {
 
     private String username;
     private String password;
@@ -16,11 +19,52 @@ public class PJSIPAccountData {
     private long port = 5060;
     private boolean tcpTransport = false;
 
+    public SipAccountData() { }
+
+    // This is used to regenerate the object.
+    // All Parcelables must have a CREATOR that implements these two methods
+    public static final Parcelable.Creator<SipAccountData> CREATOR =
+            new Parcelable.Creator<SipAccountData>() {
+                @Override
+                public SipAccountData createFromParcel(final Parcel in) {
+                    return new SipAccountData(in);
+                }
+
+                @Override
+                public SipAccountData[] newArray(final int size) {
+                    return new SipAccountData[size];
+                }
+            };
+
+    @Override
+    public void writeToParcel(Parcel parcel, int arg1) {
+        parcel.writeString(username);
+        parcel.writeString(password);
+        parcel.writeString(realm);
+        parcel.writeString(host);
+        parcel.writeLong(port);
+        parcel.writeByte((byte) (tcpTransport ? 1 : 0));
+    }
+
+    private SipAccountData(Parcel in) {
+        username = in.readString();
+        password = in.readString();
+        realm = in.readString();
+        host = in.readString();
+        port = in.readLong();
+        tcpTransport = in.readByte() == 1;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
     public String getUsername() {
         return username;
     }
 
-    public PJSIPAccountData setUsername(String username) {
+    public SipAccountData setUsername(String username) {
         this.username = username;
         return this;
     }
@@ -29,7 +73,7 @@ public class PJSIPAccountData {
         return password;
     }
 
-    public PJSIPAccountData setPassword(String password) {
+    public SipAccountData setPassword(String password) {
         this.password = password;
         return this;
     }
@@ -38,7 +82,7 @@ public class PJSIPAccountData {
         return realm;
     }
 
-    public PJSIPAccountData setRealm(String realm) {
+    public SipAccountData setRealm(String realm) {
         this.realm = realm;
         return this;
     }
@@ -47,7 +91,7 @@ public class PJSIPAccountData {
         return host;
     }
 
-    public PJSIPAccountData setHost(String host) {
+    public SipAccountData setHost(String host) {
         this.host = host;
         return this;
     }
@@ -56,7 +100,7 @@ public class PJSIPAccountData {
         return port;
     }
 
-    public PJSIPAccountData setPort(long port) {
+    public SipAccountData setPort(long port) {
         this.port = port;
         return this;
     }
@@ -65,7 +109,7 @@ public class PJSIPAccountData {
         return tcpTransport;
     }
 
-    public PJSIPAccountData setTcpTransport(boolean tcpTransport) {
+    public SipAccountData setTcpTransport(boolean tcpTransport) {
         this.tcpTransport = tcpTransport;
         return this;
     }
@@ -114,7 +158,7 @@ public class PJSIPAccountData {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        PJSIPAccountData that = (PJSIPAccountData) o;
+        SipAccountData that = (SipAccountData) o;
 
         if (port != that.port) return false;
         if (tcpTransport != that.tcpTransport) return false;

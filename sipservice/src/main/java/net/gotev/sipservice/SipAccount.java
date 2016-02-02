@@ -1,4 +1,4 @@
-package com.alexbbb.pjsipandroid;
+package net.gotev.sipservice;
 
 import android.util.Log;
 
@@ -12,21 +12,27 @@ import java.util.HashMap;
 
 /**
  * Wrapper around PJSUA2 Account object.
- * @author alexbbb (Aleksandar Gotev)
+ * @author gotev (Aleksandar Gotev)
  */
-public class PJSIPAndroidAccount extends Account {
+public class SipAccount extends Account {
 
     private static final String LOG_TAG = "PJSIPAndroidAccount";
 
-    private HashMap<Integer, PJSIPAndroidCall> activeCalls = new HashMap<>();
-    private PJSIPAccountData data;
+    private HashMap<Integer, SipCall> activeCalls = new HashMap<>();
+    private SipAccountData data;
+    private SipService service;
 
-    protected PJSIPAndroidAccount(PJSIPAccountData data) {
+    protected SipAccount(SipService service, SipAccountData data) {
         super();
+        this.service = service;
         this.data = data;
     }
 
-    public PJSIPAccountData getData() {
+    public SipService getService() {
+        return service;
+    }
+
+    public SipAccountData getData() {
         return data;
     }
 
@@ -35,34 +41,34 @@ public class PJSIPAndroidAccount extends Account {
     }
 
     protected void removeCall(int callId) {
-        PJSIPAndroidCall call = activeCalls.get(callId);
+        SipCall call = activeCalls.get(callId);
 
         if (call != null) {
-            PJSIPAndroid.debugLog(LOG_TAG, "Removing call with ID: " + callId);
+            service.debug(LOG_TAG, "Removing call with ID: " + callId);
             activeCalls.remove(callId);
         }
     }
 
-    public PJSIPAndroidCall getCall(int callId) {
+    public SipCall getCall(int callId) {
         return activeCalls.get(callId);
     }
 
-    public PJSIPAndroidCall addIncomingCall(int callId) {
+    public SipCall addIncomingCall(int callId) {
 
-        PJSIPAndroidCall call = new PJSIPAndroidCall(this, callId);
+        SipCall call = new SipCall(this, callId);
         activeCalls.put(callId, call);
-        PJSIPAndroid.debugLog(LOG_TAG, "Added incoming call with ID " + callId + " to " + data.getIdUri());
+        service.debug(LOG_TAG, "Added incoming call with ID " + callId + " to " + data.getIdUri());
         return call;
     }
 
-    public PJSIPAndroidCall addOutgoingCall(final String numberToDial) {
-        PJSIPAndroidCall call = new PJSIPAndroidCall(this);
+    public SipCall addOutgoingCall(final String numberToDial) {
+        SipCall call = new SipCall(this);
 
         CallOpParam callOpParam = new CallOpParam();
         try {
             call.makeCall("sip:" + numberToDial + "@" + data.getRealm(), callOpParam);
             activeCalls.put(call.getId(), call);
-            PJSIPAndroid.debugLog(LOG_TAG, "New outgoing call with ID: " + call.getId());
+            service.debug(LOG_TAG, "New outgoing call with ID: " + call.getId());
 
             return call;
 
@@ -77,7 +83,7 @@ public class PJSIPAndroidAccount extends Account {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        PJSIPAndroidAccount that = (PJSIPAndroidAccount) o;
+        SipAccount that = (SipAccount) o;
 
         return data.equals(that.data);
 
@@ -90,18 +96,18 @@ public class PJSIPAndroidAccount extends Account {
 
     @Override
     public void onRegState(OnRegStateParam prm) {
-        PJSIPAndroid.getBroadcastEmitter()
-                    .registrationState(data.getIdUri(), prm.getCode().swigValue());
+        service.getBroadcastEmitter()
+               .registrationState(data.getIdUri(), prm.getCode().swigValue());
     }
 
     @Override
     public void onIncomingCall(OnIncomingCallParam prm) {
 
-        PJSIPAndroidCall call = addIncomingCall(prm.getCallId());
+        SipCall call = addIncomingCall(prm.getCallId());
 
         if (activeCalls.size() > 1) {
             call.declineIncomingCall();
-            PJSIPAndroid.debugLog(LOG_TAG, "sending busy to call ID: " + prm.getCallId());
+            service.debug(LOG_TAG, "sending busy to call ID: " + prm.getCallId());
             //TODO: notification of missed call
             return;
         }
@@ -112,13 +118,13 @@ public class PJSIPAndroidAccount extends Account {
             callOpParam.setStatusCode(pjsip_status_code.PJSIP_SC_RINGING);
             call.answer(callOpParam);
 
-            PJSIPAndroid.startRingTone();
+            service.startRingtone();
 
-            PJSIPCallerInfo contactInfo = new PJSIPCallerInfo(call.getInfo());
+            CallerInfo contactInfo = new CallerInfo(call.getInfo());
 
-            PJSIPAndroid.getBroadcastEmitter()
-                        .incomingCall(data.getIdUri(), prm.getCallId(),
-                                      contactInfo.getDisplayName(), contactInfo.getRemoteUri());
+            service.getBroadcastEmitter()
+                   .incomingCall(data.getIdUri(), prm.getCallId(),
+                                 contactInfo.getDisplayName(), contactInfo.getRemoteUri());
 
         } catch (Exception exc) {
             Log.e(LOG_TAG, "Error while getting call info", exc);
