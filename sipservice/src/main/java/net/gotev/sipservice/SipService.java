@@ -175,9 +175,9 @@ public class SipService extends Service {
 
         try {
             System.loadLibrary("pjsua2");
-            debug("PJSUA2 Loaded");
+            debug("PJSIP pjsua2 loaded");
         } catch (UnsatisfiedLinkError error) {
-            error("Error while loading PJSUA2 native library", error);
+            error("Error while loading PJSIP pjsua2 native library", error);
             throw new RuntimeException(error);
         }
 
@@ -244,7 +244,6 @@ public class SipService extends Service {
                 }
             } else if (ACTION_RESTART_SIP_STACK.equals(intent.getAction())) {
                 stopStack();
-                startStack();
                 addAllConfiguredAccounts();
             }
         }
@@ -353,6 +352,7 @@ public class SipService extends Service {
         String accountString = account.getIdUri();
 
         if (!mActiveSipAccounts.containsKey(accountString)) {
+            startStack();
             SipAccount pjSipAndroidAccount = new SipAccount(this, account);
             pjSipAndroidAccount.create();
             mActiveSipAccounts.put(accountString, pjSipAndroidAccount);
