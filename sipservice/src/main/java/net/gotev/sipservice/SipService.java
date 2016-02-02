@@ -32,6 +32,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class SipService extends Service {
 
+    public static String AGENT_NAME = "AndroidSipService/" + BuildConfig.VERSION_CODE;
     private static final String TAG = SipService.class.getSimpleName();
 
     private static final String PREFS_NAME = TAG + "prefs";
@@ -270,6 +271,7 @@ public class SipService extends Service {
             mEndpoint.libCreate();
 
             EpConfig epConfig = new EpConfig();
+            epConfig.getUaConfig().setUserAgent(AGENT_NAME);
             mEndpoint.libInit(epConfig);
 
             TransportConfig udpTransport = new TransportConfig();
