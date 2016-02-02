@@ -7,9 +7,9 @@ import android.content.Intent;
  * Emits the broadcast intents.
  * @author gotev (Aleksandar Gotev)
  */
-public class BroadcastEmitter {
+public class SipServiceBroadcastEmitter {
 
-    public static final String NAMESPACE = "net.gotev";
+    public static String NAMESPACE = "net.gotev";
 
     private Context mContext;
 
@@ -34,7 +34,7 @@ public class BroadcastEmitter {
         public static final String CALL_STATE = "call_state";
     }
 
-    public BroadcastEmitter(Context context) {
+    public SipServiceBroadcastEmitter(Context context) {
         mContext = context;
     }
 

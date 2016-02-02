@@ -47,7 +47,7 @@ public class SipService extends Service {
     private static ConcurrentHashMap<String, SipAccount> mActiveSipAccounts = new ConcurrentHashMap<>();
     private PowerManager.WakeLock mWakeLock;
     private Ringtone mRingTone;
-    private BroadcastEmitter mBroadcastEmitter;
+    private SipServiceBroadcastEmitter mBroadcastEmitter;
     private Endpoint mEndpoint;
     private boolean mStarted;
 
@@ -184,7 +184,7 @@ public class SipService extends Service {
         Uri uri = RingtoneManager.getActualDefaultRingtoneUri(this, RingtoneManager.TYPE_RINGTONE);
         mRingTone = RingtoneManager.getRingtone(this, uri);
 
-        mBroadcastEmitter = new BroadcastEmitter(this);
+        mBroadcastEmitter = new SipServiceBroadcastEmitter(this);
         loadConfiguredAccounts();
         addAllConfiguredAccounts();
 
@@ -425,7 +425,7 @@ public class SipService extends Service {
         return mEndpoint.audDevManager();
     }
 
-    protected BroadcastEmitter getBroadcastEmitter() {
+    protected SipServiceBroadcastEmitter getBroadcastEmitter() {
         return mBroadcastEmitter;
     }
 }

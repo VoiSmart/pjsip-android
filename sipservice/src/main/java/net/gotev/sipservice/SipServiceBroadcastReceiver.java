@@ -6,14 +6,14 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.util.Log;
 
-import net.gotev.sipservice.BroadcastEmitter.BroadcastParameters;
+import net.gotev.sipservice.SipServiceBroadcastEmitter.BroadcastParameters;
 
 import org.pjsip.pjsua2.pjsip_inv_state;
 import org.pjsip.pjsua2.pjsip_status_code;
 
-import static net.gotev.sipservice.BroadcastEmitter.BroadcastAction.CALL_STATE;
-import static net.gotev.sipservice.BroadcastEmitter.BroadcastAction.INCOMING_CALL;
-import static net.gotev.sipservice.BroadcastEmitter.BroadcastAction.REGISTRATION;
+import static net.gotev.sipservice.SipServiceBroadcastEmitter.BroadcastAction.CALL_STATE;
+import static net.gotev.sipservice.SipServiceBroadcastEmitter.BroadcastAction.INCOMING_CALL;
+import static net.gotev.sipservice.SipServiceBroadcastEmitter.BroadcastAction.REGISTRATION;
 
 /**
  * Reference implementation to receive events emitted by the PJSIP Android library.
@@ -35,18 +35,18 @@ public class SipServiceBroadcastReceiver extends BroadcastReceiver {
 
         String action = intent.getAction();
 
-        if (action.equals(BroadcastEmitter.getAction(REGISTRATION))) {
+        if (action.equals(SipServiceBroadcastEmitter.getAction(REGISTRATION))) {
             int stateCode = intent.getIntExtra(BroadcastParameters.CODE, -1);
             onRegistration(intent.getStringExtra(BroadcastParameters.ACCOUNT_ID),
                            pjsip_status_code.swigToEnum(stateCode));
 
-        } else if (action.equals(BroadcastEmitter.getAction(INCOMING_CALL))) {
+        } else if (action.equals(SipServiceBroadcastEmitter.getAction(INCOMING_CALL))) {
             onIncomingCall(intent.getStringExtra(BroadcastParameters.ACCOUNT_ID),
                            intent.getIntExtra(BroadcastParameters.CALL_ID, -1),
                            intent.getStringExtra(BroadcastParameters.DISPLAY_NAME),
                            intent.getStringExtra(BroadcastParameters.REMOTE_URI));
 
-        } else if (action.equals(BroadcastEmitter.getAction(CALL_STATE))) {
+        } else if (action.equals(SipServiceBroadcastEmitter.getAction(CALL_STATE))) {
             int callState = intent.getIntExtra(BroadcastParameters.CALL_STATE, -1);
             onCallState(intent.getStringExtra(BroadcastParameters.ACCOUNT_ID),
                         intent.getIntExtra(BroadcastParameters.CALL_ID, -1),
@@ -67,9 +67,9 @@ public class SipServiceBroadcastReceiver extends BroadcastReceiver {
     public void register(final Context context) {
 
         final IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(BroadcastEmitter.getAction(REGISTRATION));
-        intentFilter.addAction(BroadcastEmitter.getAction(INCOMING_CALL));
-        intentFilter.addAction(BroadcastEmitter.getAction(CALL_STATE));
+        intentFilter.addAction(SipServiceBroadcastEmitter.getAction(REGISTRATION));
+        intentFilter.addAction(SipServiceBroadcastEmitter.getAction(INCOMING_CALL));
+        intentFilter.addAction(SipServiceBroadcastEmitter.getAction(CALL_STATE));
         context.registerReceiver(this, intentFilter);
     }
 
