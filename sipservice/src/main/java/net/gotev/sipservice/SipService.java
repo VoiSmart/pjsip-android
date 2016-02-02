@@ -39,8 +39,9 @@ public class SipService extends Service {
     private static final String PREFS_KEY_ACCOUNTS = "accounts";
 
     private static final String ACTION_RESTART_SIP_STACK = "restartSipStack";
-    private static final String ACTION_ADD_ACCOUNT = "addAccount";
+    private static final String ACTION_SET_ACCOUNT = "setAccount";
     private static final String ACTION_REMOVE_ACCOUNT = "removeAccount";
+    private static final String ACTION_RECONFIGURE_ACCOUNT = "reconfigureAccount";
     private static final String PARAM_ACCOUNT_DATA = "accountData";
     private static final String PARAM_ACCOUNT_ID = "accountID";
 
@@ -58,7 +59,7 @@ public class SipService extends Service {
      * @param sipAccount sip account data
      * @return sip account ID uri as a string
      */
-    public static String addAccount(Context context, SipAccountData sipAccount) {
+    public static String setAccount(Context context, SipAccountData sipAccount) {
         if (sipAccount == null) {
             throw new IllegalArgumentException("sipAccount MUST not be null!");
         }
@@ -67,7 +68,7 @@ public class SipService extends Service {
         checkAccount(accountID);
 
         Intent intent = new Intent(context, SipService.class);
-        intent.setAction(ACTION_ADD_ACCOUNT);
+        intent.setAction(ACTION_SET_ACCOUNT);
         intent.putExtra(PARAM_ACCOUNT_DATA, sipAccount);
         context.startService(intent);
 
@@ -206,11 +207,12 @@ public class SipService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent != null) {
-            if (ACTION_ADD_ACCOUNT.equals(intent.getAction())) {
+            if (ACTION_SET_ACCOUNT.equals(intent.getAction())) {
                 startStack();
                 SipAccountData data = intent.getParcelableExtra(PARAM_ACCOUNT_DATA);
 
-                if (!mConfiguredAccounts.contains(data)) {
+                int index = mConfiguredAccounts.indexOf(data);
+                if (index == -1) {
                     debug("Adding " + data.getIdUri());
 
                     try {
@@ -219,6 +221,17 @@ public class SipService extends Service {
                         persistConfiguredAccounts();
                     } catch (Exception exc) {
                         error("Error while adding " + data.getIdUri(), exc);
+                    }
+                } else {
+                    debug("Reconfiguring " + data.getIdUri());
+
+                    try {
+                        removeAccount(data.getIdUri());
+                        addAccount(data);
+                        mConfiguredAccounts.set(index, data);
+                        persistConfiguredAccounts();
+                    } catch (Exception exc) {
+                        error("Error while reconfiguring " + data.getIdUri(), exc);
                     }
                 }
 
