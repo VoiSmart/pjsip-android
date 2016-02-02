@@ -16,7 +16,7 @@ import java.util.HashMap;
  */
 public class SipAccount extends Account {
 
-    private static final String LOG_TAG = "PJSIPAndroidAccount";
+    private static final String LOG_TAG = SipAccount.class.getSimpleName();
 
     private HashMap<Integer, SipCall> activeCalls = new HashMap<>();
     private SipAccountData data;
@@ -124,7 +124,7 @@ public class SipAccount extends Account {
 
             service.getBroadcastEmitter()
                    .incomingCall(data.getIdUri(), prm.getCallId(),
-                                 contactInfo.getDisplayName(), contactInfo.getRemoteUri());
+                           contactInfo.getDisplayName(), contactInfo.getRemoteUri());
 
         } catch (Exception exc) {
             Log.e(LOG_TAG, "Error while getting call info", exc);

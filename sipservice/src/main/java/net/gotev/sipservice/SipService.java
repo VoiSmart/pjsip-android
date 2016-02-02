@@ -37,12 +37,11 @@ public class SipService extends Service {
     private static final String PREFS_NAME = TAG + "prefs";
     private static final String PREFS_KEY_ACCOUNTS = "accounts";
 
+    private static final String ACTION_RESTART_SIP_STACK = "restartSipStack";
     private static final String ACTION_ADD_ACCOUNT = "addAccount";
     private static final String ACTION_REMOVE_ACCOUNT = "removeAccount";
     private static final String PARAM_ACCOUNT_DATA = "accountData";
     private static final String PARAM_ACCOUNT_ID = "accountID";
-
-    public static String NAMESPACE = "net.gotev";
 
     private List<SipAccountData> mConfiguredAccounts = new ArrayList<>();
     private static ConcurrentHashMap<String, SipAccount> mActiveSipAccounts = new ConcurrentHashMap<>();
@@ -52,9 +51,18 @@ public class SipService extends Service {
     private Endpoint mEndpoint;
     private boolean mStarted;
 
+    /**
+     * Adds a new SIP account.
+     * @param context application context
+     * @param sipAccount sip account data
+     * @return sip account ID uri as a string
+     */
     public static String addAccount(Context context, SipAccountData sipAccount) {
-        String accountID = sipAccount.getIdUri();
+        if (sipAccount == null) {
+            throw new IllegalArgumentException("sipAccount MUST not be null!");
+        }
 
+        String accountID = sipAccount.getIdUri();
         checkAccount(accountID);
 
         Intent intent = new Intent(context, SipService.class);
@@ -65,12 +73,43 @@ public class SipService extends Service {
         return accountID;
     }
 
+    /**
+     * Remove a SIP account.
+     * @param context application context
+     * @param accountID account ID uri
+     */
     public static void removeAccount(Context context, String accountID) {
         checkAccount(accountID);
 
         Intent intent = new Intent(context, SipService.class);
         intent.setAction(ACTION_REMOVE_ACCOUNT);
         intent.putExtra(PARAM_ACCOUNT_ID, accountID);
+        context.startService(intent);
+    }
+
+    /**
+     * Starts the SIP service.
+     * @param context application context
+     */
+    public static void start(Context context) {
+        context.startService(new Intent(context, SipService.class));
+    }
+
+    /**
+     * Stops the SIP service.
+     * @param context application context
+     */
+    public static void stop(Context context) {
+        context.stopService(new Intent(context, SipService.class));
+    }
+
+    /**
+     * Restarts the SIP stack without restarting the service.
+     * @param context application context
+     */
+    public static void restartSipStack(Context context) {
+        Intent intent = new Intent(context, SipService.class);
+        intent.setAction(ACTION_RESTART_SIP_STACK);
         context.startService(intent);
     }
 
@@ -100,10 +139,6 @@ public class SipService extends Service {
         if (accountID == null || accountID.isEmpty() || !accountID.startsWith("sip:")) {
             throw new IllegalArgumentException("Invalid accountID! Example: sip:user@domain");
         }
-    }
-
-    public static void stop(Context context) {
-        context.stopService(new Intent(context, SipService.class));
     }
 
     @Override
@@ -171,10 +206,10 @@ public class SipService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent != null) {
             if (ACTION_ADD_ACCOUNT.equals(intent.getAction())) {
+                startStack();
                 SipAccountData data = intent.getParcelableExtra(PARAM_ACCOUNT_DATA);
 
                 if (!mConfiguredAccounts.contains(data)) {
-                    startStack();
                     debug("Adding " + data.getIdUri());
 
                     try {
@@ -207,6 +242,10 @@ public class SipService extends Service {
                         break;
                     }
                 }
+            } else if (ACTION_RESTART_SIP_STACK.equals(intent.getAction())) {
+                stopStack();
+                startStack();
+                addAllConfiguredAccounts();
             }
         }
 

@@ -26,7 +26,7 @@ import java.util.Date;
  */
 public class SipCall extends Call {
 
-    private static final String LOG_TAG = "SipCall";
+    private static final String LOG_TAG = SipCall.class.getSimpleName();
 
     private SipAccount account;
     private boolean localHold = false;
