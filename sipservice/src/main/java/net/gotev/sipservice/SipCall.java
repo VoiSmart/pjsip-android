@@ -1,7 +1,5 @@
 package net.gotev.sipservice;
 
-import android.util.Log;
-
 import org.pjsip.pjsua2.AudDevManager;
 import org.pjsip.pjsua2.AudioMedia;
 import org.pjsip.pjsua2.Call;
@@ -79,7 +77,7 @@ public class SipCall extends Call {
             }
 
         } catch (Exception exc) {
-            Log.e(LOG_TAG, "onCallState: error while getting call info", exc);
+            Logger.error(LOG_TAG, "onCallState: error while getting call info", exc);
         }
 
     }
@@ -91,7 +89,7 @@ public class SipCall extends Call {
         try {
             info = getInfo();
         } catch (Exception exc) {
-            Log.e(LOG_TAG, "onCallMediaState: error while getting call info", exc);
+            Logger.error(LOG_TAG, "onCallMediaState: error while getting call info", exc);
             return;
         }
 
@@ -112,7 +110,7 @@ public class SipCall extends Call {
                     audioMedia.startTransmit(mgr.getPlaybackDevMedia());
                     mgr.getCaptureDevMedia().startTransmit(audioMedia);
                 } catch (Exception exc) {
-                    Log.e(LOG_TAG, "Error while connecting audio media to sound device", exc);
+                    Logger.error(LOG_TAG, "Error while connecting audio media to sound device", exc);
                 }
             }
         }
@@ -134,7 +132,7 @@ public class SipCall extends Call {
         try {
             answer(param);
         } catch (Exception exc) {
-            Log.e(LOG_TAG, "Failed to accept incoming call", exc);
+            Logger.error(LOG_TAG, "Failed to accept incoming call", exc);
         }
     }
 
@@ -145,7 +143,7 @@ public class SipCall extends Call {
         try {
             answer(param);
         } catch (Exception exc) {
-            Log.e(LOG_TAG, "Failed to send busy here", exc);
+            Logger.error(LOG_TAG, "Failed to send busy here", exc);
         }
     }
 
@@ -156,7 +154,7 @@ public class SipCall extends Call {
         try {
             answer(param);
         } catch (Exception exc) {
-            Log.e(LOG_TAG, "Failed to decline incoming call", exc);
+            Logger.error(LOG_TAG, "Failed to decline incoming call", exc);
         }
     }
 
@@ -167,7 +165,7 @@ public class SipCall extends Call {
         try {
             hangup(param);
         } catch (Exception exc) {
-            Log.e(LOG_TAG, "Failed to hangUp call", exc);
+            Logger.error(LOG_TAG, "Failed to hangUp call", exc);
         }
     }
 
@@ -184,7 +182,7 @@ public class SipCall extends Call {
         try {
             info = getInfo();
         } catch (Exception exc) {
-            Log.e(LOG_TAG, "setMute: error while getting call info", exc);
+            Logger.error(LOG_TAG, "setMute: error while getting call info", exc);
             return;
         }
 
@@ -210,7 +208,7 @@ public class SipCall extends Call {
                     }
 
                 } catch (Exception exc) {
-                    Log.e(LOG_TAG, "setMute: error while connecting audio media to sound device", exc);
+                    Logger.error(LOG_TAG, "setMute: error while connecting audio media to sound device", exc);
                 }
             }
         }
@@ -259,12 +257,12 @@ public class SipCall extends Call {
 
         try {
             if (hold) {
-                account.getService().debug(LOG_TAG, "holding call with ID " + getId());
+                Logger.debug(LOG_TAG, "holding call with ID " + getId());
                 setHold(param);
                 localHold = true;
             } else {
                 // http://lists.pjsip.org/pipermail/pjsip_lists.pjsip.org/2015-March/018246.html
-                account.getService().debug(LOG_TAG, "un-holding call with ID " + getId());
+                Logger.debug(LOG_TAG, "un-holding call with ID " + getId());
                 CallSetting opt = param.getOpt();
                 opt.setAudioCount(1);
                 opt.setVideoCount(0);
@@ -274,7 +272,7 @@ public class SipCall extends Call {
             }
         } catch (Exception exc) {
             String operation = hold ? "hold" : "unhold";
-            Log.e(LOG_TAG, "Error while trying to " + operation + " call", exc);
+            Logger.error(LOG_TAG, "Error while trying to " + operation + " call", exc);
         }
     }
 

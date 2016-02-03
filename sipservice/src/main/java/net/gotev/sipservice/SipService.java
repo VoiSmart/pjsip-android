@@ -11,7 +11,6 @@ import android.net.Uri;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.Vibrator;
-import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -157,7 +156,7 @@ public class SipService extends Service {
     public void onCreate() {
         super.onCreate();
 
-        debug("Creating SipService");
+        Logger.debug(TAG, "Creating SipService");
 
         PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
         mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
@@ -166,25 +165,25 @@ public class SipService extends Service {
 
         try {
             System.loadLibrary("openh264");
-            debug("OpenH264 loaded");
+            Logger.debug(TAG, "OpenH264 loaded");
         } catch (UnsatisfiedLinkError error) {
-            error("Error while loading OpenH264 native library", error);
+            Logger.error(TAG, "Error while loading OpenH264 native library", error);
             throw new RuntimeException(error);
         }
 
         try {
             System.loadLibrary("yuv");
-            debug("libyuv loaded");
+            Logger.debug(TAG, "libyuv loaded");
         } catch (UnsatisfiedLinkError error) {
-            error("Error while loading libyuv native library", error);
+            Logger.error(TAG, "Error while loading libyuv native library", error);
             throw new RuntimeException(error);
         }
 
         try {
             System.loadLibrary("pjsua2");
-            debug("PJSIP pjsua2 loaded");
+            Logger.debug(TAG, "PJSIP pjsua2 loaded");
         } catch (UnsatisfiedLinkError error) {
-            error("Error while loading PJSIP pjsua2 native library", error);
+            Logger.error(TAG, "Error while loading PJSIP pjsua2 native library", error);
             throw new RuntimeException(error);
         }
 
@@ -196,7 +195,7 @@ public class SipService extends Service {
         loadConfiguredAccounts();
         addAllConfiguredAccounts();
 
-        debug("SipService created!");
+        Logger.debug(TAG, "SipService created!");
 
     }
 
@@ -204,9 +203,9 @@ public class SipService extends Service {
     public void onDestroy() {
         super.onDestroy();
 
-        debug("Destroying SipService");
+        Logger.debug(TAG, "Destroying SipService");
         stopStack();
-        debug("SipService destroyed!");
+        Logger.debug(TAG, "SipService destroyed!");
         mWakeLock.release();
     }
 
@@ -219,17 +218,17 @@ public class SipService extends Service {
 
                 int index = mConfiguredAccounts.indexOf(data);
                 if (index == -1) {
-                    debug("Adding " + data.getIdUri());
+                    Logger.debug(TAG, "Adding " + data.getIdUri());
 
                     try {
                         addAccount(data);
                         mConfiguredAccounts.add(data);
                         persistConfiguredAccounts();
                     } catch (Exception exc) {
-                        error("Error while adding " + data.getIdUri(), exc);
+                        Logger.error(TAG, "Error while adding " + data.getIdUri(), exc);
                     }
                 } else {
-                    debug("Reconfiguring " + data.getIdUri());
+                    Logger.debug(TAG, "Reconfiguring " + data.getIdUri());
 
                     try {
                         removeAccount(data.getIdUri());
@@ -237,14 +236,14 @@ public class SipService extends Service {
                         mConfiguredAccounts.set(index, data);
                         persistConfiguredAccounts();
                     } catch (Exception exc) {
-                        error("Error while reconfiguring " + data.getIdUri(), exc);
+                        Logger.error(TAG, "Error while reconfiguring " + data.getIdUri(), exc);
                     }
                 }
 
             } else if (ACTION_REMOVE_ACCOUNT.equals(intent.getAction())) {
                 String accountIDtoRemove = intent.getStringExtra(PARAM_ACCOUNT_ID);
 
-                debug("Removing " + accountIDtoRemove);
+                Logger.debug(TAG, "Removing " + accountIDtoRemove);
 
                 Iterator<SipAccountData> iterator = mConfiguredAccounts.iterator();
 
@@ -257,7 +256,7 @@ public class SipService extends Service {
                             iterator.remove();
                             persistConfiguredAccounts();
                         } catch (Exception exc) {
-                            error("Error while removing account " + accountIDtoRemove, exc);
+                            Logger.error(TAG, "Error while removing account " + accountIDtoRemove, exc);
                         }
                         break;
                     }
@@ -269,7 +268,7 @@ public class SipService extends Service {
         }
 
         if (mConfiguredAccounts.isEmpty()) {
-            debug("No more configured accounts. Shutting down service");
+            Logger.debug(TAG, "No more configured accounts. Shutting down service");
             stopSelf();
             return START_NOT_STICKY;
         }
@@ -285,7 +284,7 @@ public class SipService extends Service {
         if (mStarted) return;
 
         try {
-            debug("Starting PJSIP");
+            Logger.debug(TAG, "Starting PJSIP");
             mEndpoint = new Endpoint();
             mEndpoint.libCreate();
 
@@ -301,11 +300,11 @@ public class SipService extends Service {
             mEndpoint.libStart();
             mEndpoint.codecSetPriority("G729/8000", (short) 255);
 
-            debug("PJSIP started!");
+            Logger.debug(TAG, "PJSIP started!");
             mStarted = true;
 
         } catch (Exception exc) {
-            error("Error while starting PJSIP", exc);
+            Logger.error(TAG, "Error while starting PJSIP", exc);
             mStarted = false;
         }
     }
@@ -319,7 +318,7 @@ public class SipService extends Service {
         if (!mStarted) return;
 
         try {
-            debug("Stopping PJSIP");
+            Logger.debug(TAG, "Stopping PJSIP");
 
             removeAllActiveAccounts();
 
@@ -330,10 +329,10 @@ public class SipService extends Service {
             mEndpoint.libDestroy();
             mEndpoint.delete();
 
-            debug("PJSIP stopped");
+            Logger.debug(TAG, "PJSIP stopped");
 
         } catch (Exception exc) {
-            error("Error while stopping PJSIP", exc);
+            Logger.error(TAG, "Error while stopping PJSIP", exc);
 
         } finally {
             mStarted = false;
@@ -347,7 +346,7 @@ public class SipService extends Service {
                 try {
                     removeAccount(accountID);
                 } catch (Exception exc) {
-                    error("Error while removing " + accountID);
+                    Logger.error(TAG, "Error while removing " + accountID);
                 }
             }
         }
@@ -359,7 +358,7 @@ public class SipService extends Service {
                 try {
                     addAccount(accountData);
                 } catch (Exception exc) {
-                    error("Error while adding " + accountData.getIdUri());
+                    Logger.error(TAG, "Error while adding " + accountData.getIdUri());
                 }
             }
         }
@@ -377,7 +376,7 @@ public class SipService extends Service {
             SipAccount pjSipAndroidAccount = new SipAccount(this, account);
             pjSipAndroidAccount.create();
             mActiveSipAccounts.put(accountString, pjSipAndroidAccount);
-            debug("SIP account " + account.getIdUri() + " successfully added");
+            Logger.debug(TAG, "SIP account " + account.getIdUri() + " successfully added");
         }
     }
 
@@ -388,14 +387,14 @@ public class SipService extends Service {
         SipAccount account = mActiveSipAccounts.get(accountID);
 
         if (account == null) {
-            error("No account for ID: "+ accountID);
+            Logger.error(TAG, "No account for ID: " + accountID);
             return;
         }
 
-        debug("Removing SIP account" + accountID);
+        Logger.debug(TAG, "Removing SIP account" + accountID);
         account.delete();
         mActiveSipAccounts.remove(accountID);
-        debug("SIP account " + accountID + " successfully removed");
+        Logger.debug(TAG, "SIP account " + accountID + " successfully removed");
     }
 
     private void persistConfiguredAccounts() {
@@ -416,22 +415,6 @@ public class SipService extends Service {
         }
     }
 
-    private void debug(String message) {
-        Log.d(TAG, message);
-    }
-
-    private void error(String message) {
-        Log.e(TAG, message);
-    }
-
-    private void error(String message, Throwable exc) {
-        Log.e(TAG, message, exc);
-    }
-
-    protected void debug(String tag, String message) {
-        Log.d(tag, message);
-    }
-
     protected synchronized void startRingtone() {
         mVibrator.vibrate(VIBRATOR_PATTERN, 0);
 
@@ -444,7 +427,7 @@ public class SipService extends Service {
 
             mRingTone.start();
         } catch (Exception exc) {
-            error("Error while trying to play ringtone!", exc);
+            Logger.error(TAG, "Error while trying to play ringtone!", exc);
         }
     }
 

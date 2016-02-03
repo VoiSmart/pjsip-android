@@ -1,7 +1,5 @@
 package net.gotev.sipservice;
 
-import android.util.Log;
-
 import org.pjsip.pjsua2.Account;
 import org.pjsip.pjsua2.CallOpParam;
 import org.pjsip.pjsua2.OnIncomingCallParam;
@@ -44,7 +42,7 @@ public class SipAccount extends Account {
         SipCall call = activeCalls.get(callId);
 
         if (call != null) {
-            service.debug(LOG_TAG, "Removing call with ID: " + callId);
+            Logger.debug(LOG_TAG, "Removing call with ID: " + callId);
             activeCalls.remove(callId);
         }
     }
@@ -57,7 +55,7 @@ public class SipAccount extends Account {
 
         SipCall call = new SipCall(this, callId);
         activeCalls.put(callId, call);
-        service.debug(LOG_TAG, "Added incoming call with ID " + callId + " to " + data.getIdUri());
+        Logger.debug(LOG_TAG, "Added incoming call with ID " + callId + " to " + data.getIdUri());
         return call;
     }
 
@@ -68,12 +66,12 @@ public class SipAccount extends Account {
         try {
             call.makeCall("sip:" + numberToDial + "@" + data.getRealm(), callOpParam);
             activeCalls.put(call.getId(), call);
-            service.debug(LOG_TAG, "New outgoing call with ID: " + call.getId());
+            Logger.debug(LOG_TAG, "New outgoing call with ID: " + call.getId());
 
             return call;
 
         } catch (Exception exc) {
-            Log.e(LOG_TAG, "Error while making outgoing call", exc);
+            Logger.error(LOG_TAG, "Error while making outgoing call", exc);
             return null;
         }
     }
@@ -107,7 +105,7 @@ public class SipAccount extends Account {
 
         if (activeCalls.size() > 1) {
             call.declineIncomingCall();
-            service.debug(LOG_TAG, "sending busy to call ID: " + prm.getCallId());
+            Logger.debug(LOG_TAG, "sending busy to call ID: " + prm.getCallId());
             //TODO: notification of missed call
             return;
         }
@@ -117,6 +115,7 @@ public class SipAccount extends Account {
             CallOpParam callOpParam = new CallOpParam();
             callOpParam.setStatusCode(pjsip_status_code.PJSIP_SC_RINGING);
             call.answer(callOpParam);
+            Logger.debug(LOG_TAG, "Sending 180 ringing");
 
             service.startRingtone();
 
@@ -127,7 +126,7 @@ public class SipAccount extends Account {
                            contactInfo.getDisplayName(), contactInfo.getRemoteUri());
 
         } catch (Exception exc) {
-            Log.e(LOG_TAG, "Error while getting call info", exc);
+            Logger.error(LOG_TAG, "Error while getting call info", exc);
         }
     }
 }

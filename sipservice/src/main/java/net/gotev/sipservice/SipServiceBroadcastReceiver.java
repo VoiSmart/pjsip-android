@@ -4,7 +4,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.util.Log;
 
 import net.gotev.sipservice.SipServiceBroadcastEmitter.BroadcastParameters;
 
@@ -84,19 +83,19 @@ public class SipServiceBroadcastReceiver extends BroadcastReceiver {
     }
 
     public void onRegistration(String accountID, pjsip_status_code registrationStateCode) {
-        Log.d(LOG_TAG, "onRegistration - accountID: " + accountID +
+        Logger.debug(LOG_TAG, "onRegistration - accountID: " + accountID +
                 ", registrationStateCode: " + registrationStateCode);
     }
 
     public void onIncomingCall(String accountID, int callID, String displayName, String remoteUri) {
-        Log.d(LOG_TAG, "onIncomingCall - accountID: " + accountID +
+        Logger.debug(LOG_TAG, "onIncomingCall - accountID: " + accountID +
                 ", callID: " + callID +
                 ", displayName: " + displayName +
                 ", remoteUri: " + remoteUri);
     }
 
     public void onCallState(String accountID, int callID, pjsip_inv_state callStateCode) {
-        Log.d(LOG_TAG, "onCallState - accountID: " + accountID +
+        Logger.debug(LOG_TAG, "onCallState - accountID: " + accountID +
                 ", callID: " + callID +
                 ", callStateCode: " + callStateCode);
     }
