@@ -4,11 +4,14 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.media.Ringtone;
+import android.media.AudioAttributes;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.IBinder;
 import android.os.PowerManager;
+import android.os.Vibrator;
 import android.util.Log;
 
 import com.google.gson.Gson;
@@ -34,6 +37,7 @@ public class SipService extends Service {
 
     public static String AGENT_NAME = "AndroidSipService/" + BuildConfig.VERSION_CODE;
     private static final String TAG = SipService.class.getSimpleName();
+    private static final long[] VIBRATOR_PATTERN = {0, 1000, 1000};
 
     private static final String PREFS_NAME = TAG + "prefs";
     private static final String PREFS_KEY_ACCOUNTS = "accounts";
@@ -41,14 +45,16 @@ public class SipService extends Service {
     private static final String ACTION_RESTART_SIP_STACK = "restartSipStack";
     private static final String ACTION_SET_ACCOUNT = "setAccount";
     private static final String ACTION_REMOVE_ACCOUNT = "removeAccount";
-    private static final String ACTION_RECONFIGURE_ACCOUNT = "reconfigureAccount";
     private static final String PARAM_ACCOUNT_DATA = "accountData";
     private static final String PARAM_ACCOUNT_ID = "accountID";
 
     private List<SipAccountData> mConfiguredAccounts = new ArrayList<>();
     private static ConcurrentHashMap<String, SipAccount> mActiveSipAccounts = new ConcurrentHashMap<>();
     private PowerManager.WakeLock mWakeLock;
-    private Ringtone mRingTone;
+    private MediaPlayer mRingTone;
+    private AudioManager mAudioManager;
+    private Vibrator mVibrator;
+    private Uri mRingtoneUri;
     private SipServiceBroadcastEmitter mBroadcastEmitter;
     private Endpoint mEndpoint;
     private boolean mStarted;
@@ -183,8 +189,9 @@ public class SipService extends Service {
             throw new RuntimeException(error);
         }
 
-        Uri uri = RingtoneManager.getActualDefaultRingtoneUri(this, RingtoneManager.TYPE_RINGTONE);
-        mRingTone = RingtoneManager.getRingtone(this, uri);
+        mRingtoneUri = RingtoneManager.getActualDefaultRingtoneUri(this, RingtoneManager.TYPE_RINGTONE);
+        mAudioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
+        mVibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
         mBroadcastEmitter = new SipServiceBroadcastEmitter(this);
         loadConfiguredAccounts();
@@ -427,13 +434,30 @@ public class SipService extends Service {
     }
 
     protected synchronized void startRingtone() {
-        if (!mRingTone.isPlaying())
-            mRingTone.play();
+        mVibrator.vibrate(VIBRATOR_PATTERN, 0);
+
+        try {
+            mRingTone = MediaPlayer.create(this, mRingtoneUri);
+            mRingTone.setLooping(true);
+
+            int volume = mAudioManager.getStreamVolume(AudioManager.STREAM_RING);
+            mRingTone.setVolume(volume, volume);
+
+            mRingTone.start();
+        } catch (Exception exc) {
+            error("Error while trying to play ringtone!", exc);
+        }
     }
 
     protected synchronized void stopRingtone() {
-        if (mRingTone.isPlaying())
-            mRingTone.stop();
+        mVibrator.cancel();
+
+        if (mRingTone != null) {
+            if (mRingTone.isPlaying())
+                mRingTone.stop();
+            mRingTone.reset();
+            mRingTone.release();
+        }
     }
 
     protected synchronized AudDevManager getAudDevManager() {
