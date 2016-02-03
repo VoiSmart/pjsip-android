@@ -4,7 +4,6 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.RingtoneManager;
@@ -453,10 +452,15 @@ public class SipService extends Service {
         mVibrator.cancel();
 
         if (mRingTone != null) {
-            if (mRingTone.isPlaying())
-                mRingTone.stop();
-            mRingTone.reset();
-            mRingTone.release();
+            try {
+                if (mRingTone.isPlaying())
+                    mRingTone.stop();
+            } catch (Exception ignored) { }
+
+            try {
+                mRingTone.reset();
+                mRingTone.release();
+            } catch (Exception ignored) { }
         }
     }
 
