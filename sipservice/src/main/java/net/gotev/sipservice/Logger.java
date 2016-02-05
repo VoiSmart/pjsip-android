@@ -1,11 +1,10 @@
 package net.gotev.sipservice;
 
-import android.util.Log;
-
 /**
  * SipService library logger.
  * You can provide your own logger delegate implementation, to be able to log in a different way.
- * By default the logger logs in Android's LogCat.
+ * By default the log level is set to DEBUG when the build type is debug, and OFF in release.
+ * The default logger implementation logs in Android's LogCat.
  * @author gotev (Aleksandar Gotev)
  */
 public class Logger {
@@ -24,33 +23,20 @@ public class Logger {
         void info(String tag, String message);
     }
 
-    private LogLevel mLogLevel = LogLevel.DEBUG;
-    private LoggerDelegate mDelegate = new LoggerDelegate() {
-        @Override
-        public void error(String tag, String message) {
-            Log.e(tag, message);
-        }
+    private LogLevel mLogLevel = BuildConfig.DEBUG ? LogLevel.DEBUG : LogLevel.OFF;
 
-        @Override
-        public void error(String tag, String message, Throwable exception) {
-            Log.e(tag, message, exception);
-        }
-
-        @Override
-        public void debug(String tag, String message) {
-            Log.d(tag, message);
-        }
-
-        @Override
-        public void info(String tag, String message) {
-            Log.i(tag, message);
-        }
-    };
+    private LoggerDelegate mDelegate = new DefaultLoggerDelegate();
 
     private Logger() { }
 
     private static class SingletonHolder {
         private static final Logger instance = new Logger();
+    }
+
+    public static void resetLoggerDelegate() {
+        synchronized (Logger.class) {
+            SingletonHolder.instance.mDelegate = new DefaultLoggerDelegate();
+        }
     }
 
     public static void setLoggerDelegate(LoggerDelegate delegate) {
@@ -69,30 +55,26 @@ public class Logger {
     }
 
     public static void error(String tag, String message) {
-        if (SingletonHolder.instance.mLogLevel.compareTo(LogLevel.ERROR) > 0)
-            return;
-
-        SingletonHolder.instance.mDelegate.error(tag, message);
+        if (SingletonHolder.instance.mLogLevel.compareTo(LogLevel.ERROR) <= 0) {
+            SingletonHolder.instance.mDelegate.error(tag, message);
+        }
     }
 
     public static void error(String tag, String message, Throwable exception) {
-        if (SingletonHolder.instance.mLogLevel.compareTo(LogLevel.ERROR) > 0)
-            return;
-
-        SingletonHolder.instance.mDelegate.error(tag, message, exception);
+        if (SingletonHolder.instance.mLogLevel.compareTo(LogLevel.ERROR) <= 0) {
+            SingletonHolder.instance.mDelegate.error(tag, message, exception);
+        }
     }
 
     public static void info(String tag, String message) {
-        if (SingletonHolder.instance.mLogLevel.compareTo(LogLevel.INFO) > 0)
-            return;
-
-        SingletonHolder.instance.mDelegate.info(tag, message);
+        if (SingletonHolder.instance.mLogLevel.compareTo(LogLevel.INFO) <= 0) {
+            SingletonHolder.instance.mDelegate.info(tag, message);
+        }
     }
 
     public static void debug(String tag, String message) {
-        if (SingletonHolder.instance.mLogLevel.compareTo(LogLevel.DEBUG) > 0)
-            return;
-
-        SingletonHolder.instance.mDelegate.debug(tag, message);
+        if (SingletonHolder.instance.mLogLevel.compareTo(LogLevel.DEBUG) <= 0) {
+            SingletonHolder.instance.mDelegate.debug(tag, message);
+        }
     }
 }
