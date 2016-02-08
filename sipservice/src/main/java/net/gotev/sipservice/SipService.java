@@ -213,7 +213,6 @@ public class SipService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent != null) {
             if (ACTION_SET_ACCOUNT.equals(intent.getAction())) {
-                startStack();
                 SipAccountData data = intent.getParcelableExtra(PARAM_ACCOUNT_DATA);
 
                 int index = mConfiguredAccounts.indexOf(data);
@@ -384,16 +383,15 @@ public class SipService extends Service {
      * Removes a SIP Account and performs un-registration.
      */
     private void removeAccount(String accountID) throws Exception {
-        SipAccount account = mActiveSipAccounts.get(accountID);
+        SipAccount account = mActiveSipAccounts.remove(accountID);
 
         if (account == null) {
             Logger.error(TAG, "No account for ID: " + accountID);
             return;
         }
 
-        Logger.debug(TAG, "Removing SIP account" + accountID);
+        Logger.debug(TAG, "Removing SIP account " + accountID);
         account.delete();
-        mActiveSipAccounts.remove(accountID);
         Logger.debug(TAG, "SIP account " + accountID + " successfully removed");
     }
 
