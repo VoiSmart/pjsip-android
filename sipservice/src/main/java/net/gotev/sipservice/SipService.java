@@ -55,7 +55,7 @@ public class SipService extends Service {
     private Uri mRingtoneUri;
     private SipServiceBroadcastEmitter mBroadcastEmitter;
     private Endpoint mEndpoint;
-    private boolean mStarted;
+    private volatile boolean mStarted;
 
     /**
      * Adds a new SIP account.
@@ -196,7 +196,6 @@ public class SipService extends Service {
         addAllConfiguredAccounts();
 
         Logger.debug(TAG, "SipService created!");
-
     }
 
     @Override
@@ -261,6 +260,7 @@ public class SipService extends Service {
                     }
                 }
             } else if (ACTION_RESTART_SIP_STACK.equals(intent.getAction())) {
+                Logger.debug(TAG, "Restarting SIP stack");
                 stopStack();
                 addAllConfiguredAccounts();
             }
@@ -327,6 +327,7 @@ public class SipService extends Service {
 
             mEndpoint.libDestroy();
             mEndpoint.delete();
+            mEndpoint = null;
 
             Logger.debug(TAG, "PJSIP stopped");
 
