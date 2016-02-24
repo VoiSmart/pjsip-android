@@ -177,7 +177,7 @@ public class SipService extends BackgroundService {
         }
 
         mBroadcastEmitter.callState(accountID, callID, sipCall.getCurrentState().swigValue(),
-                sipCall.getConnectDurationMillis());
+                                    sipCall.getConnectTimestamp());
     }
 
     private void handleSendDTMF(Intent intent) {
