@@ -5,20 +5,21 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 
-import net.gotev.sipservice.SipServiceBroadcastEmitter.BroadcastParameters;
+import net.gotev.sipservice.BroadcastEventEmitter.BroadcastParameters;
 
 import org.pjsip.pjsua2.pjsip_inv_state;
 import org.pjsip.pjsua2.pjsip_status_code;
 
-import static net.gotev.sipservice.SipServiceBroadcastEmitter.BroadcastAction.CALL_STATE;
-import static net.gotev.sipservice.SipServiceBroadcastEmitter.BroadcastAction.INCOMING_CALL;
-import static net.gotev.sipservice.SipServiceBroadcastEmitter.BroadcastAction.REGISTRATION;
+import static net.gotev.sipservice.BroadcastEventEmitter.BroadcastAction.CALL_STATE;
+import static net.gotev.sipservice.BroadcastEventEmitter.BroadcastAction.INCOMING_CALL;
+import static net.gotev.sipservice.BroadcastEventEmitter.BroadcastAction.OUTGOING_CALL;
+import static net.gotev.sipservice.BroadcastEventEmitter.BroadcastAction.REGISTRATION;
 
 /**
- * Reference implementation to receive events emitted by the PJSIP Android library.
+ * Reference implementation to receive events emitted by the sip service.
  * @author gotev (Aleksandar Gotev)
  */
-public class SipServiceBroadcastReceiver extends BroadcastReceiver {
+public class BroadcastEventReceiver extends BroadcastReceiver {
 
     private static final String LOG_TAG = "SipServiceBR";
 
@@ -34,22 +35,28 @@ public class SipServiceBroadcastReceiver extends BroadcastReceiver {
 
         String action = intent.getAction();
 
-        if (action.equals(SipServiceBroadcastEmitter.getAction(REGISTRATION))) {
+        if (action.equals(BroadcastEventEmitter.getAction(REGISTRATION))) {
             int stateCode = intent.getIntExtra(BroadcastParameters.CODE, -1);
             onRegistration(intent.getStringExtra(BroadcastParameters.ACCOUNT_ID),
                            pjsip_status_code.swigToEnum(stateCode));
 
-        } else if (action.equals(SipServiceBroadcastEmitter.getAction(INCOMING_CALL))) {
+        } else if (action.equals(BroadcastEventEmitter.getAction(INCOMING_CALL))) {
             onIncomingCall(intent.getStringExtra(BroadcastParameters.ACCOUNT_ID),
                            intent.getIntExtra(BroadcastParameters.CALL_ID, -1),
                            intent.getStringExtra(BroadcastParameters.DISPLAY_NAME),
                            intent.getStringExtra(BroadcastParameters.REMOTE_URI));
 
-        } else if (action.equals(SipServiceBroadcastEmitter.getAction(CALL_STATE))) {
+        } else if (action.equals(BroadcastEventEmitter.getAction(CALL_STATE))) {
             int callState = intent.getIntExtra(BroadcastParameters.CALL_STATE, -1);
             onCallState(intent.getStringExtra(BroadcastParameters.ACCOUNT_ID),
                         intent.getIntExtra(BroadcastParameters.CALL_ID, -1),
-                        pjsip_inv_state.swigToEnum(callState));
+                        pjsip_inv_state.swigToEnum(callState),
+                        intent.getLongExtra(BroadcastParameters.CONNECT_TIMESTAMP, -1));
+
+        } else if (action.equals(BroadcastEventEmitter.getAction(OUTGOING_CALL))) {
+            onOutgoingCall(intent.getStringExtra(BroadcastParameters.ACCOUNT_ID),
+                           intent.getIntExtra(BroadcastParameters.CALL_ID, -1),
+                           intent.getStringExtra(BroadcastParameters.NUMBER));
         }
     }
 
@@ -66,9 +73,10 @@ public class SipServiceBroadcastReceiver extends BroadcastReceiver {
     public void register(final Context context) {
 
         final IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(SipServiceBroadcastEmitter.getAction(REGISTRATION));
-        intentFilter.addAction(SipServiceBroadcastEmitter.getAction(INCOMING_CALL));
-        intentFilter.addAction(SipServiceBroadcastEmitter.getAction(CALL_STATE));
+        intentFilter.addAction(BroadcastEventEmitter.getAction(REGISTRATION));
+        intentFilter.addAction(BroadcastEventEmitter.getAction(INCOMING_CALL));
+        intentFilter.addAction(BroadcastEventEmitter.getAction(CALL_STATE));
+        intentFilter.addAction(BroadcastEventEmitter.getAction(OUTGOING_CALL));
         context.registerReceiver(this, intentFilter);
     }
 
@@ -94,9 +102,17 @@ public class SipServiceBroadcastReceiver extends BroadcastReceiver {
                 ", remoteUri: " + remoteUri);
     }
 
-    public void onCallState(String accountID, int callID, pjsip_inv_state callStateCode) {
+    public void onCallState(String accountID, int callID, pjsip_inv_state callStateCode,
+                            long connectTimestamp) {
         Logger.debug(LOG_TAG, "onCallState - accountID: " + accountID +
                 ", callID: " + callID +
-                ", callStateCode: " + callStateCode);
+                ", callStateCode: " + callStateCode +
+                ", connectTimestamp: " + connectTimestamp);
+    }
+
+    public void onOutgoingCall(String accountID, int callID, String number) {
+        Logger.debug(LOG_TAG, "onOutgoingCall - accountID: " + accountID +
+                ", callID: " + callID +
+                ", number: " + number);
     }
 }

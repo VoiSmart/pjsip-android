@@ -4,10 +4,10 @@ import android.content.Context;
 import android.content.Intent;
 
 /**
- * Emits the broadcast intents.
+ * Emits the sip service broadcast intents.
  * @author gotev (Aleksandar Gotev)
  */
-public class SipServiceBroadcastEmitter {
+public class BroadcastEventEmitter {
 
     public static String NAMESPACE = "net.gotev";
 
@@ -19,7 +19,8 @@ public class SipServiceBroadcastEmitter {
     public enum BroadcastAction {
         REGISTRATION,
         INCOMING_CALL,
-        CALL_STATE
+        CALL_STATE,
+        OUTGOING_CALL
     }
 
     /**
@@ -32,9 +33,11 @@ public class SipServiceBroadcastEmitter {
         public static final String REMOTE_URI = "remote_uri";
         public static final String DISPLAY_NAME = "display_name";
         public static final String CALL_STATE = "call_state";
+        public static final String NUMBER = "number";
+        public static final String CONNECT_TIMESTAMP = "connectTimestamp";
     }
 
-    public SipServiceBroadcastEmitter(Context context) {
+    public BroadcastEventEmitter(Context context) {
         mContext = context;
     }
 
@@ -82,13 +85,25 @@ public class SipServiceBroadcastEmitter {
      * @param callID call ID number
      * @param callStateCode SIP call state code
      */
-    public void callState(String accountID, int callID, int callStateCode) {
+    public void callState(String accountID, int callID, int callStateCode, long connectTimestamp) {
         final Intent intent = new Intent();
 
         intent.setAction(getAction(BroadcastAction.CALL_STATE));
         intent.putExtra(BroadcastParameters.ACCOUNT_ID, accountID);
         intent.putExtra(BroadcastParameters.CALL_ID, callID);
         intent.putExtra(BroadcastParameters.CALL_STATE, callStateCode);
+        intent.putExtra(BroadcastParameters.CONNECT_TIMESTAMP, connectTimestamp);
+
+        mContext.sendBroadcast(intent);
+    }
+
+    public void outgoingCall(String accountID, int callID, String number) {
+        final Intent intent = new Intent();
+
+        intent.setAction(getAction(BroadcastAction.OUTGOING_CALL));
+        intent.putExtra(BroadcastParameters.ACCOUNT_ID, accountID);
+        intent.putExtra(BroadcastParameters.CALL_ID, callID);
+        intent.putExtra(BroadcastParameters.NUMBER, number);
 
         mContext.sendBroadcast(intent);
     }

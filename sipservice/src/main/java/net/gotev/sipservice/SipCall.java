@@ -50,15 +50,22 @@ public class SipCall extends Call {
         this.account = account;
     }
 
+    public pjsip_inv_state getCurrentState() {
+        try {
+            CallInfo info = getInfo();
+            return info.getState();
+        } catch (Exception exc) {
+            Logger.error(getClass().getSimpleName(), "Error while getting call Info", exc);
+            return pjsip_inv_state.PJSIP_INV_STATE_DISCONNECTED;
+        }
+    }
+
     @Override
     public void onCallState(OnCallStateParam prm) {
         try {
             CallInfo info = getInfo();
             int callID = info.getId();
             pjsip_inv_state callState = info.getState();
-
-            account.getService().getBroadcastEmitter()
-                   .callState(account.getData().getIdUri(), callID, callState.swigValue());
 
             /**
              * From: http://www.pjsip.org/docs/book-latest/html/call.html#call-disconnection
@@ -75,6 +82,10 @@ public class SipCall extends Call {
                 account.getService().stopRingtone();
                 connectTimestamp = new Date().getTime();
             }
+
+            account.getService().getBroadcastEmitter()
+                    .callState(account.getData().getIdUri(), callID, callState.swigValue(),
+                               connectTimestamp);
 
         } catch (Exception exc) {
             Logger.error(LOG_TAG, "onCallState: error while getting call info", exc);

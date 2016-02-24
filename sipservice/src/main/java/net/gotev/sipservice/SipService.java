@@ -1,6 +1,5 @@
 package net.gotev.sipservice;
 
-import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -9,7 +8,6 @@ import android.media.MediaPlayer;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.IBinder;
-import android.os.PowerManager;
 import android.os.Vibrator;
 
 import com.google.gson.Gson;
@@ -19,6 +17,7 @@ import org.pjsip.pjsua2.AudDevManager;
 import org.pjsip.pjsua2.Endpoint;
 import org.pjsip.pjsua2.EpConfig;
 import org.pjsip.pjsua2.TransportConfig;
+import org.pjsip.pjsua2.pjsip_inv_state;
 import org.pjsip.pjsua2.pjsip_transport_type_e;
 
 import java.lang.reflect.Type;
@@ -27,125 +26,29 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static net.gotev.sipservice.SipServiceCommand.*;
+
 /**
  * Sip Service.
  * @author gotev (Aleksandar Gotev)
  */
-public class SipService extends Service {
+public class SipService extends BackgroundService {
 
-    public static String AGENT_NAME = "AndroidSipService/" + BuildConfig.VERSION_CODE;
     private static final String TAG = SipService.class.getSimpleName();
     private static final long[] VIBRATOR_PATTERN = {0, 1000, 1000};
 
     private static final String PREFS_NAME = TAG + "prefs";
     private static final String PREFS_KEY_ACCOUNTS = "accounts";
 
-    private static final String ACTION_RESTART_SIP_STACK = "restartSipStack";
-    private static final String ACTION_SET_ACCOUNT = "setAccount";
-    private static final String ACTION_REMOVE_ACCOUNT = "removeAccount";
-    private static final String PARAM_ACCOUNT_DATA = "accountData";
-    private static final String PARAM_ACCOUNT_ID = "accountID";
-
     private List<SipAccountData> mConfiguredAccounts = new ArrayList<>();
     private static ConcurrentHashMap<String, SipAccount> mActiveSipAccounts = new ConcurrentHashMap<>();
-    private PowerManager.WakeLock mWakeLock;
     private MediaPlayer mRingTone;
     private AudioManager mAudioManager;
     private Vibrator mVibrator;
     private Uri mRingtoneUri;
-    private SipServiceBroadcastEmitter mBroadcastEmitter;
+    private BroadcastEventEmitter mBroadcastEmitter;
     private Endpoint mEndpoint;
     private volatile boolean mStarted;
-
-    /**
-     * Adds a new SIP account.
-     * @param context application context
-     * @param sipAccount sip account data
-     * @return sip account ID uri as a string
-     */
-    public static String setAccount(Context context, SipAccountData sipAccount) {
-        if (sipAccount == null) {
-            throw new IllegalArgumentException("sipAccount MUST not be null!");
-        }
-
-        String accountID = sipAccount.getIdUri();
-        checkAccount(accountID);
-
-        Intent intent = new Intent(context, SipService.class);
-        intent.setAction(ACTION_SET_ACCOUNT);
-        intent.putExtra(PARAM_ACCOUNT_DATA, sipAccount);
-        context.startService(intent);
-
-        return accountID;
-    }
-
-    /**
-     * Remove a SIP account.
-     * @param context application context
-     * @param accountID account ID uri
-     */
-    public static void removeAccount(Context context, String accountID) {
-        checkAccount(accountID);
-
-        Intent intent = new Intent(context, SipService.class);
-        intent.setAction(ACTION_REMOVE_ACCOUNT);
-        intent.putExtra(PARAM_ACCOUNT_ID, accountID);
-        context.startService(intent);
-    }
-
-    /**
-     * Starts the SIP service.
-     * @param context application context
-     */
-    public static void start(Context context) {
-        context.startService(new Intent(context, SipService.class));
-    }
-
-    /**
-     * Stops the SIP service.
-     * @param context application context
-     */
-    public static void stop(Context context) {
-        context.stopService(new Intent(context, SipService.class));
-    }
-
-    /**
-     * Restarts the SIP stack without restarting the service.
-     * @param context application context
-     */
-    public static void restartSipStack(Context context) {
-        Intent intent = new Intent(context, SipService.class);
-        intent.setAction(ACTION_RESTART_SIP_STACK);
-        context.startService(intent);
-    }
-
-    /**
-     * Get an active account instance, given its accountID.
-     * @param accountID (e.g. sip:user@domain.com)
-     * @return the instance of the account or null if it doesn't exist
-     */
-    public static synchronized SipAccount get(String accountID) {
-        return mActiveSipAccounts.get(accountID);
-    }
-
-    /**
-     * Get an active call instance, given the Account ID and the Call ID.
-     * @param accountID (e.g. sip:user@domain.com)
-     * @param callID the id of the call
-     * @return the instance of the call or null if it doesn't exist
-     */
-    public static synchronized SipCall getCall(String accountID, int callID) {
-        SipAccount account = get(accountID);
-        if (account == null) return null;
-
-        return account.getCall(callID);
-    }
-
-    private static void checkAccount(String accountID) {
-        if (accountID == null || accountID.isEmpty() || !accountID.startsWith("sip:")) {
-            throw new IllegalArgumentException("Invalid accountID! Example: sip:user@domain");
-        }
-    }
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -156,13 +59,370 @@ public class SipService extends Service {
     public void onCreate() {
         super.onCreate();
 
-        Logger.debug(TAG, "Creating SipService");
+        enqueueJob(new Runnable() {
+            @Override
+            public void run() {
+                Logger.debug(TAG, "Creating SipService");
 
-        PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
-        mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
+                loadNativeLibraries();
 
-        mWakeLock.acquire();
+                mRingtoneUri = RingtoneManager.getActualDefaultRingtoneUri(SipService.this, RingtoneManager.TYPE_RINGTONE);
+                mAudioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
+                mVibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
+                mBroadcastEmitter = new BroadcastEventEmitter(SipService.this);
+                loadConfiguredAccounts();
+                addAllConfiguredAccounts();
+
+                Logger.debug(TAG, "SipService created!");
+            }
+        });
+    }
+
+    @Override
+    public int onStartCommand(final Intent intent, int flags, int startId) {
+        enqueueJob(new Runnable() {
+            @Override
+            public void run() {
+                if (intent == null) return;
+
+                String action = intent.getAction();
+
+                if (ACTION_SET_ACCOUNT.equals(action)) {
+                    handleSetAccount(intent);
+
+                } else if (ACTION_REMOVE_ACCOUNT.equals(action)) {
+                    handleRemoveAccount(intent);
+
+                } else if (ACTION_RESTART_SIP_STACK.equals(action)) {
+                    handleRestartSipStack();
+
+                } else if (ACTION_MAKE_CALL.equals(action)) {
+                    handleMakeCall(intent);
+
+                } else if (ACTION_HANG_UP_CALL.equals(action)) {
+                    handleHangUpCall(intent);
+
+                } else if (ACTION_GET_CALL_STATUS.equals(action)) {
+                    handleGetCallStatus(intent);
+
+                } else if (ACTION_SEND_DTMF.equals(action)) {
+                    handleSendDTMF(intent);
+
+                } else if (ACTION_ACCEPT_INCOMING_CALL.equals(action)) {
+                    handleAcceptIncomingCall(intent);
+
+                } else if (ACTION_DECLINE_INCOMING_CALL.equals(action)) {
+                    handleDeclineIncomingCall(intent);
+
+                } else if (ACTION_SET_HOLD.equals(action)) {
+                    handleSetCallHold(intent);
+
+                } else if (ACTION_TOGGLE_HOLD.equals(action)) {
+                    handleToggleCallHold(intent);
+
+                } else if (ACTION_SET_MUTE.equals(action)) {
+                    handleSetCallMute(intent);
+
+                } else if (ACTION_TOGGLE_MUTE.equals(action)) {
+                    handleToggleCallMute(intent);
+
+                } else if (ACTION_TRANSFER_CALL.equals(action)) {
+                    handleTransferCall(intent);
+
+                }
+
+                if (mConfiguredAccounts.isEmpty()) {
+                    Logger.debug(TAG, "No more configured accounts. Shutting down service");
+                    stopSelf();
+                }
+            }
+        });
+
+        return START_STICKY;
+    }
+
+    @Override
+    public void onDestroy() {
+        enqueueJob(new Runnable() {
+            @Override
+            public void run() {
+                Logger.debug(TAG, "Destroying SipService");
+                stopStack();
+            }
+        });
+        super.onDestroy();
+    }
+
+    private SipCall getCall(String accountID, int callID) {
+        SipAccount account = mActiveSipAccounts.get(accountID);
+
+        if (account == null) return null;
+        return account.getCall(callID);
+    }
+
+    private void notifyCallDisconnected(String accountID, int callID) {
+        mBroadcastEmitter.callState(accountID, callID,
+                pjsip_inv_state.PJSIP_INV_STATE_DISCONNECTED.swigValue(), 0);
+    }
+
+    private void handleGetCallStatus(Intent intent) {
+        String accountID = intent.getStringExtra(PARAM_ACCOUNT_ID);
+        int callID = intent.getIntExtra(PARAM_CALL_ID, 0);
+
+        SipCall sipCall = getCall(accountID, callID);
+        if (sipCall == null) {
+            notifyCallDisconnected(accountID, callID);
+            return;
+        }
+
+        mBroadcastEmitter.callState(accountID, callID, sipCall.getCurrentState().swigValue(),
+                sipCall.getConnectDurationMillis());
+    }
+
+    private void handleSendDTMF(Intent intent) {
+        String accountID = intent.getStringExtra(PARAM_ACCOUNT_ID);
+        int callID = intent.getIntExtra(PARAM_CALL_ID, 0);
+        String dtmf = intent.getStringExtra(PARAM_DTMF);
+
+        SipCall sipCall = getCall(accountID, callID);
+        if (sipCall == null) {
+            notifyCallDisconnected(accountID, callID);
+            return;
+        }
+
+        try {
+            sipCall.dialDtmf(dtmf);
+        } catch (Exception exc) {
+            Logger.error(TAG, "Error while dialing dtmf: " + dtmf + ". AccountID: "
+                         + accountID + ", CallID: " + callID);
+        }
+    }
+
+    private void handleAcceptIncomingCall(Intent intent) {
+        String accountID = intent.getStringExtra(PARAM_ACCOUNT_ID);
+        int callID = intent.getIntExtra(PARAM_CALL_ID, 0);
+
+        SipCall sipCall = getCall(accountID, callID);
+        if (sipCall == null) {
+            notifyCallDisconnected(accountID, callID);
+            return;
+        }
+
+        try {
+            sipCall.acceptIncomingCall();
+        } catch (Exception exc) {
+            Logger.error(TAG, "Error while accepting incoming call. AccountID: "
+                         + accountID + ", CallID: " + callID);
+        }
+    }
+
+    private void handleSetCallHold(Intent intent) {
+        String accountID = intent.getStringExtra(PARAM_ACCOUNT_ID);
+        int callID = intent.getIntExtra(PARAM_CALL_ID, 0);
+        boolean hold = intent.getBooleanExtra(PARAM_HOLD, false);
+
+        SipCall sipCall = getCall(accountID, callID);
+        if (sipCall == null) {
+            notifyCallDisconnected(accountID, callID);
+            return;
+        }
+
+        try {
+            sipCall.setHold(hold);
+        } catch (Exception exc) {
+            Logger.error(TAG, "Error while setting hold. AccountID: "
+                    + accountID + ", CallID: " + callID);
+        }
+    }
+
+    private void handleToggleCallHold(Intent intent) {
+        String accountID = intent.getStringExtra(PARAM_ACCOUNT_ID);
+        int callID = intent.getIntExtra(PARAM_CALL_ID, 0);
+
+        SipCall sipCall = getCall(accountID, callID);
+        if (sipCall == null) {
+            notifyCallDisconnected(accountID, callID);
+            return;
+        }
+
+        try {
+            sipCall.toggleHold();
+        } catch (Exception exc) {
+            Logger.error(TAG, "Error while toggling hold. AccountID: "
+                    + accountID + ", CallID: " + callID);
+        }
+    }
+
+    private void handleSetCallMute(Intent intent) {
+        String accountID = intent.getStringExtra(PARAM_ACCOUNT_ID);
+        int callID = intent.getIntExtra(PARAM_CALL_ID, 0);
+        boolean mute = intent.getBooleanExtra(PARAM_MUTE, false);
+
+        SipCall sipCall = getCall(accountID, callID);
+        if (sipCall == null) {
+            notifyCallDisconnected(accountID, callID);
+            return;
+        }
+
+        try {
+            sipCall.setMute(mute);
+        } catch (Exception exc) {
+            Logger.error(TAG, "Error while setting mute. AccountID: "
+                         + accountID + ", CallID: " + callID);
+        }
+    }
+
+    private void handleToggleCallMute(Intent intent) {
+        String accountID = intent.getStringExtra(PARAM_ACCOUNT_ID);
+        int callID = intent.getIntExtra(PARAM_CALL_ID, 0);
+
+        SipCall sipCall = getCall(accountID, callID);
+        if (sipCall == null) {
+            notifyCallDisconnected(accountID, callID);
+            return;
+        }
+
+        try {
+            sipCall.toggleMute();
+        } catch (Exception exc) {
+            Logger.error(TAG, "Error while toggling mute. AccountID: "
+                    + accountID + ", CallID: " + callID);
+        }
+    }
+
+    private void handleDeclineIncomingCall(Intent intent) {
+        String accountID = intent.getStringExtra(PARAM_ACCOUNT_ID);
+        int callID = intent.getIntExtra(PARAM_CALL_ID, 0);
+
+        SipCall sipCall = getCall(accountID, callID);
+        if (sipCall == null) {
+            notifyCallDisconnected(accountID, callID);
+            return;
+        }
+
+        try {
+            sipCall.declineIncomingCall();
+        } catch (Exception exc) {
+            Logger.error(TAG, "Error while declining incoming call. AccountID: "
+                    + accountID + ", CallID: " + callID);
+        }
+    }
+
+    private void handleHangUpCall(Intent intent) {
+        String accountID = intent.getStringExtra(PARAM_ACCOUNT_ID);
+        int callID = intent.getIntExtra(PARAM_CALL_ID, 0);
+
+        try {
+            SipCall sipCall = getCall(accountID, callID);
+
+            if (sipCall == null) {
+                notifyCallDisconnected(accountID, callID);
+                return;
+            }
+
+            sipCall.hangUp();
+
+        } catch (Exception exc) {
+            Logger.error(TAG, "Error while hanging up call", exc);
+            notifyCallDisconnected(accountID, callID);
+        }
+    }
+
+    private void handleTransferCall(Intent intent) {
+        String accountID = intent.getStringExtra(PARAM_ACCOUNT_ID);
+        int callID = intent.getIntExtra(PARAM_CALL_ID, 0);
+        String number = intent.getStringExtra(PARAM_NUMBER);
+
+        try {
+            SipCall sipCall = getCall(accountID, callID);
+
+            if (sipCall == null) {
+                notifyCallDisconnected(accountID, callID);
+                return;
+            }
+
+            sipCall.transferTo(number);
+
+        } catch (Exception exc) {
+            Logger.error(TAG, "Error while transferring call to " + number, exc);
+            notifyCallDisconnected(accountID, callID);
+        }
+    }
+
+    private void handleMakeCall(Intent intent) {
+        String accountID = intent.getStringExtra(PARAM_ACCOUNT_ID);
+        String number = intent.getStringExtra(PARAM_NUMBER);
+
+        Logger.debug(TAG, "Making call to " + number);
+
+        try {
+            SipCall call = mActiveSipAccounts.get(accountID).addOutgoingCall(number);
+            mBroadcastEmitter.outgoingCall(accountID, call.getId(), number);
+        } catch (Exception exc) {
+            Logger.error(TAG, "Error while making outgoing call", exc);
+            mBroadcastEmitter.outgoingCall(accountID, -1, number);
+        }
+    }
+
+    private void handleRestartSipStack() {
+        Logger.debug(TAG, "Restarting SIP stack");
+        stopStack();
+        addAllConfiguredAccounts();
+    }
+
+    private void handleRemoveAccount(Intent intent) {
+        String accountIDtoRemove = intent.getStringExtra(PARAM_ACCOUNT_ID);
+
+        Logger.debug(TAG, "Removing " + accountIDtoRemove);
+
+        Iterator<SipAccountData> iterator = mConfiguredAccounts.iterator();
+
+        while (iterator.hasNext()) {
+            SipAccountData data = iterator.next();
+
+            if (data.getIdUri().equals(accountIDtoRemove)) {
+                try {
+                    removeAccount(accountIDtoRemove);
+                    iterator.remove();
+                    persistConfiguredAccounts();
+                } catch (Exception exc) {
+                    Logger.error(TAG, "Error while removing account " + accountIDtoRemove, exc);
+                }
+                break;
+            }
+        }
+    }
+
+    private void handleSetAccount(Intent intent) {
+        SipAccountData data = intent.getParcelableExtra(PARAM_ACCOUNT_DATA);
+
+        int index = mConfiguredAccounts.indexOf(data);
+        if (index == -1) {
+            Logger.debug(TAG, "Adding " + data.getIdUri());
+
+            try {
+                addAccount(data);
+                mConfiguredAccounts.add(data);
+                persistConfiguredAccounts();
+            } catch (Exception exc) {
+                Logger.error(TAG, "Error while adding " + data.getIdUri(), exc);
+            }
+        } else {
+            Logger.debug(TAG, "Reconfiguring " + data.getIdUri());
+
+            try {
+                removeAccount(data.getIdUri());
+                addAccount(data);
+                mConfiguredAccounts.set(index, data);
+                persistConfiguredAccounts();
+            } catch (Exception exc) {
+                Logger.error(TAG, "Error while reconfiguring " + data.getIdUri(), exc);
+            }
+        }
+    }
+
+    private void loadNativeLibraries() {
         try {
             System.loadLibrary("openh264");
             Logger.debug(TAG, "OpenH264 loaded");
@@ -186,93 +446,6 @@ public class SipService extends Service {
             Logger.error(TAG, "Error while loading PJSIP pjsua2 native library", error);
             throw new RuntimeException(error);
         }
-
-        mRingtoneUri = RingtoneManager.getActualDefaultRingtoneUri(this, RingtoneManager.TYPE_RINGTONE);
-        mAudioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
-        mVibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-
-        mBroadcastEmitter = new SipServiceBroadcastEmitter(this);
-        loadConfiguredAccounts();
-        addAllConfiguredAccounts();
-
-        Logger.debug(TAG, "SipService created!");
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-
-        Logger.debug(TAG, "Destroying SipService");
-        stopStack();
-        Logger.debug(TAG, "SipService destroyed!");
-        mWakeLock.release();
-    }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        if (intent != null) {
-            if (ACTION_SET_ACCOUNT.equals(intent.getAction())) {
-                SipAccountData data = intent.getParcelableExtra(PARAM_ACCOUNT_DATA);
-
-                int index = mConfiguredAccounts.indexOf(data);
-                if (index == -1) {
-                    Logger.debug(TAG, "Adding " + data.getIdUri());
-
-                    try {
-                        addAccount(data);
-                        mConfiguredAccounts.add(data);
-                        persistConfiguredAccounts();
-                    } catch (Exception exc) {
-                        Logger.error(TAG, "Error while adding " + data.getIdUri(), exc);
-                    }
-                } else {
-                    Logger.debug(TAG, "Reconfiguring " + data.getIdUri());
-
-                    try {
-                        removeAccount(data.getIdUri());
-                        addAccount(data);
-                        mConfiguredAccounts.set(index, data);
-                        persistConfiguredAccounts();
-                    } catch (Exception exc) {
-                        Logger.error(TAG, "Error while reconfiguring " + data.getIdUri(), exc);
-                    }
-                }
-
-            } else if (ACTION_REMOVE_ACCOUNT.equals(intent.getAction())) {
-                String accountIDtoRemove = intent.getStringExtra(PARAM_ACCOUNT_ID);
-
-                Logger.debug(TAG, "Removing " + accountIDtoRemove);
-
-                Iterator<SipAccountData> iterator = mConfiguredAccounts.iterator();
-
-                while (iterator.hasNext()) {
-                    SipAccountData data = iterator.next();
-
-                    if (data.getIdUri().equals(accountIDtoRemove)) {
-                        try {
-                            removeAccount(accountIDtoRemove);
-                            iterator.remove();
-                            persistConfiguredAccounts();
-                        } catch (Exception exc) {
-                            Logger.error(TAG, "Error while removing account " + accountIDtoRemove, exc);
-                        }
-                        break;
-                    }
-                }
-            } else if (ACTION_RESTART_SIP_STACK.equals(intent.getAction())) {
-                Logger.debug(TAG, "Restarting SIP stack");
-                stopStack();
-                addAllConfiguredAccounts();
-            }
-        }
-
-        if (mConfiguredAccounts.isEmpty()) {
-            Logger.debug(TAG, "No more configured accounts. Shutting down service");
-            stopSelf();
-            return START_NOT_STICKY;
-        }
-
-        return START_STICKY;
     }
 
     /**
@@ -450,7 +623,7 @@ public class SipService extends Service {
         return mEndpoint.audDevManager();
     }
 
-    protected SipServiceBroadcastEmitter getBroadcastEmitter() {
+    protected BroadcastEventEmitter getBroadcastEmitter() {
         return mBroadcastEmitter;
     }
 }
