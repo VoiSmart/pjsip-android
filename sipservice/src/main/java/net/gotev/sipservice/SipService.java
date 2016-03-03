@@ -88,7 +88,7 @@ public class SipService extends BackgroundService {
         enqueueJob(new Runnable() {
             @Override
             public void run() {
-                Logger.debug(TAG, "Creating SipService");
+                Logger.debug(TAG, "Creating SipService with priority: " + Thread.currentThread().getPriority());
 
                 loadNativeLibraries();
 
@@ -502,7 +502,6 @@ public class SipService extends BackgroundService {
             mEndpoint.transportCreate(pjsip_transport_type_e.PJSIP_TRANSPORT_UDP, udpTransport);
             mEndpoint.transportCreate(pjsip_transport_type_e.PJSIP_TRANSPORT_TCP, tcpTransport);
             mEndpoint.libStart();
-            mEndpoint.codecSetPriority("G729/8000/1", (short) 254);
 
             Logger.debug(TAG, "PJSIP started!");
             mStarted = true;
