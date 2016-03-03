@@ -5,6 +5,8 @@ import android.content.Intent;
 
 import org.pjsip.pjsua2.pjsip_inv_state;
 
+import java.util.ArrayList;
+
 /**
  * Triggers sip service commands.
  * @author gotev (Aleksandar Gotev)
@@ -28,6 +30,7 @@ public class SipServiceCommand {
     protected static final String ACTION_TOGGLE_MUTE = "callToggleMute";
     protected static final String ACTION_TRANSFER_CALL = "callTransfer";
     protected static final String ACTION_GET_CODEC_PRIORITIES = "codecPriorities";
+    protected static final String ACTION_SET_CODEC_PRIORITIES = "setCodecPriorities";
 
     protected static final String PARAM_ACCOUNT_DATA = "accountData";
     protected static final String PARAM_ACCOUNT_ID = "accountID";
@@ -36,6 +39,7 @@ public class SipServiceCommand {
     protected static final String PARAM_DTMF = "dtmf";
     protected static final String PARAM_HOLD = "hold";
     protected static final String PARAM_MUTE = "mute";
+    protected static final String PARAM_CODEC_PRIORITIES = "codecPriorities";
 
     /**
      * Adds a new SIP account.
@@ -309,6 +313,19 @@ public class SipServiceCommand {
     public static void getCodecPriorities(Context context) {
         Intent intent = new Intent(context, SipService.class);
         intent.setAction(ACTION_GET_CODEC_PRIORITIES);
+        context.startService(intent);
+    }
+
+    /**
+     * Set codec priorities. this is going to work only if the sip stack has
+     * been started, otherwise you will see an error message in LogCat.
+     * @param context application context
+     * @param codecPriorities list with the codec priorities to set
+     */
+    public static void setCodecPriorities(Context context, ArrayList<CodecPriority> codecPriorities) {
+        Intent intent = new Intent(context, SipService.class);
+        intent.setAction(ACTION_SET_CODEC_PRIORITIES);
+        intent.putParcelableArrayListExtra(PARAM_CODEC_PRIORITIES, codecPriorities);
         context.startService(intent);
     }
 

@@ -63,7 +63,7 @@ public class CodecPriority implements Parcelable, Comparable<CodecPriority> {
         return mPriority;
     }
 
-    public CodecPriority setPriority(short mPriority) {
+    public CodecPriority setPriority(int mPriority) {
         if (mPriority > PRIORITY_MAX) {
             this.mPriority = PRIORITY_MAX;
         } else if (mPriority < PRIORITY_DISABLED) {

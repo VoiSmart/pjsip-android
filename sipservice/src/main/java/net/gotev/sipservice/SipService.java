@@ -38,6 +38,7 @@ import static net.gotev.sipservice.SipServiceCommand.ACTION_REMOVE_ACCOUNT;
 import static net.gotev.sipservice.SipServiceCommand.ACTION_RESTART_SIP_STACK;
 import static net.gotev.sipservice.SipServiceCommand.ACTION_SEND_DTMF;
 import static net.gotev.sipservice.SipServiceCommand.ACTION_SET_ACCOUNT;
+import static net.gotev.sipservice.SipServiceCommand.ACTION_SET_CODEC_PRIORITIES;
 import static net.gotev.sipservice.SipServiceCommand.ACTION_SET_HOLD;
 import static net.gotev.sipservice.SipServiceCommand.ACTION_SET_MUTE;
 import static net.gotev.sipservice.SipServiceCommand.ACTION_TOGGLE_HOLD;
@@ -47,6 +48,7 @@ import static net.gotev.sipservice.SipServiceCommand.AGENT_NAME;
 import static net.gotev.sipservice.SipServiceCommand.PARAM_ACCOUNT_DATA;
 import static net.gotev.sipservice.SipServiceCommand.PARAM_ACCOUNT_ID;
 import static net.gotev.sipservice.SipServiceCommand.PARAM_CALL_ID;
+import static net.gotev.sipservice.SipServiceCommand.PARAM_CODEC_PRIORITIES;
 import static net.gotev.sipservice.SipServiceCommand.PARAM_DTMF;
 import static net.gotev.sipservice.SipServiceCommand.PARAM_HOLD;
 import static net.gotev.sipservice.SipServiceCommand.PARAM_MUTE;
@@ -156,6 +158,10 @@ public class SipService extends BackgroundService {
 
                 } else if (ACTION_GET_CODEC_PRIORITIES.equals(action)) {
                     handleGetCodecPriorities();
+
+                } else if (ACTION_SET_CODEC_PRIORITIES.equals(action)) {
+                    handleSetCodecPriorities(intent);
+
                 }
 
                 if (mConfiguredAccounts.isEmpty()) {
@@ -576,6 +582,31 @@ public class SipService extends BackgroundService {
 
         if (codecs != null) {
             mBroadcastEmitter.codecPriorities(codecs);
+        }
+    }
+
+    private void handleSetCodecPriorities(Intent intent) {
+        ArrayList<CodecPriority> codecPriorities = intent.getParcelableArrayListExtra(PARAM_CODEC_PRIORITIES);
+
+        if (mEndpoint == null) {
+            Logger.error(TAG, "Can't get codec priority list! The SIP Stack has not been " +
+                    "initialized! Add an account first!");
+            return;
+        }
+
+        try {
+            StringBuilder log = new StringBuilder();
+            log.append("Codec priorities successfully set. The priority order is now:\n");
+
+            for (CodecPriority codecPriority : codecPriorities) {
+                mEndpoint.codecSetPriority(codecPriority.getCodecId(), (short) codecPriority.getPriority());
+                log.append(codecPriority.toString()).append("\n");
+            }
+
+            Logger.debug(TAG, log.toString());
+
+        } catch (Exception exc) {
+            Logger.error(TAG, "Error while setting codec priorities", exc);
         }
     }
 
