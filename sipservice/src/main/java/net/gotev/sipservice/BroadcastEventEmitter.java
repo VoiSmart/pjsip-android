@@ -3,6 +3,8 @@ package net.gotev.sipservice;
 import android.content.Context;
 import android.content.Intent;
 
+import java.util.ArrayList;
+
 /**
  * Emits the sip service broadcast intents.
  * @author gotev (Aleksandar Gotev)
@@ -20,7 +22,9 @@ public class BroadcastEventEmitter {
         REGISTRATION,
         INCOMING_CALL,
         CALL_STATE,
-        OUTGOING_CALL
+        OUTGOING_CALL,
+        STACK_STATUS,
+        CODEC_PRIORITIES
     }
 
     /**
@@ -35,6 +39,8 @@ public class BroadcastEventEmitter {
         public static final String CALL_STATE = "call_state";
         public static final String NUMBER = "number";
         public static final String CONNECT_TIMESTAMP = "connectTimestamp";
+        public static final String STACK_STARTED = "stack_started";
+        public static final String CODEC_PRIORITIES_LIST = "codec_priorities_list";
     }
 
     public BroadcastEventEmitter(Context context) {
@@ -104,6 +110,24 @@ public class BroadcastEventEmitter {
         intent.putExtra(BroadcastParameters.ACCOUNT_ID, accountID);
         intent.putExtra(BroadcastParameters.CALL_ID, callID);
         intent.putExtra(BroadcastParameters.NUMBER, number);
+
+        mContext.sendBroadcast(intent);
+    }
+
+    public void stackStatus(boolean started) {
+        final Intent intent = new Intent();
+
+        intent.setAction(getAction(BroadcastAction.STACK_STATUS));
+        intent.putExtra(BroadcastParameters.STACK_STARTED, started);
+
+        mContext.sendBroadcast(intent);
+    }
+
+    public void codecPriorities(ArrayList<CodecPriority> codecPriorities) {
+        final Intent intent = new Intent();
+
+        intent.setAction(getAction(BroadcastAction.CODEC_PRIORITIES));
+        intent.putParcelableArrayListExtra(BroadcastParameters.CODEC_PRIORITIES_LIST, codecPriorities);
 
         mContext.sendBroadcast(intent);
     }

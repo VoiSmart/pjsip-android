@@ -14,6 +14,8 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import org.pjsip.pjsua2.AudDevManager;
+import org.pjsip.pjsua2.CodecInfo;
+import org.pjsip.pjsua2.CodecInfoVector;
 import org.pjsip.pjsua2.Endpoint;
 import org.pjsip.pjsua2.EpConfig;
 import org.pjsip.pjsua2.TransportConfig;
@@ -26,7 +28,29 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static net.gotev.sipservice.SipServiceCommand.*;
+import static net.gotev.sipservice.SipServiceCommand.ACTION_ACCEPT_INCOMING_CALL;
+import static net.gotev.sipservice.SipServiceCommand.ACTION_DECLINE_INCOMING_CALL;
+import static net.gotev.sipservice.SipServiceCommand.ACTION_GET_CALL_STATUS;
+import static net.gotev.sipservice.SipServiceCommand.ACTION_GET_CODEC_PRIORITIES;
+import static net.gotev.sipservice.SipServiceCommand.ACTION_HANG_UP_CALL;
+import static net.gotev.sipservice.SipServiceCommand.ACTION_MAKE_CALL;
+import static net.gotev.sipservice.SipServiceCommand.ACTION_REMOVE_ACCOUNT;
+import static net.gotev.sipservice.SipServiceCommand.ACTION_RESTART_SIP_STACK;
+import static net.gotev.sipservice.SipServiceCommand.ACTION_SEND_DTMF;
+import static net.gotev.sipservice.SipServiceCommand.ACTION_SET_ACCOUNT;
+import static net.gotev.sipservice.SipServiceCommand.ACTION_SET_HOLD;
+import static net.gotev.sipservice.SipServiceCommand.ACTION_SET_MUTE;
+import static net.gotev.sipservice.SipServiceCommand.ACTION_TOGGLE_HOLD;
+import static net.gotev.sipservice.SipServiceCommand.ACTION_TOGGLE_MUTE;
+import static net.gotev.sipservice.SipServiceCommand.ACTION_TRANSFER_CALL;
+import static net.gotev.sipservice.SipServiceCommand.AGENT_NAME;
+import static net.gotev.sipservice.SipServiceCommand.PARAM_ACCOUNT_DATA;
+import static net.gotev.sipservice.SipServiceCommand.PARAM_ACCOUNT_ID;
+import static net.gotev.sipservice.SipServiceCommand.PARAM_CALL_ID;
+import static net.gotev.sipservice.SipServiceCommand.PARAM_DTMF;
+import static net.gotev.sipservice.SipServiceCommand.PARAM_HOLD;
+import static net.gotev.sipservice.SipServiceCommand.PARAM_MUTE;
+import static net.gotev.sipservice.SipServiceCommand.PARAM_NUMBER;
 
 /**
  * Sip Service.
@@ -130,6 +154,8 @@ public class SipService extends BackgroundService {
                 } else if (ACTION_TRANSFER_CALL.equals(action)) {
                     handleTransferCall(intent);
 
+                } else if (ACTION_GET_CODEC_PRIORITIES.equals(action)) {
+                    handleGetCodecPriorities();
                 }
 
                 if (mConfiguredAccounts.isEmpty()) {
@@ -470,10 +496,11 @@ public class SipService extends BackgroundService {
             mEndpoint.transportCreate(pjsip_transport_type_e.PJSIP_TRANSPORT_UDP, udpTransport);
             mEndpoint.transportCreate(pjsip_transport_type_e.PJSIP_TRANSPORT_TCP, tcpTransport);
             mEndpoint.libStart();
-            mEndpoint.codecSetPriority("G729/8000", (short) 255);
+            mEndpoint.codecSetPriority("G729/8000/1", (short) 254);
 
             Logger.debug(TAG, "PJSIP started!");
             mStarted = true;
+            mBroadcastEmitter.stackStatus(true);
 
         } catch (Exception exc) {
             Logger.error(TAG, "Error while starting PJSIP", exc);
@@ -503,6 +530,7 @@ public class SipService extends BackgroundService {
             mEndpoint = null;
 
             Logger.debug(TAG, "PJSIP stopped");
+            mBroadcastEmitter.stackStatus(false);
 
         } catch (Exception exc) {
             Logger.error(TAG, "Error while stopping PJSIP", exc);
@@ -510,6 +538,44 @@ public class SipService extends BackgroundService {
         } finally {
             mStarted = false;
             mEndpoint = null;
+        }
+    }
+
+    private ArrayList<CodecPriority> getCodecPriorityList() {
+        if (mEndpoint == null) {
+            Logger.error(TAG, "Can't get codec priority list! The SIP Stack has not been " +
+                              "initialized! Add an account first!");
+            return null;
+        }
+
+        try {
+            CodecInfoVector codecs = mEndpoint.codecEnum();
+            if (codecs == null || codecs.size() == 0) return null;
+
+            ArrayList<CodecPriority> codecPrioritiesList = new ArrayList<>((int)codecs.size());
+
+            for (int i = 0; i < (int)codecs.size(); i++) {
+                CodecInfo codecInfo = codecs.get(i);
+                codecPrioritiesList.add(new CodecPriority(codecInfo.getCodecId(),
+                                                          codecInfo.getPriority()));
+                codecInfo.delete();
+            }
+
+            codecs.delete();
+
+            return codecPrioritiesList;
+
+        } catch (Exception exc) {
+            Logger.error(TAG, "Error while getting codec priority list!", exc);
+            return null;
+        }
+    }
+
+    private void handleGetCodecPriorities() {
+        ArrayList<CodecPriority> codecs = getCodecPriorityList();
+
+        if (codecs != null) {
+            mBroadcastEmitter.codecPriorities(codecs);
         }
     }
 

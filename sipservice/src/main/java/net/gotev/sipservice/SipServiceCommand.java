@@ -27,6 +27,7 @@ public class SipServiceCommand {
     protected static final String ACTION_TOGGLE_HOLD = "callToggleHold";
     protected static final String ACTION_TOGGLE_MUTE = "callToggleMute";
     protected static final String ACTION_TRANSFER_CALL = "callTransfer";
+    protected static final String ACTION_GET_CODEC_PRIORITIES = "codecPriorities";
 
     protected static final String PARAM_ACCOUNT_DATA = "accountData";
     protected static final String PARAM_ACCOUNT_ID = "accountID";
@@ -297,6 +298,17 @@ public class SipServiceCommand {
         intent.setAction(ACTION_TOGGLE_MUTE);
         intent.putExtra(PARAM_ACCOUNT_ID, accountID);
         intent.putExtra(PARAM_CALL_ID, callID);
+        context.startService(intent);
+    }
+
+    /**
+     * Requests the codec priorities. This is going to return results only if the sip stack has
+     * been started, otherwise you will see an error message in LogCat.
+     * @param context application context
+     */
+    public static void getCodecPriorities(Context context) {
+        Intent intent = new Intent(context, SipService.class);
+        intent.setAction(ACTION_GET_CODEC_PRIORITIES);
         context.startService(intent);
     }
 

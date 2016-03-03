@@ -10,10 +10,14 @@ import net.gotev.sipservice.BroadcastEventEmitter.BroadcastParameters;
 import org.pjsip.pjsua2.pjsip_inv_state;
 import org.pjsip.pjsua2.pjsip_status_code;
 
+import java.util.ArrayList;
+
 import static net.gotev.sipservice.BroadcastEventEmitter.BroadcastAction.CALL_STATE;
+import static net.gotev.sipservice.BroadcastEventEmitter.BroadcastAction.CODEC_PRIORITIES;
 import static net.gotev.sipservice.BroadcastEventEmitter.BroadcastAction.INCOMING_CALL;
 import static net.gotev.sipservice.BroadcastEventEmitter.BroadcastAction.OUTGOING_CALL;
 import static net.gotev.sipservice.BroadcastEventEmitter.BroadcastAction.REGISTRATION;
+import static net.gotev.sipservice.BroadcastEventEmitter.BroadcastAction.STACK_STATUS;
 
 /**
  * Reference implementation to receive events emitted by the sip service.
@@ -57,6 +61,13 @@ public class BroadcastEventReceiver extends BroadcastReceiver {
             onOutgoingCall(intent.getStringExtra(BroadcastParameters.ACCOUNT_ID),
                            intent.getIntExtra(BroadcastParameters.CALL_ID, -1),
                            intent.getStringExtra(BroadcastParameters.NUMBER));
+
+        } else if (action.equals(BroadcastEventEmitter.getAction(STACK_STATUS))) {
+            onStackStatus(intent.getBooleanExtra(BroadcastParameters.STACK_STARTED, false));
+
+        } else if (action.equals(BroadcastEventEmitter.getAction(CODEC_PRIORITIES))) {
+            ArrayList<CodecPriority> codecList = intent.getParcelableArrayListExtra(BroadcastParameters.CODEC_PRIORITIES_LIST);
+            onReceivedCodecPriorities(codecList);
         }
     }
 
@@ -77,6 +88,8 @@ public class BroadcastEventReceiver extends BroadcastReceiver {
         intentFilter.addAction(BroadcastEventEmitter.getAction(INCOMING_CALL));
         intentFilter.addAction(BroadcastEventEmitter.getAction(CALL_STATE));
         intentFilter.addAction(BroadcastEventEmitter.getAction(OUTGOING_CALL));
+        intentFilter.addAction(BroadcastEventEmitter.getAction(STACK_STATUS));
+        intentFilter.addAction(BroadcastEventEmitter.getAction(CODEC_PRIORITIES));
         context.registerReceiver(this, intentFilter);
     }
 
@@ -114,5 +127,16 @@ public class BroadcastEventReceiver extends BroadcastReceiver {
         Logger.debug(LOG_TAG, "onOutgoingCall - accountID: " + accountID +
                 ", callID: " + callID +
                 ", number: " + number);
+    }
+
+    public void onStackStatus(boolean started) {
+        Logger.debug(LOG_TAG, "SIP service stack " + (started ? "started" : "stopped"));
+    }
+
+    public void onReceivedCodecPriorities(ArrayList<CodecPriority> codecPriorities) {
+        Logger.debug(LOG_TAG, "Received codec priorities");
+        for (CodecPriority codec : codecPriorities) {
+            Logger.debug(LOG_TAG, codec.toString());
+        }
     }
 }
