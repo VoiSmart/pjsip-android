@@ -116,6 +116,14 @@ public class SipCall extends Call {
                 // connect the call audio media to sound device
                 try {
                     AudDevManager mgr = account.getService().getAudDevManager();
+
+                    try {
+                        audioMedia.adjustRxLevel((float) 1.5);
+                        audioMedia.adjustTxLevel((float) 1.5);
+                    } catch (Exception exc) {
+                        Logger.error(LOG_TAG, "Error while adjusting levels", exc);
+                    }
+
                     audioMedia.startTransmit(mgr.getPlaybackDevMedia());
                     mgr.getCaptureDevMedia().startTransmit(audioMedia);
                 } catch (Exception exc) {

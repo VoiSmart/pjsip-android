@@ -526,6 +526,10 @@ public class SipService extends BackgroundService {
 
             EpConfig epConfig = new EpConfig();
             epConfig.getUaConfig().setUserAgent(AGENT_NAME);
+            epConfig.getMedConfig().setHasIoqueue(true);
+            epConfig.getMedConfig().setClockRate(8000);
+            epConfig.getMedConfig().setQuality(4);
+            epConfig.getMedConfig().setThreadCnt(2);
             mEndpoint.libInit(epConfig);
 
             TransportConfig udpTransport = new TransportConfig();
