@@ -26,6 +26,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static net.gotev.sipservice.SipServiceCommand.ACTION_ACCEPT_INCOMING_CALL;
@@ -33,6 +34,7 @@ import static net.gotev.sipservice.SipServiceCommand.ACTION_DECLINE_INCOMING_CAL
 import static net.gotev.sipservice.SipServiceCommand.ACTION_GET_CALL_STATUS;
 import static net.gotev.sipservice.SipServiceCommand.ACTION_GET_CODEC_PRIORITIES;
 import static net.gotev.sipservice.SipServiceCommand.ACTION_HANG_UP_CALL;
+import static net.gotev.sipservice.SipServiceCommand.ACTION_HANG_UP_CALLS;
 import static net.gotev.sipservice.SipServiceCommand.ACTION_MAKE_CALL;
 import static net.gotev.sipservice.SipServiceCommand.ACTION_REMOVE_ACCOUNT;
 import static net.gotev.sipservice.SipServiceCommand.ACTION_RESTART_SIP_STACK;
@@ -128,6 +130,9 @@ public class SipService extends BackgroundService {
 
                 } else if (ACTION_HANG_UP_CALL.equals(action)) {
                     handleHangUpCall(intent);
+
+                } else if (ACTION_HANG_UP_CALLS.equals(action)) {
+                    handleHangUpActiveCalls(intent);
 
                 } else if (ACTION_GET_CALL_STATUS.equals(action)) {
                     handleGetCallStatus(intent);
@@ -358,6 +363,33 @@ public class SipService extends BackgroundService {
         } catch (Exception exc) {
             Logger.error(TAG, "Error while hanging up call", exc);
             notifyCallDisconnected(accountID, callID);
+        }
+    }
+
+    private void handleHangUpActiveCalls(Intent intent) {
+        String accountID = intent.getStringExtra(PARAM_ACCOUNT_ID);
+
+        SipAccount account = mActiveSipAccounts.get(accountID);
+        if (account == null) return;
+
+        Set<Integer> activeCallIDs = account.getCallIDs();
+
+        if (activeCallIDs == null || activeCallIDs.isEmpty()) return;
+
+        for (int callID : activeCallIDs) {
+            try {
+                SipCall sipCall = getCall(accountID, callID);
+
+                if (sipCall == null) {
+                    notifyCallDisconnected(accountID, callID);
+                    return;
+                }
+
+                sipCall.hangUp();
+            } catch (Exception exc) {
+                Logger.error(TAG, "Error while hanging up call", exc);
+                notifyCallDisconnected(accountID, callID);
+            }
         }
     }
 

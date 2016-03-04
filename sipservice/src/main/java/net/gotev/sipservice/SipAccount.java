@@ -7,6 +7,7 @@ import org.pjsip.pjsua2.OnRegStateParam;
 import org.pjsip.pjsua2.pjsip_status_code;
 
 import java.util.HashMap;
+import java.util.Set;
 
 /**
  * Wrapper around PJSUA2 Account object.
@@ -49,6 +50,10 @@ public class SipAccount extends Account {
 
     public SipCall getCall(int callId) {
         return activeCalls.get(callId);
+    }
+
+    public Set<Integer> getCallIDs() {
+        return activeCalls.keySet();
     }
 
     public SipCall addIncomingCall(int callId) {
