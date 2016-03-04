@@ -5,6 +5,7 @@ import android.os.Parcelable;
 
 import org.pjsip.pjsua2.AccountConfig;
 import org.pjsip.pjsua2.AuthCredInfo;
+import org.pjsip.pjsua2.pj_qos_type;
 
 /**
  * Contains the account's configuration data.
@@ -143,6 +144,7 @@ public class SipAccountData implements Parcelable {
 
     protected AccountConfig getAccountConfig() {
         AccountConfig accountConfig = new AccountConfig();
+        accountConfig.getMediaConfig().getTransportConfig().setQosType(pj_qos_type.PJ_QOS_TYPE_VOICE);
         accountConfig.setIdUri(getIdUri());
         accountConfig.getRegConfig().setRegistrarUri(getRegistrarUri());
 
