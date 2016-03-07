@@ -28,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
     @Bind(R.id.password) EditText mPassword;
     @Bind(R.id.numberToCall) EditText mNumberToCall;
 
+    private static final String KEY_SIP_ACCOUNT = "sip_account";
     private SipAccountData mSipAccount;
 
     private BroadcastEventReceiver sipEvents = new BroadcastEventReceiver() {
@@ -55,12 +56,25 @@ public class MainActivity extends AppCompatActivity {
     };
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        if (mSipAccount != null) {
+            outState.putParcelable(KEY_SIP_ACCOUNT, mSipAccount);
+        }
+
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
         Logger.setLogLevel(Logger.LogLevel.DEBUG);
+
+        if (savedInstanceState != null && savedInstanceState.containsKey(KEY_SIP_ACCOUNT)) {
+            mSipAccount = savedInstanceState.getParcelable(KEY_SIP_ACCOUNT);
+        }
     }
 
     @Override
