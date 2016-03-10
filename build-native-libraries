@@ -1,0 +1,5 @@
+#!/bin/bash -e
+cd pjsip-android-builder
+./build-with-vagrant.sh
+cp -a pjsip-build/libs/* ../sipservice/src/main/jniLibs/
+echo "Native libraries successfully generated!"
