@@ -55,7 +55,9 @@ public class BroadcastEventReceiver extends BroadcastReceiver {
             onCallState(intent.getStringExtra(BroadcastParameters.ACCOUNT_ID),
                         intent.getIntExtra(BroadcastParameters.CALL_ID, -1),
                         pjsip_inv_state.swigToEnum(callState),
-                        intent.getLongExtra(BroadcastParameters.CONNECT_TIMESTAMP, -1));
+                        intent.getLongExtra(BroadcastParameters.CONNECT_TIMESTAMP, -1),
+                        intent.getBooleanExtra(BroadcastParameters.LOCAL_HOLD, false),
+                        intent.getBooleanExtra(BroadcastParameters.LOCAL_MUTE, false));
 
         } else if (action.equals(BroadcastEventEmitter.getAction(OUTGOING_CALL))) {
             onOutgoingCall(intent.getStringExtra(BroadcastParameters.ACCOUNT_ID),
@@ -116,11 +118,13 @@ public class BroadcastEventReceiver extends BroadcastReceiver {
     }
 
     public void onCallState(String accountID, int callID, pjsip_inv_state callStateCode,
-                            long connectTimestamp) {
+                            long connectTimestamp, boolean isLocalHold, boolean isLocalMute) {
         Logger.debug(LOG_TAG, "onCallState - accountID: " + accountID +
                 ", callID: " + callID +
                 ", callStateCode: " + callStateCode +
-                ", connectTimestamp: " + connectTimestamp);
+                ", connectTimestamp: " + connectTimestamp +
+                ", isLocalHold: " + isLocalHold +
+                ", isLocalMute: " + isLocalMute);
     }
 
     public void onOutgoingCall(String accountID, int callID, String number) {

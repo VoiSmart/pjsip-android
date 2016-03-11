@@ -21,6 +21,7 @@ public class SipServiceCommand {
     protected static final String ACTION_MAKE_CALL = "makeCall";
     protected static final String ACTION_HANG_UP_CALL = "hangUpCall";
     protected static final String ACTION_HANG_UP_CALLS = "hangUpCalls";
+    protected static final String ACTION_HOLD_CALLS = "holdCalls";
     protected static final String ACTION_GET_CALL_STATUS = "getCallStatus";
     protected static final String ACTION_SEND_DTMF = "sendDtmf";
     protected static final String ACTION_ACCEPT_INCOMING_CALL = "acceptIncomingCall";
@@ -165,6 +166,20 @@ public class SipServiceCommand {
 
         Intent intent = new Intent(context, SipService.class);
         intent.setAction(ACTION_HANG_UP_CALLS);
+        intent.putExtra(PARAM_ACCOUNT_ID, accountID);
+        context.startService(intent);
+    }
+
+    /**
+     * Hangs up active calls.
+     * @param context application context
+     * @param accountID account ID
+     */
+    public static void holdActiveCalls(Context context, String accountID) {
+        checkAccount(accountID);
+
+        Intent intent = new Intent(context, SipService.class);
+        intent.setAction(ACTION_HOLD_CALLS);
         intent.putExtra(PARAM_ACCOUNT_ID, accountID);
         context.startService(intent);
     }

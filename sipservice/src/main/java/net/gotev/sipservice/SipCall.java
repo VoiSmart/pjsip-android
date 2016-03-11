@@ -83,7 +83,7 @@ public class SipCall extends Call {
 
             account.getService().getBroadcastEmitter()
                     .callState(account.getData().getIdUri(), callID, callState.swigValue(),
-                               connectTimestamp);
+                               connectTimestamp, localHold, localMute);
 
         } catch (Exception exc) {
             Logger.error(LOG_TAG, "onCallState: error while getting call info", exc);

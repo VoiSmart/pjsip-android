@@ -41,6 +41,8 @@ public class BroadcastEventEmitter {
         public static final String CONNECT_TIMESTAMP = "connectTimestamp";
         public static final String STACK_STARTED = "stack_started";
         public static final String CODEC_PRIORITIES_LIST = "codec_priorities_list";
+        public static final String LOCAL_HOLD = "local_hold";
+        public static final String LOCAL_MUTE = "local_mute";
     }
 
     public BroadcastEventEmitter(Context context) {
@@ -90,8 +92,12 @@ public class BroadcastEventEmitter {
      * @param accountID call's account IdUri
      * @param callID call ID number
      * @param callStateCode SIP call state code
+     * @param connectTimestamp call start timestamp
+     * @param isLocalHold true if the call is held locally
+     * @param isLocalMute true if the call is muted locally
      */
-    public void callState(String accountID, int callID, int callStateCode, long connectTimestamp) {
+    public void callState(String accountID, int callID, int callStateCode, long connectTimestamp,
+                          boolean isLocalHold, boolean isLocalMute) {
         final Intent intent = new Intent();
 
         intent.setAction(getAction(BroadcastAction.CALL_STATE));
@@ -99,6 +105,8 @@ public class BroadcastEventEmitter {
         intent.putExtra(BroadcastParameters.CALL_ID, callID);
         intent.putExtra(BroadcastParameters.CALL_STATE, callStateCode);
         intent.putExtra(BroadcastParameters.CONNECT_TIMESTAMP, connectTimestamp);
+        intent.putExtra(BroadcastParameters.LOCAL_HOLD, isLocalHold);
+        intent.putExtra(BroadcastParameters.LOCAL_MUTE, isLocalMute);
 
         mContext.sendBroadcast(intent);
     }

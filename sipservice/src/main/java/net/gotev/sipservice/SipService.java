@@ -36,6 +36,7 @@ import static net.gotev.sipservice.SipServiceCommand.ACTION_GET_CALL_STATUS;
 import static net.gotev.sipservice.SipServiceCommand.ACTION_GET_CODEC_PRIORITIES;
 import static net.gotev.sipservice.SipServiceCommand.ACTION_HANG_UP_CALL;
 import static net.gotev.sipservice.SipServiceCommand.ACTION_HANG_UP_CALLS;
+import static net.gotev.sipservice.SipServiceCommand.ACTION_HOLD_CALLS;
 import static net.gotev.sipservice.SipServiceCommand.ACTION_MAKE_CALL;
 import static net.gotev.sipservice.SipServiceCommand.ACTION_REMOVE_ACCOUNT;
 import static net.gotev.sipservice.SipServiceCommand.ACTION_RESTART_SIP_STACK;
@@ -135,6 +136,9 @@ public class SipService extends BackgroundService {
                 } else if (ACTION_HANG_UP_CALLS.equals(action)) {
                     handleHangUpActiveCalls(intent);
 
+                } else if (ACTION_HOLD_CALLS.equals(action)) {
+                    handleHoldActiveCalls(intent);
+
                 } else if (ACTION_GET_CALL_STATUS.equals(action)) {
                     handleGetCallStatus(intent);
 
@@ -201,7 +205,7 @@ public class SipService extends BackgroundService {
 
     private void notifyCallDisconnected(String accountID, int callID) {
         mBroadcastEmitter.callState(accountID, callID,
-                pjsip_inv_state.PJSIP_INV_STATE_DISCONNECTED.swigValue(), 0);
+                pjsip_inv_state.PJSIP_INV_STATE_DISCONNECTED.swigValue(), 0, false, false);
     }
 
     private void handleGetCallStatus(Intent intent) {
@@ -215,7 +219,8 @@ public class SipService extends BackgroundService {
         }
 
         mBroadcastEmitter.callState(accountID, callID, sipCall.getCurrentState().swigValue(),
-                                    sipCall.getConnectTimestamp());
+                                    sipCall.getConnectTimestamp(), sipCall.isLocalHold(),
+                                    sipCall.isLocalMute());
     }
 
     private void handleSendDTMF(Intent intent) {
@@ -390,6 +395,32 @@ public class SipService extends BackgroundService {
             } catch (Exception exc) {
                 Logger.error(TAG, "Error while hanging up call", exc);
                 notifyCallDisconnected(accountID, callID);
+            }
+        }
+    }
+
+    private void handleHoldActiveCalls(Intent intent) {
+        String accountID = intent.getStringExtra(PARAM_ACCOUNT_ID);
+
+        SipAccount account = mActiveSipAccounts.get(accountID);
+        if (account == null) return;
+
+        Set<Integer> activeCallIDs = account.getCallIDs();
+
+        if (activeCallIDs == null || activeCallIDs.isEmpty()) return;
+
+        for (int callID : activeCallIDs) {
+            try {
+                SipCall sipCall = getCall(accountID, callID);
+
+                if (sipCall == null) {
+                    notifyCallDisconnected(accountID, callID);
+                    return;
+                }
+
+                sipCall.setHold(true);
+            } catch (Exception exc) {
+                Logger.error(TAG, "Error while holding call", exc);
             }
         }
     }
