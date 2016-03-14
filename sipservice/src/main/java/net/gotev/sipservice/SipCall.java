@@ -255,9 +255,9 @@ public class SipCall extends Call {
         String transferString;
 
         if (destination.startsWith("sip:")) {
-            transferString = destination;
+            transferString = "<" + destination + ">";
         } else {
-            transferString = "sip:" + destination + "@" + account.getData().getRealm();
+            transferString = "<sip:" + destination + "@" + account.getData().getRealm() + ">";
         }
 
         CallOpParam param = new CallOpParam();
