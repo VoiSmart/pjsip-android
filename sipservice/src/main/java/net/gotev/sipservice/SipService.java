@@ -25,6 +25,7 @@ import org.pjsip.pjsua2.pjsip_transport_type_e;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -633,13 +634,16 @@ public class SipService extends BackgroundService {
 
             for (int i = 0; i < (int)codecs.size(); i++) {
                 CodecInfo codecInfo = codecs.get(i);
-                codecPrioritiesList.add(new CodecPriority(codecInfo.getCodecId(),
-                                                          codecInfo.getPriority()));
+                CodecPriority newCodec = new CodecPriority(codecInfo.getCodecId(),
+                                                           codecInfo.getPriority());
+                if (!codecPrioritiesList.contains(newCodec))
+                    codecPrioritiesList.add(newCodec);
                 codecInfo.delete();
             }
 
             codecs.delete();
 
+            Collections.sort(codecPrioritiesList);
             return codecPrioritiesList;
 
         } catch (Exception exc) {

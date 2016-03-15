@@ -13,6 +13,13 @@ public class CodecPriority implements Parcelable, Comparable<CodecPriority> {
     public static int PRIORITY_MIN = 1;
     public static int PRIORITY_DISABLED = 0;
 
+    private static final String G729_LABEL = "G.729";
+    private static final String G711U_LABEL = "G.711u";
+    private static final String G711A_LABEL = "G.711a";
+    private static final String SPEEX_LABEL = "Speex";
+    private static final String G722_LABEL = "G.722";
+    private static final String G7221_LABEL = "G.722.1";
+
     private String mCodecId;
     private int mPriority;
 
@@ -75,7 +82,28 @@ public class CodecPriority implements Parcelable, Comparable<CodecPriority> {
     }
 
     public String getCodecName() {
-        return mCodecId.split("/")[0];
+        String name = mCodecId.split("/")[0];
+
+        if (name.equals("G729"))
+            return G729_LABEL;
+
+        if (name.equals("PCMU"))
+            return G711U_LABEL;
+
+        if (name.equals("PCMA"))
+            return G711A_LABEL;
+
+        if (name.equals("speex"))
+            return SPEEX_LABEL;
+
+        if (name.equals("G722"))
+            return G722_LABEL;
+
+        if (name.equals("G7221"))
+            return G7221_LABEL;
+
+        return name;
+
     }
 
     public int getCodecBitrateInKbitPerSecond() {
