@@ -147,7 +147,7 @@ public class SipServiceCommand {
 
     /**
      * Checks the status of a call. You will receive the result in
-     * {@link BroadcastEventReceiver#onCallState(String, int, pjsip_inv_state, long)}
+     * {@link BroadcastEventReceiver#onCallState(String, int, pjsip_inv_state, long, boolean, boolean)}
      * @param context application context
      * @param accountID account ID used to make the call
      * @param callID call ID
@@ -165,7 +165,7 @@ public class SipServiceCommand {
     /**
      * Hangs up an active call. If the call does not exist or has been terminated, a disconnected
      * state will be sent to
-     * {@link BroadcastEventReceiver#onCallState(String, int, pjsip_inv_state, long)}
+     * {@link BroadcastEventReceiver#onCallState(String, int, pjsip_inv_state, long, boolean, boolean)}
      * @param context application context
      * @param accountID account ID
      * @param callID call ID to hang up
@@ -211,7 +211,7 @@ public class SipServiceCommand {
     /**
      * Send DTMF. If the call does not exist or has been terminated, a disconnected
      * state will be sent to
-     * {@link BroadcastEventReceiver#onCallState(String, int, pjsip_inv_state, long)}
+     * {@link BroadcastEventReceiver#onCallState(String, int, pjsip_inv_state, long, boolean, boolean)}
      * @param context application context
      * @param accountID account ID
      * @param callID call ID to hang up
@@ -230,7 +230,7 @@ public class SipServiceCommand {
     /**
      * Accept an incoming call. If the call does not exist or has been terminated, a disconnected
      * state will be sent to
-     * {@link BroadcastEventReceiver#onCallState(String, int, pjsip_inv_state, long)}
+     * {@link BroadcastEventReceiver#onCallState(String, int, pjsip_inv_state, long, boolean, boolean)}
      * @param context application context
      * @param accountID account ID
      * @param callID call ID to hang up
@@ -248,7 +248,7 @@ public class SipServiceCommand {
     /**
      * Decline an incoming call. If the call does not exist or has been terminated, a disconnected
      * state will be sent to
-     * {@link BroadcastEventReceiver#onCallState(String, int, pjsip_inv_state, long)}
+     * {@link BroadcastEventReceiver#onCallState(String, int, pjsip_inv_state, long, boolean, boolean)}
      * @param context application context
      * @param accountID account ID
      * @param callID call ID to hang up
@@ -266,7 +266,7 @@ public class SipServiceCommand {
     /**
      * Blind call transfer. If the call does not exist or has been terminated, a disconnected
      * state will be sent to
-     * {@link BroadcastEventReceiver#onCallState(String, int, pjsip_inv_state, long)}
+     * {@link BroadcastEventReceiver#onCallState(String, int, pjsip_inv_state, long, boolean, boolean)}
      * @param context application context
      * @param accountID account ID
      * @param callID call ID
@@ -286,7 +286,7 @@ public class SipServiceCommand {
     /**
      * Sets hold status for a call. If the call does not exist or has been terminated, a disconnected
      * state will be sent to
-     * {@link BroadcastEventReceiver#onCallState(String, int, pjsip_inv_state, long)}
+     * {@link BroadcastEventReceiver#onCallState(String, int, pjsip_inv_state, long, boolean, boolean)}
      * @param context application context
      * @param accountID account ID
      * @param callID call ID
@@ -306,7 +306,7 @@ public class SipServiceCommand {
     /**
      * Toggle hold status for a call. If the call does not exist or has been terminated, a disconnected
      * state will be sent to
-     * {@link BroadcastEventReceiver#onCallState(String, int, pjsip_inv_state, long)}
+     * {@link BroadcastEventReceiver#onCallState(String, int, pjsip_inv_state, long, boolean, boolean)}
      * @param context application context
      * @param accountID account ID
      * @param callID call ID
@@ -324,7 +324,7 @@ public class SipServiceCommand {
     /**
      * Sets mute status for a call. If the call does not exist or has been terminated, a disconnected
      * state will be sent to
-     * {@link BroadcastEventReceiver#onCallState(String, int, pjsip_inv_state, long)}
+     * {@link BroadcastEventReceiver#onCallState(String, int, pjsip_inv_state, long, boolean, boolean)}
      * @param context application context
      * @param accountID account ID
      * @param callID call ID
@@ -344,7 +344,7 @@ public class SipServiceCommand {
     /**
      * Toggle mute status for a call. If the call does not exist or has been terminated, a disconnected
      * state will be sent to
-     * {@link BroadcastEventReceiver#onCallState(String, int, pjsip_inv_state, long)}
+     * {@link BroadcastEventReceiver#onCallState(String, int, pjsip_inv_state, long, boolean, boolean)}
      * @param context application context
      * @param accountID account ID
      * @param callID call ID
