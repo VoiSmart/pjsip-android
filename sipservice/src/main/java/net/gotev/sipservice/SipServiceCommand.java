@@ -66,6 +66,30 @@ public class SipServiceCommand {
     }
 
     /**
+     * Adds a new SIP account and changes the sip stack codec priority settings.
+     * @param context application context
+     * @param sipAccount sip account data
+     * @return sip account ID uri as a string
+     */
+    public static String setAccountWithCodecs(Context context, SipAccountData sipAccount,
+                                              ArrayList<CodecPriority> codecPriorities) {
+        if (sipAccount == null) {
+            throw new IllegalArgumentException("sipAccount MUST not be null!");
+        }
+
+        String accountID = sipAccount.getIdUri();
+        checkAccount(accountID);
+
+        Intent intent = new Intent(context, SipService.class);
+        intent.setAction(ACTION_SET_ACCOUNT);
+        intent.putExtra(PARAM_ACCOUNT_DATA, sipAccount);
+        intent.putParcelableArrayListExtra(PARAM_CODEC_PRIORITIES, codecPriorities);
+        context.startService(intent);
+
+        return accountID;
+    }
+
+    /**
      * Remove a SIP account.
      * @param context application context
      * @param accountID account ID uri

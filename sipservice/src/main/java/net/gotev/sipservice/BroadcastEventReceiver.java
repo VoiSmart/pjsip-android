@@ -14,6 +14,7 @@ import java.util.ArrayList;
 
 import static net.gotev.sipservice.BroadcastEventEmitter.BroadcastAction.CALL_STATE;
 import static net.gotev.sipservice.BroadcastEventEmitter.BroadcastAction.CODEC_PRIORITIES;
+import static net.gotev.sipservice.BroadcastEventEmitter.BroadcastAction.CODEC_PRIORITIES_SET_STATUS;
 import static net.gotev.sipservice.BroadcastEventEmitter.BroadcastAction.INCOMING_CALL;
 import static net.gotev.sipservice.BroadcastEventEmitter.BroadcastAction.OUTGOING_CALL;
 import static net.gotev.sipservice.BroadcastEventEmitter.BroadcastAction.REGISTRATION;
@@ -70,6 +71,10 @@ public class BroadcastEventReceiver extends BroadcastReceiver {
         } else if (action.equals(BroadcastEventEmitter.getAction(CODEC_PRIORITIES))) {
             ArrayList<CodecPriority> codecList = intent.getParcelableArrayListExtra(BroadcastParameters.CODEC_PRIORITIES_LIST);
             onReceivedCodecPriorities(codecList);
+
+        } else if (action.equals(BroadcastEventEmitter.getAction(CODEC_PRIORITIES_SET_STATUS))) {
+            onCodecPrioritiesSetStatus(intent.getBooleanExtra(BroadcastParameters.SUCCESS, false));
+
         }
     }
 
@@ -92,6 +97,7 @@ public class BroadcastEventReceiver extends BroadcastReceiver {
         intentFilter.addAction(BroadcastEventEmitter.getAction(OUTGOING_CALL));
         intentFilter.addAction(BroadcastEventEmitter.getAction(STACK_STATUS));
         intentFilter.addAction(BroadcastEventEmitter.getAction(CODEC_PRIORITIES));
+        intentFilter.addAction(BroadcastEventEmitter.getAction(CODEC_PRIORITIES_SET_STATUS));
         context.registerReceiver(this, intentFilter);
     }
 
@@ -142,5 +148,9 @@ public class BroadcastEventReceiver extends BroadcastReceiver {
         for (CodecPriority codec : codecPriorities) {
             Logger.debug(LOG_TAG, codec.toString());
         }
+    }
+
+    public void onCodecPrioritiesSetStatus(boolean success) {
+        Logger.debug(LOG_TAG, "Codec priorities " + (success ? "successfully set" : "set error"));
     }
 }

@@ -70,6 +70,7 @@ public class SipService extends BackgroundService {
 
     private static final String PREFS_NAME = TAG + "prefs";
     private static final String PREFS_KEY_ACCOUNTS = "accounts";
+    private static final String PREFS_KEY_CODEC_PRIORITIES = "codec_priorities";
 
     private List<SipAccountData> mConfiguredAccounts = new ArrayList<>();
     private static ConcurrentHashMap<String, SipAccount> mActiveSipAccounts = new ConcurrentHashMap<>();
@@ -499,6 +500,7 @@ public class SipService extends BackgroundService {
             Logger.debug(TAG, "Adding " + data.getIdUri());
 
             try {
+                handleSetCodecPriorities(intent);
                 addAccount(data);
                 mConfiguredAccounts.add(data);
                 persistConfiguredAccounts();
@@ -510,6 +512,7 @@ public class SipService extends BackgroundService {
 
             try {
                 removeAccount(data.getIdUri());
+                handleSetCodecPriorities(intent);
                 addAccount(data);
                 mConfiguredAccounts.set(index, data);
                 persistConfiguredAccounts();
@@ -576,6 +579,17 @@ public class SipService extends BackgroundService {
             mEndpoint.transportCreate(pjsip_transport_type_e.PJSIP_TRANSPORT_TCP, tcpTransport);
             mEndpoint.libStart();
 
+            ArrayList<CodecPriority> codecPriorities = getConfiguredCodecPriorities();
+            if (codecPriorities != null) {
+                Logger.debug(TAG, "Setting saved codec priorities...");
+                for (CodecPriority codecPriority : codecPriorities) {
+                    mEndpoint.codecSetPriority(codecPriority.getCodecId(), (short) codecPriority.getPriority());
+                }
+                Logger.debug(TAG, "Saved codec priorities set!");
+            } else {
+                mEndpoint.codecSetPriority("G729/8000", (short) CodecPriority.PRIORITY_MAX);
+            }
+
             Logger.debug(TAG, "PJSIP started!");
             mStarted = true;
             mBroadcastEmitter.stackStatus(true);
@@ -620,9 +634,11 @@ public class SipService extends BackgroundService {
     }
 
     private ArrayList<CodecPriority> getCodecPriorityList() {
-        if (mEndpoint == null) {
+        startStack();
+
+        if (!mStarted) {
             Logger.error(TAG, "Can't get codec priority list! The SIP Stack has not been " +
-                              "initialized! Add an account first!");
+                    "initialized! Add an account first!");
             return null;
         }
 
@@ -663,9 +679,14 @@ public class SipService extends BackgroundService {
     private void handleSetCodecPriorities(Intent intent) {
         ArrayList<CodecPriority> codecPriorities = intent.getParcelableArrayListExtra(PARAM_CODEC_PRIORITIES);
 
-        if (mEndpoint == null) {
-            Logger.error(TAG, "Can't get codec priority list! The SIP Stack has not been " +
-                    "initialized! Add an account first!");
+        if (codecPriorities == null) {
+            return;
+        }
+
+        startStack();
+
+        if (!mStarted) {
+            mBroadcastEmitter.codecPrioritiesSetStatus(false);
             return;
         }
 
@@ -678,10 +699,13 @@ public class SipService extends BackgroundService {
                 log.append(codecPriority.toString()).append("\n");
             }
 
+            persistConfiguredCodecPriorities(codecPriorities);
             Logger.debug(TAG, log.toString());
+            mBroadcastEmitter.codecPrioritiesSetStatus(true);
 
         } catch (Exception exc) {
             Logger.error(TAG, "Error while setting codec priorities", exc);
+            mBroadcastEmitter.codecPrioritiesSetStatus(false);
         }
     }
 
@@ -744,6 +768,23 @@ public class SipService extends BackgroundService {
     private void persistConfiguredAccounts() {
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         prefs.edit().putString(PREFS_KEY_ACCOUNTS, new Gson().toJson(mConfiguredAccounts)).apply();
+    }
+
+    private void persistConfiguredCodecPriorities(ArrayList<CodecPriority> codecPriorities) {
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        prefs.edit().putString(PREFS_KEY_CODEC_PRIORITIES, new Gson().toJson(codecPriorities)).apply();
+    }
+
+    private ArrayList<CodecPriority> getConfiguredCodecPriorities() {
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+
+        String codecPriorities = prefs.getString(PREFS_KEY_CODEC_PRIORITIES, "");
+        if (codecPriorities.isEmpty()) {
+            return null;
+        }
+
+        Type listType = new TypeToken<ArrayList<CodecPriority>>(){}.getType();
+        return new Gson().fromJson(codecPriorities, listType);
     }
 
     private void loadConfiguredAccounts() {

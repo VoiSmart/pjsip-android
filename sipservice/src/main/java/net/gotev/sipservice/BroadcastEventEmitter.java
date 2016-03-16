@@ -24,7 +24,8 @@ public class BroadcastEventEmitter {
         CALL_STATE,
         OUTGOING_CALL,
         STACK_STATUS,
-        CODEC_PRIORITIES
+        CODEC_PRIORITIES,
+        CODEC_PRIORITIES_SET_STATUS
     }
 
     /**
@@ -43,6 +44,7 @@ public class BroadcastEventEmitter {
         public static final String CODEC_PRIORITIES_LIST = "codec_priorities_list";
         public static final String LOCAL_HOLD = "local_hold";
         public static final String LOCAL_MUTE = "local_mute";
+        public static final String SUCCESS = "success";
     }
 
     public BroadcastEventEmitter(Context context) {
@@ -136,6 +138,15 @@ public class BroadcastEventEmitter {
 
         intent.setAction(getAction(BroadcastAction.CODEC_PRIORITIES));
         intent.putParcelableArrayListExtra(BroadcastParameters.CODEC_PRIORITIES_LIST, codecPriorities);
+
+        mContext.sendBroadcast(intent);
+    }
+
+    public void codecPrioritiesSetStatus(boolean success) {
+        final Intent intent = new Intent();
+
+        intent.setAction(getAction(BroadcastAction.CODEC_PRIORITIES_SET_STATUS));
+        intent.putExtra(BroadcastParameters.SUCCESS, success);
 
         mContext.sendBroadcast(intent);
     }
