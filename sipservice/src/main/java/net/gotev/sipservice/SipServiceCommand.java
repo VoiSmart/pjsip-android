@@ -33,6 +33,7 @@ public class SipServiceCommand {
     protected static final String ACTION_TRANSFER_CALL = "callTransfer";
     protected static final String ACTION_GET_CODEC_PRIORITIES = "codecPriorities";
     protected static final String ACTION_SET_CODEC_PRIORITIES = "setCodecPriorities";
+    protected static final String ACTION_GET_REGISTRATION_STATUS = "getRegistrationStatus";
 
     protected static final String PARAM_ACCOUNT_DATA = "accountData";
     protected static final String PARAM_ACCOUNT_ID = "accountID";
@@ -387,5 +388,19 @@ public class SipServiceCommand {
         if (accountID == null || accountID.isEmpty() || !accountID.startsWith("sip:")) {
             throw new IllegalArgumentException("Invalid accountID! Example: sip:user@domain");
         }
+    }
+
+    /**
+     * Gets the registration status for an account.
+     * @param context application context
+     * @param accountID sip account data
+     */
+    public static void getRegistrationStatus(Context context, String accountID) {
+        checkAccount(accountID);
+
+        Intent intent = new Intent(context, SipService.class);
+        intent.setAction(ACTION_GET_REGISTRATION_STATUS);
+        intent.putExtra(PARAM_ACCOUNT_ID, accountID);
+        context.startService(intent);
     }
 }

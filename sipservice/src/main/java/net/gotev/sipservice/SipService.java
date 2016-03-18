@@ -35,6 +35,7 @@ import static net.gotev.sipservice.SipServiceCommand.ACTION_ACCEPT_INCOMING_CALL
 import static net.gotev.sipservice.SipServiceCommand.ACTION_DECLINE_INCOMING_CALL;
 import static net.gotev.sipservice.SipServiceCommand.ACTION_GET_CALL_STATUS;
 import static net.gotev.sipservice.SipServiceCommand.ACTION_GET_CODEC_PRIORITIES;
+import static net.gotev.sipservice.SipServiceCommand.ACTION_GET_REGISTRATION_STATUS;
 import static net.gotev.sipservice.SipServiceCommand.ACTION_HANG_UP_CALL;
 import static net.gotev.sipservice.SipServiceCommand.ACTION_HANG_UP_CALLS;
 import static net.gotev.sipservice.SipServiceCommand.ACTION_HOLD_CALLS;
@@ -173,6 +174,9 @@ public class SipService extends BackgroundService {
 
                 } else if (ACTION_SET_CODEC_PRIORITIES.equals(action)) {
                     handleSetCodecPriorities(intent);
+
+                } else if (ACTION_GET_REGISTRATION_STATUS.equals(action)) {
+                    handleGetRegistrationStatus(intent);
 
                 }
 
@@ -706,6 +710,22 @@ public class SipService extends BackgroundService {
         } catch (Exception exc) {
             Logger.error(TAG, "Error while setting codec priorities", exc);
             mBroadcastEmitter.codecPrioritiesSetStatus(false);
+        }
+    }
+
+    private void handleGetRegistrationStatus(Intent intent) {
+        String accountID = intent.getStringExtra(PARAM_ACCOUNT_ID);
+
+        if (!mStarted || mActiveSipAccounts.get(accountID) == null) {
+            mBroadcastEmitter.registrationState("", 400);
+            return;
+        }
+
+        SipAccount account = mActiveSipAccounts.get(accountID);
+        try {
+            mBroadcastEmitter.registrationState(accountID, account.getInfo().getRegStatus().swigValue());
+        } catch (Exception exc) {
+            Logger.error(TAG, "Error while getting registration status for " + accountID, exc);
         }
     }
 
