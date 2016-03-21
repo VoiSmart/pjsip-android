@@ -567,8 +567,8 @@ public class SipService extends BackgroundService {
             EpConfig epConfig = new EpConfig();
             epConfig.getUaConfig().setUserAgent(AGENT_NAME);
             epConfig.getMedConfig().setHasIoqueue(true);
-            epConfig.getMedConfig().setClockRate(8000);
-            epConfig.getMedConfig().setQuality(4);
+            epConfig.getMedConfig().setClockRate(16000);
+            epConfig.getMedConfig().setQuality(10);
             epConfig.getMedConfig().setEcOptions(1);
             epConfig.getMedConfig().setEcTailLen(200);
             epConfig.getMedConfig().setThreadCnt(2);
