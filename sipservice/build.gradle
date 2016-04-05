@@ -1,5 +1,14 @@
 apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'com.jfrog.bintray'
+
+def siteUrl = 'https://github.com/gotev/pjsip-android'
+def gitUrl = 'https://github.com/gotev/pjsip-android.git'
+def projectName = "pjsip-android"
+def projectDesc = "SIP Service for Android based on PJSIP."
+def projectGroup = "net.gotev"
+group = projectGroup
+version = "1.0"
 
 android {
     compileSdkVersion 23
@@ -9,7 +18,7 @@ android {
         minSdkVersion 18
         targetSdkVersion 23
         versionCode 2
-        versionName "1.0"
+        versionName version
     }
     buildTypes {
         release {
@@ -22,4 +31,98 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.google.code.gson:gson:2.5'
+}
+
+// add the following information to the file: local.properties situated in the parent directory of
+// where this file is:
+//
+// bintray.user=gotev
+// bintray.apikey=api key got from the bintray profile
+//
+// be sure to add local.properties to the .gitignore!
+
+Properties properties = new Properties()
+if (project.rootProject.file("local.properties").exists()) {
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+}
+
+install {
+    repositories.mavenInstaller {
+        pom.project {
+            name projectName
+            description projectDesc
+            packaging 'aar'
+            groupId projectGroup
+            version version
+            url siteUrl
+            licenses {
+                license {
+                    name 'The Apache Software License, Version 2.0'
+                    url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                }
+            }
+            developers {
+                developer {
+                    id 'gotev'
+                    name 'Aleksandar Gotev'
+                }
+            }
+            scm {
+                connection gitUrl
+                developerConnection gitUrl
+                url siteUrl
+
+            }
+        }
+    }
+}
+
+bintray {
+    user = properties.getProperty("bintray.user")
+    key = properties.getProperty("bintray.apikey")
+    configurations = ['archives']
+    pkg {
+        repo = "maven"
+        name = projectName
+        desc = projectDesc
+        websiteUrl = siteUrl
+        vcsUrl = gitUrl
+        issueTrackerUrl = siteUrl + "/issues/"
+        licenses = ["Apache-2.0"]
+        labels = ['android', 'sip', 'service', 'pjsip', 'background', 'library']
+        publicDownloadNumbers = true
+        publish = true
+    }
+}
+
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+
+task javadoc(type: Javadoc) {
+    title = "SIP Service $project.version API"
+    description "Generates Javadoc"
+    source = android.sourceSets.main.java.srcDirs
+    classpath += files(android.bootClasspath)
+    exclude '**/BuildConfig.java', '**/R.java'
+    options {
+        windowTitle("SIP Service $project.version Reference")
+        locale = 'en_US'
+        encoding = 'UTF-8'
+        charSet = 'UTF-8'
+        links("http://docs.oracle.com/javase/7/docs/api/");
+        linksOffline("http://d.android.com/reference", "${android.sdkDirectory}/docs/reference");
+        setMemberLevel(JavadocMemberLevel.PUBLIC)
+    }
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives javadocJar
+    archives sourcesJar
 }

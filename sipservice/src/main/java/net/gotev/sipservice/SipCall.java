@@ -188,7 +188,6 @@ public class SipCall extends Call {
     /**
      * Utility method to mute/unmute the device microphone during a call.
      * @param mute true to mute the microphone, false to un-mute it
-     * @throws Exception if an error occurs during the mute/unmute operation
      */
     public void setMute(boolean mute) {
         // return immediately if we are not changing the current state

@@ -68,8 +68,11 @@ public class SipServiceCommand {
 
     /**
      * Adds a new SIP account and changes the sip stack codec priority settings.
+     * This is handy to set an account plus the global codec priority configuration with
+     * just a single call.
      * @param context application context
      * @param sipAccount sip account data
+     * @param codecPriorities list with the codec priorities to set
      * @return sip account ID uri as a string
      */
     public static String setAccountWithCodecs(Context context, SipAccountData sipAccount,
@@ -216,6 +219,8 @@ public class SipServiceCommand {
      * @param context application context
      * @param accountID account ID
      * @param callID call ID to hang up
+     * @param dtmfTone DTMF tone to send (e.g. number from 0 to 9 or # or *).
+     *                 You can send only one DTMF at a time.
      */
     public static void sendDTMF(Context context, String accountID, int callID, String dtmfTone) {
         checkAccount(accountID);
