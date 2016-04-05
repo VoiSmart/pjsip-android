@@ -36,3 +36,6 @@ local.properties
 ehthumbs.db
 Thumbs.db
 *.log
+
+#Vagrant
+.vagrant
