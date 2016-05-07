@@ -13,12 +13,16 @@ import org.pjsip.pjsua2.pj_qos_type;
  */
 public class SipAccountData implements Parcelable {
 
+    public static final String AUTH_TYPE_DIGEST = "digest";
+    public static final String AUTH_TYPE_PLAIN = "plain";
+
     private String username;
     private String password;
     private String realm;
     private String host;
     private long port = 5060;
     private boolean tcpTransport = false;
+    private String authenticationType = AUTH_TYPE_DIGEST;
 
     public SipAccountData() { }
 
@@ -45,6 +49,7 @@ public class SipAccountData implements Parcelable {
         parcel.writeString(host);
         parcel.writeLong(port);
         parcel.writeByte((byte) (tcpTransport ? 1 : 0));
+        parcel.writeString(authenticationType);
     }
 
     private SipAccountData(Parcel in) {
@@ -54,6 +59,7 @@ public class SipAccountData implements Parcelable {
         host = in.readString();
         port = in.readLong();
         tcpTransport = in.readByte() == 1;
+        authenticationType = in.readString();
     }
 
     @Override
@@ -116,6 +122,9 @@ public class SipAccountData implements Parcelable {
     }
 
     public String getIdUri() {
+        if ("*".equals(realm))
+            return "sip:" + username;
+
         return "sip:" + username + "@" + realm;
     }
 
@@ -148,11 +157,21 @@ public class SipAccountData implements Parcelable {
         accountConfig.setIdUri(getIdUri());
         accountConfig.getRegConfig().setRegistrarUri(getRegistrarUri());
 
-        AuthCredInfo cred = new AuthCredInfo("digest", getRealm(), getUsername(), 0, getPassword());
+        AuthCredInfo cred = new AuthCredInfo(authenticationType, getRealm(),
+                                             getUsername(), 0, getPassword());
         accountConfig.getSipConfig().getAuthCreds().add(cred);
         accountConfig.getSipConfig().getProxies().add(getProxyUri());
 
         return accountConfig;
+    }
+
+    public String getAuthenticationType() {
+        return authenticationType;
+    }
+
+    public SipAccountData setAuthenticationType(String authenticationType) {
+        this.authenticationType = authenticationType;
+        return this;
     }
 
     @Override

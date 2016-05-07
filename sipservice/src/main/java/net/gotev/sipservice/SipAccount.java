@@ -69,7 +69,11 @@ public class SipAccount extends Account {
 
         CallOpParam callOpParam = new CallOpParam();
         try {
-            call.makeCall("sip:" + numberToDial + "@" + data.getRealm(), callOpParam);
+            if ("*".equals(data.getRealm())) {
+                call.makeCall("sip:" + numberToDial, callOpParam);
+            } else {
+                call.makeCall("sip:" + numberToDial + "@" + data.getRealm(), callOpParam);
+            }
             activeCalls.put(call.getId(), call);
             Logger.debug(LOG_TAG, "New outgoing call with ID: " + call.getId());
 
