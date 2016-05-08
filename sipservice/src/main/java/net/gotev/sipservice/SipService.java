@@ -473,6 +473,25 @@ public class SipService extends BackgroundService {
         addAllConfiguredAccounts();
     }
 
+    private void handleResetAccounts(Intent intent) {
+        Logger.debug(TAG, "Removing all the configured accounts");
+
+        Iterator<SipAccountData> iterator = mConfiguredAccounts.iterator();
+
+        while (iterator.hasNext()) {
+            SipAccountData data = iterator.next();
+
+            try {
+                removeAccount(data.getIdUri());
+                iterator.remove();
+            } catch (Exception exc) {
+                Logger.error(TAG, "Error while removing account " + data.getIdUri(), exc);
+            }
+        }
+
+        persistConfiguredAccounts();
+    }
+
     private void handleRemoveAccount(Intent intent) {
         String accountIDtoRemove = intent.getStringExtra(PARAM_ACCOUNT_ID);
 
@@ -501,6 +520,7 @@ public class SipService extends BackgroundService {
 
         int index = mConfiguredAccounts.indexOf(data);
         if (index == -1) {
+            handleResetAccounts(intent);
             Logger.debug(TAG, "Adding " + data.getIdUri());
 
             try {
