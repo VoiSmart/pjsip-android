@@ -607,6 +607,7 @@ public class SipService extends BackgroundService {
             if (codecPriorities != null) {
                 Logger.debug(TAG, "Setting saved codec priorities...");
                 for (CodecPriority codecPriority : codecPriorities) {
+                    Logger.debug(TAG, "Setting " + codecPriority.getCodecId() + " priority to " + codecPriority.getPriority());
                     mEndpoint.codecSetPriority(codecPriority.getCodecId(), (short) codecPriority.getPriority());
                 }
                 Logger.debug(TAG, "Saved codec priorities set!");

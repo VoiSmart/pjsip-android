@@ -34,7 +34,7 @@ public class CallerInfo {
         } else {
             Matcher remoteUriInfo = remoteUriPattern.matcher(temp);
             if (remoteUriInfo.matches()) {
-                displayName = remoteUri = completeInfo.group(1);
+                displayName = remoteUri = remoteUriInfo.group(1);
             } else {
                 displayName = remoteUri = UNKNOWN;
             }
