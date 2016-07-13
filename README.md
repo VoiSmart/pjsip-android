@@ -36,3 +36,15 @@ Give it a try by checking out the project and running the [demo app](https://git
 - Respond to a call and play a sound file
 - Support for In-Call RTCP signaling to get call statistics
 - Other things which I'm not aware at the moment...
+
+# Recompile native libraries
+You need to install [Vagrant](https://www.vagrantup.com/) and [VirtualBox](https://www.virtualbox.org/) and to checkout the project. On OSX or Linux, to recompile the native libraries, just execute:
+```shell
+./build-native-libraries
+```
+What happens under the hood is:
+* a new virtual machine with pjsip-android-builder gets prepared
+* the virtual machine gets booted
+* the build scripts gets executed
+* the final libraries gets copied to the proper locations in the Android Studio project
+* the virtual machine gets halted
