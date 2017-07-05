@@ -87,7 +87,7 @@ public class SipCall extends Call {
                 checkAndStopLocalRingBackTone();
                 connectTimestamp = System.currentTimeMillis();
 
-                // MOD BY ENZO -> check whether the 183 has arrived or not
+                // check whether the 183 has arrived or not
             } else if (callState == pjsip_inv_state.PJSIP_INV_STATE_EARLY){
                 pjsip_status_code statusCode = info.getLastStatusCode();
                 // check if 180
@@ -329,7 +329,7 @@ public class SipCall extends Call {
         return localHold;
     }
 
-    // MOD BY ENZO -> check if Local RingBack Tone has started, if so, stop it.
+    // check if Local RingBack Tone has started, if so, stop it.
     private void checkAndStopLocalRingBackTone(){
         if (toneGenerator != null){
             toneGenerator.stopTone();
