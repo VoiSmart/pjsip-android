@@ -94,7 +94,7 @@ public class SipCall extends Call {
                 if (statusCode == pjsip_status_code.PJSIP_SC_RINGING){
                     checkAndStopLocalRingBackTone();
                     toneGenerator = new ToneGenerator(AudioManager.STREAM_VOICE_CALL, 100);
-                    toneGenerator.startTone(ToneGenerator.TONE_CDMA_NETWORK_USA_RINGBACK);
+                    toneGenerator.startTone(ToneGenerator.TONE_SUP_RINGTONE);
                     // check if 183
                 } else if (statusCode == pjsip_status_code.PJSIP_SC_PROGRESS){
                     checkAndStopLocalRingBackTone();
