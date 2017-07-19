@@ -2,7 +2,6 @@ package net.gotev.sipservice;
 
 import android.media.AudioManager;
 import android.media.ToneGenerator;
-import android.util.Log;
 
 import org.pjsip.pjsua2.AudDevManager;
 import org.pjsip.pjsua2.AudioMedia;
