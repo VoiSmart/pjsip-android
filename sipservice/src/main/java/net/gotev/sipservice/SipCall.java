@@ -2,6 +2,7 @@ package net.gotev.sipservice;
 
 import android.media.AudioManager;
 import android.media.ToneGenerator;
+import android.util.Log;
 
 import org.pjsip.pjsua2.AudDevManager;
 import org.pjsip.pjsua2.AudioMedia;
@@ -15,6 +16,7 @@ import org.pjsip.pjsua2.OnCallMediaStateParam;
 import org.pjsip.pjsua2.OnCallStateParam;
 import org.pjsip.pjsua2.pjmedia_type;
 import org.pjsip.pjsua2.pjsip_inv_state;
+import org.pjsip.pjsua2.pjsip_role_e;
 import org.pjsip.pjsua2.pjsip_status_code;
 import org.pjsip.pjsua2.pjsua_call_flag;
 import org.pjsip.pjsua2.pjsua_call_media_status;
@@ -90,8 +92,8 @@ public class SipCall extends Call {
                 // check whether the 183 has arrived or not
             } else if (callState == pjsip_inv_state.PJSIP_INV_STATE_EARLY){
                 pjsip_status_code statusCode = info.getLastStatusCode();
-                // check if 180
-                if (statusCode == pjsip_status_code.PJSIP_SC_RINGING){
+                // check if 180 && call is outgoing (ROLE UAC)
+                if (statusCode == pjsip_status_code.PJSIP_SC_RINGING && info.getRole() == pjsip_role_e.PJSIP_ROLE_UAC){
                     checkAndStopLocalRingBackTone();
                     toneGenerator = new ToneGenerator(AudioManager.STREAM_VOICE_CALL, 100);
                     toneGenerator.startTone(ToneGenerator.TONE_SUP_RINGTONE);
