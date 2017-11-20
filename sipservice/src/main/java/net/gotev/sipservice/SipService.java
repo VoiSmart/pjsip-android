@@ -3,8 +3,7 @@ package net.gotev.sipservice;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
+import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.IBinder;
@@ -75,8 +74,7 @@ public class SipService extends BackgroundService {
 
     private List<SipAccountData> mConfiguredAccounts = new ArrayList<>();
     private static ConcurrentHashMap<String, SipAccount> mActiveSipAccounts = new ConcurrentHashMap<>();
-    private MediaPlayer mRingTone;
-    private AudioManager mAudioManager;
+    private Ringtone mRingTone;
     private Vibrator mVibrator;
     private Uri mRingtoneUri;
     private BroadcastEventEmitter mBroadcastEmitter;
@@ -100,7 +98,6 @@ public class SipService extends BackgroundService {
                 loadNativeLibraries();
 
                 mRingtoneUri = RingtoneManager.getActualDefaultRingtoneUri(SipService.this, RingtoneManager.TYPE_RINGTONE);
-                mAudioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
                 mVibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
                 mBroadcastEmitter = new BroadcastEventEmitter(SipService.this);
@@ -855,13 +852,8 @@ public class SipService extends BackgroundService {
         mVibrator.vibrate(VIBRATOR_PATTERN, 0);
 
         try {
-            mRingTone = MediaPlayer.create(this, mRingtoneUri);
-            mRingTone.setLooping(true);
-
-            int volume = mAudioManager.getStreamVolume(AudioManager.STREAM_RING);
-            mRingTone.setVolume(volume, volume);
-
-            mRingTone.start();
+            mRingTone = RingtoneManager.getRingtone(this, mRingtoneUri);
+            mRingTone.play();
         } catch (Exception exc) {
             Logger.error(TAG, "Error while trying to play ringtone!", exc);
         }
@@ -874,11 +866,6 @@ public class SipService extends BackgroundService {
             try {
                 if (mRingTone.isPlaying())
                     mRingTone.stop();
-            } catch (Exception ignored) { }
-
-            try {
-                mRingTone.reset();
-                mRingTone.release();
             } catch (Exception ignored) { }
         }
     }
