@@ -70,6 +70,7 @@ public class BroadcastEventEmitter {
         intent.putExtra(BroadcastParameters.CALL_ID, callID);
         intent.putExtra(BroadcastParameters.DISPLAY_NAME, displayName);
         intent.putExtra(BroadcastParameters.REMOTE_URI, remoteUri);
+        intent.addFlags(Intent.FLAG_RECEIVER_FOREGROUND);
 
         mContext.sendBroadcast(intent);
     }
