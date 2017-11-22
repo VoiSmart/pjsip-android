@@ -544,7 +544,7 @@ public class SipService extends BackgroundService {
     }
 
     private void loadNativeLibraries() {
-        try {
+        /*try {
             System.loadLibrary("openh264");
             Logger.debug(TAG, "OpenH264 loaded");
         } catch (UnsatisfiedLinkError error) {
@@ -558,7 +558,7 @@ public class SipService extends BackgroundService {
         } catch (UnsatisfiedLinkError error) {
             Logger.error(TAG, "Error while loading libyuv native library", error);
             throw new RuntimeException(error);
-        }
+        }*/
 
         try {
             System.loadLibrary("pjsua2");
