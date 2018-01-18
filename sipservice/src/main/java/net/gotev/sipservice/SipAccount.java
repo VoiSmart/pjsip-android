@@ -36,6 +36,7 @@ public class SipAccount extends Account {
     }
 
     public void create() throws Exception {
+        Logger.error(LOG_TAG, "CREATE");
         create(data.getAccountConfig());
     }
 
@@ -109,6 +110,9 @@ public class SipAccount extends Account {
     public void onRegState(OnRegStateParam prm) {
         service.getBroadcastEmitter()
                .registrationState(data.getIdUri(), prm.getCode().swigValue());
+
+        this.service.checkRegistrationTimeout(prm.getRdata().getWholeMsg(), data.getIdUri());
+
     }
 
     @Override

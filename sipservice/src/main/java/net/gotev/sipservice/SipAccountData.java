@@ -23,6 +23,8 @@ public class SipAccountData implements Parcelable {
     private long port = 5060;
     private boolean tcpTransport = false;
     private String authenticationType = AUTH_TYPE_DIGEST;
+    private String contactUriParams;
+    private int regExpirationTimeout = 300;//(int) TimeUnit.DAYS.toSeconds(7L);
 
     public SipAccountData() { }
 
@@ -50,6 +52,8 @@ public class SipAccountData implements Parcelable {
         parcel.writeLong(port);
         parcel.writeByte((byte) (tcpTransport ? 1 : 0));
         parcel.writeString(authenticationType);
+        parcel.writeString(contactUriParams);
+        parcel.writeInt(regExpirationTimeout);
     }
 
     private SipAccountData(Parcel in) {
@@ -60,6 +64,8 @@ public class SipAccountData implements Parcelable {
         port = in.readLong();
         tcpTransport = in.readByte() == 1;
         authenticationType = in.readString();
+        contactUriParams = in.readString();
+        regExpirationTimeout = in.readInt();
     }
 
     @Override
@@ -144,6 +150,24 @@ public class SipAccountData implements Parcelable {
         return proxyUri.toString();
     }
 
+    public SipAccountData setContactUriParams(String contactUriParams){
+        this.contactUriParams = contactUriParams;
+        return this;
+    }
+
+    public String getContactUriParams(){
+        return ";"+contactUriParams;
+    }
+
+    public SipAccountData setRegExpirationTimeout(int regExpirationTimeout){
+        this.regExpirationTimeout = regExpirationTimeout;
+        return this;
+    }
+
+    public int getRegExpirationTimeout(){
+        return this.regExpirationTimeout;
+    }
+
     public boolean isValid() {
         return ((username != null) && !username.isEmpty()
                 && (password != null) && !password.isEmpty()
@@ -161,7 +185,8 @@ public class SipAccountData implements Parcelable {
                                              getUsername(), 0, getPassword());
         accountConfig.getSipConfig().getAuthCreds().add(cred);
         accountConfig.getSipConfig().getProxies().add(getProxyUri());
-
+        accountConfig.getRegConfig().setTimeoutSec(regExpirationTimeout);
+        accountConfig.getSipConfig().setContactUriParams(getContactUriParams());
         return accountConfig;
     }
 

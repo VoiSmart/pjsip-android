@@ -34,6 +34,7 @@ public class SipServiceCommand {
     protected static final String ACTION_GET_CODEC_PRIORITIES = "codecPriorities";
     protected static final String ACTION_SET_CODEC_PRIORITIES = "setCodecPriorities";
     protected static final String ACTION_GET_REGISTRATION_STATUS = "getRegistrationStatus";
+    protected static final String ACTION_REFRESH_REGISTRATION = "refreshRegistration";
 
     protected static final String PARAM_ACCOUNT_DATA = "accountData";
     protected static final String PARAM_ACCOUNT_ID = "accountID";
@@ -43,6 +44,8 @@ public class SipServiceCommand {
     protected static final String PARAM_HOLD = "hold";
     protected static final String PARAM_MUTE = "mute";
     protected static final String PARAM_CODEC_PRIORITIES = "codecPriorities";
+    protected static final String PARAM_REG_EXP_TIMEOUT = "regExpTimeout";
+    protected static final String PARAM_REG_CONTACT_PARAMS = "regContactParams";
 
     /**
      * Adds a new SIP account.
@@ -406,6 +409,15 @@ public class SipServiceCommand {
         Intent intent = new Intent(context, SipService.class);
         intent.setAction(ACTION_GET_REGISTRATION_STATUS);
         intent.putExtra(PARAM_ACCOUNT_ID, accountID);
+        context.startService(intent);
+    }
+
+    public static void refreshRegistration(Context context, String accountID, int regExpTimeout, String regContactParams){
+        Intent intent = new Intent(context, SipService.class);
+        intent.setAction(ACTION_REFRESH_REGISTRATION);
+        intent.putExtra(PARAM_ACCOUNT_ID, accountID);
+        intent.putExtra(PARAM_REG_EXP_TIMEOUT, regExpTimeout);
+        intent.putExtra(PARAM_REG_CONTACT_PARAMS, regContactParams);
         context.startService(intent);
     }
 }

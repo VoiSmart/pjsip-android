@@ -8,6 +8,7 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.IBinder;
 import android.os.Vibrator;
+import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -29,6 +30,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 import static net.gotev.sipservice.SipServiceCommand.ACTION_ACCEPT_INCOMING_CALL;
 import static net.gotev.sipservice.SipServiceCommand.ACTION_DECLINE_INCOMING_CALL;
@@ -39,6 +41,7 @@ import static net.gotev.sipservice.SipServiceCommand.ACTION_HANG_UP_CALL;
 import static net.gotev.sipservice.SipServiceCommand.ACTION_HANG_UP_CALLS;
 import static net.gotev.sipservice.SipServiceCommand.ACTION_HOLD_CALLS;
 import static net.gotev.sipservice.SipServiceCommand.ACTION_MAKE_CALL;
+import static net.gotev.sipservice.SipServiceCommand.ACTION_REFRESH_REGISTRATION;
 import static net.gotev.sipservice.SipServiceCommand.ACTION_REMOVE_ACCOUNT;
 import static net.gotev.sipservice.SipServiceCommand.ACTION_RESTART_SIP_STACK;
 import static net.gotev.sipservice.SipServiceCommand.ACTION_SEND_DTMF;
@@ -58,6 +61,9 @@ import static net.gotev.sipservice.SipServiceCommand.PARAM_DTMF;
 import static net.gotev.sipservice.SipServiceCommand.PARAM_HOLD;
 import static net.gotev.sipservice.SipServiceCommand.PARAM_MUTE;
 import static net.gotev.sipservice.SipServiceCommand.PARAM_NUMBER;
+import static net.gotev.sipservice.SipServiceCommand.PARAM_REG_EXP_TIMEOUT;
+import static net.gotev.sipservice.SipServiceCommand.PARAM_REG_CONTACT_PARAMS;
+import static net.gotev.sipservice.SipServiceCommand.refreshRegistration;
 
 /**
  * Sip Service.
@@ -175,6 +181,8 @@ public class SipService extends BackgroundService {
                 } else if (ACTION_GET_REGISTRATION_STATUS.equals(action)) {
                     handleGetRegistrationStatus(intent);
 
+                } else if (ACTION_REFRESH_REGISTRATION.equals(action)){
+                    handleRefreshRegistration(intent);
                 }
 
                 if (mConfiguredAccounts.isEmpty()) {
@@ -184,7 +192,7 @@ public class SipService extends BackgroundService {
             }
         });
 
-        return START_STICKY;
+        return START_NOT_STICKY;
     }
 
     @Override
@@ -464,6 +472,43 @@ public class SipService extends BackgroundService {
         }
     }
 
+    private void handleRefreshRegistration(Intent intent) {
+        String accountID = intent.getStringExtra(PARAM_ACCOUNT_ID);
+        int regExpTimeout = intent.getIntExtra(PARAM_REG_EXP_TIMEOUT, 0);
+        String regContactParams = intent.getStringExtra(PARAM_REG_CONTACT_PARAMS);
+        boolean refresh = true;
+        if (!mActiveSipAccounts.isEmpty() && mActiveSipAccounts.containsKey(accountID)){
+            try {
+                SipAccount sipAccount = mActiveSipAccounts.get(accountID);
+                if (regExpTimeout != 0 && regExpTimeout != sipAccount.getData().getRegExpirationTimeout()) {
+                    sipAccount.getData().setRegExpirationTimeout(regExpTimeout);
+                    Logger.error(TAG, String.valueOf(regExpTimeout));
+                    refresh = false;
+                }
+                if (regContactParams != null && !(String.valueOf(";"+regContactParams).equals(sipAccount.getData().getContactUriParams()))) {
+                    Logger.error(TAG, regContactParams);
+                    sipAccount.getData().setContactUriParams(regContactParams);
+                    refresh = false;
+                    mActiveSipAccounts.put(accountID, sipAccount);
+                    mConfiguredAccounts.clear();
+                    mConfiguredAccounts.add(sipAccount.getData());
+                    persistConfiguredAccounts();
+                }
+                if (refresh) {
+                    sipAccount.setRegistration(true);
+                } else {
+                    sipAccount.modify(sipAccount.getData().getAccountConfig());
+                    sipAccount.getData().setRegExpirationTimeout(100);
+                }
+            } catch (Exception ex) {
+                Logger.error(TAG, "Error while refreshing registration");
+                ex.printStackTrace();
+            }
+        } else {
+            Logger.debug(TAG, "account "+accountID+" not set");
+        }
+    }
+
     private void handleRestartSipStack() {
         Logger.debug(TAG, "Restarting SIP stack");
         stopStack();
@@ -532,7 +577,7 @@ public class SipService extends BackgroundService {
             Logger.debug(TAG, "Reconfiguring " + data.getIdUri());
 
             try {
-                removeAccount(data.getIdUri());
+                //removeAccount(data.getIdUri());
                 handleSetCodecPriorities(intent);
                 addAccount(data);
                 mConfiguredAccounts.set(index, data);
@@ -788,12 +833,16 @@ public class SipService extends BackgroundService {
     private void addAccount(SipAccountData account) throws Exception {
         String accountString = account.getIdUri();
 
-        if (!mActiveSipAccounts.containsKey(accountString)) {
+        if (!mActiveSipAccounts.containsKey(accountString) ||
+                !mActiveSipAccounts.get(accountString).isValid() ||
+                !account.getContactUriParams().equals(mActiveSipAccounts.get(accountString).getData().getContactUriParams())) {
             startStack();
             SipAccount pjSipAndroidAccount = new SipAccount(this, account);
             pjSipAndroidAccount.create();
             mActiveSipAccounts.put(accountString, pjSipAndroidAccount);
             Logger.debug(TAG, "SIP account " + account.getIdUri() + " successfully added");
+        } else {
+            mActiveSipAccounts.get(accountString).setRegistration(true);
         }
     }
 
@@ -876,5 +925,45 @@ public class SipService extends BackgroundService {
 
     protected BroadcastEventEmitter getBroadcastEmitter() {
         return mBroadcastEmitter;
+    }
+
+    /****           TEST STUFF DO NOT USE               ****/
+    public void checkRegistrationTimeout(final String message, final String id){
+        enqueueJob(new Runnable() {
+            @Override
+            public void run() {
+                SharedPreferences preferences = getSharedPreferences("push_preferences", Context.MODE_PRIVATE);
+                String tok = preferences.getString("fcm_token", "");
+                int expire = 0;
+                boolean found = false, validMessage = false;
+                int indexTok = 0, indexLastTok = 0, indexExp = 0, indexLastExp = 0, indexSemiColon = 0;
+                Log.e("SA", message);
+                indexTok = message.indexOf("pn-tok=");
+                while (!found && !tok.isEmpty() && indexTok != -1) {
+                    validMessage = true;
+                    indexTok += 6;
+                    indexSemiColon = message.indexOf(";", indexTok);
+                    if (message.substring(indexTok + 1, indexSemiColon).equals(tok)) {
+                        String exp = message.substring((message.indexOf("=", indexSemiColon) + 1), message.indexOf("\r", indexSemiColon));
+                        expire = Integer.parseInt(exp);
+                        Log.e("SAAAAA", String.valueOf(expire));
+                        if (expire > TimeUnit.DAYS.toSeconds(4L)){
+                            Log.e("SA", "FOUND");
+                            found = true;
+                        }
+                    }
+                    indexTok = message.indexOf("pn-tok=", indexTok);
+                }
+                if (!found && validMessage){
+                    Log.e("SA", "NOT FOUND");
+                    enqueueDelayedJob(new Runnable() {
+                        @Override
+                        public void run() {
+                            refreshRegistration(SipService.this, id, 604800, null);
+                        }
+                    }, 5000);
+                }
+            }
+        });
     }
 }
