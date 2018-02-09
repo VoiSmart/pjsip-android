@@ -3,6 +3,7 @@ package net.gotev.sipservice;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.AudioManager;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -898,11 +899,16 @@ public class SipService extends BackgroundService {
     }
 
     protected synchronized void startRingtone() {
-        mVibrator.vibrate(VIBRATOR_PATTERN, 0);
+        AudioManager audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
 
         try {
-            mRingTone = RingtoneManager.getRingtone(this, mRingtoneUri);
-            mRingTone.play();
+            if (audioManager.getRingerMode() == AudioManager.RINGER_MODE_NORMAL) {
+                mVibrator.vibrate(VIBRATOR_PATTERN, 0);
+                mRingTone = RingtoneManager.getRingtone(this, mRingtoneUri);
+                mRingTone.play();
+            } else if (audioManager.getRingerMode() == AudioManager.RINGER_MODE_VIBRATE){
+                mVibrator.vibrate(VIBRATOR_PATTERN, 0);
+            }
         } catch (Exception exc) {
             Logger.error(TAG, "Error while trying to play ringtone!", exc);
         }
