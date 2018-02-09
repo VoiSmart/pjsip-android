@@ -835,7 +835,7 @@ public class SipService extends BackgroundService {
 
         if (!mActiveSipAccounts.containsKey(accountString) ||
                 !mActiveSipAccounts.get(accountString).isValid() ||
-                !account.getContactUriParams().equals(mActiveSipAccounts.get(accountString).getData().getContactUriParams())) {
+                !account.equals(mActiveSipAccounts.get(accountString).getData())) {
             startStack();
             SipAccount pjSipAndroidAccount = new SipAccount(this, account);
             pjSipAndroidAccount.create();

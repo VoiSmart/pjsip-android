@@ -206,6 +206,15 @@ public class SipAccountData implements Parcelable {
 
         SipAccountData that = (SipAccountData) o;
 
+        if (username != null ? !username.equals(that.getUsername()) : that.getUsername() != null) return false;
+        if (password != null ? !password.equals(that.getPassword()) : that.getPassword() != null) return false;
+        if (realm != null ? !realm.equals(that.getRealm()) : that.getRealm() != null) return false;
+        if (host != null ? !host.equals(that.getHost()) : that.getHost() != null) return false;
+        if (port != that.getPort()) return false;
+        if (tcpTransport != that.isTcpTransport()) return false;
+        if (contactUriParams != null ? !contactUriParams.equals(that.getContactUriParams()) : that.getContactUriParams() != null) return false;
+        if (regExpirationTimeout != that.getRegExpirationTimeout()) return false;
+
         return getIdUri().equals(that.getIdUri());
 
     }
