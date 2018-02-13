@@ -9,7 +9,6 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.IBinder;
 import android.os.Vibrator;
-import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -953,7 +952,6 @@ public class SipService extends BackgroundService {
                 int expire = 0;
                 boolean found = false, validMessage = false;
                 int indexTok = 0, indexLastTok = 0, indexExp = 0, indexLastExp = 0, indexSemiColon = 0;
-                Log.e("SA", message);
                 indexTok = message.indexOf("pn-tok=");
                 while (!found && !tok.isEmpty() && indexTok != -1) {
                     validMessage = true;
@@ -962,16 +960,13 @@ public class SipService extends BackgroundService {
                     if (message.substring(indexTok + 1, indexSemiColon).equals(tok)) {
                         String exp = message.substring((message.indexOf("=", indexSemiColon) + 1), message.indexOf("\r", indexSemiColon));
                         expire = Integer.parseInt(exp);
-                        Log.e("SAAAAA", String.valueOf(expire));
                         if (expire > TimeUnit.DAYS.toSeconds(4L)){
-                            Log.e("SA", "FOUND");
                             found = true;
                         }
                     }
                     indexTok = message.indexOf("pn-tok=", indexTok);
                 }
                 if (!found && validMessage){
-                    Log.e("SA", "NOT FOUND");
                     enqueueDelayedJob(new Runnable() {
                         @Override
                         public void run() {

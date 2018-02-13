@@ -36,7 +36,6 @@ public class SipAccount extends Account {
     }
 
     public void create() throws Exception {
-        Logger.error(LOG_TAG, "CREATE");
         create(data.getAccountConfig());
     }
 
