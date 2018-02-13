@@ -87,6 +87,7 @@ public class SipService extends BackgroundService {
     private BroadcastEventEmitter mBroadcastEmitter;
     private Endpoint mEndpoint;
     private volatile boolean mStarted;
+    private int callStatus;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -216,11 +217,13 @@ public class SipService extends BackgroundService {
     }
 
     private void notifyCallDisconnected(String accountID, int callID) {
+
         mBroadcastEmitter.callState(accountID, callID,
-                pjsip_inv_state.PJSIP_INV_STATE_DISCONNECTED.swigValue(), 0, false, false);
+                pjsip_inv_state.PJSIP_INV_STATE_DISCONNECTED.swigValue(), callStatus, 0, false, false);
     }
 
     private void handleGetCallStatus(Intent intent) {
+
         String accountID = intent.getStringExtra(PARAM_ACCOUNT_ID);
         int callID = intent.getIntExtra(PARAM_CALL_ID, 0);
 
@@ -230,7 +233,14 @@ public class SipService extends BackgroundService {
             return;
         }
 
-        mBroadcastEmitter.callState(accountID, callID, sipCall.getCurrentState().swigValue(),
+        int callStatusCode = callStatus;
+        try {
+            callStatusCode = sipCall.getInfo().getLastStatusCode().swigValue();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        mBroadcastEmitter.callState(accountID, callID, sipCall.getCurrentState().swigValue(), callStatusCode,
                                     sipCall.getConnectTimestamp(), sipCall.isLocalHold(),
                                     sipCall.isLocalMute());
     }
@@ -971,5 +981,9 @@ public class SipService extends BackgroundService {
                 }
             }
         });
+    }
+
+    public void setLastCallStatus(int callStatus) {
+        this.callStatus = callStatus;
     }
 }

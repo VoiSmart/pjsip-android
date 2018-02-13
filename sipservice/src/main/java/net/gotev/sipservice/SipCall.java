@@ -69,6 +69,7 @@ public class SipCall extends Call {
             CallInfo info = getInfo();
             int callID = info.getId();
             pjsip_inv_state callState = info.getState();
+            pjsip_status_code callStatus = null;
 
             /**
              * From: http://www.pjsip.org/docs/book-latest/html/call.html#call-disconnection
@@ -79,6 +80,12 @@ public class SipCall extends Call {
              * Thus, it is recommended to delete the call object inside the callback.
              */
 
+            try {
+                callStatus = info.getLastStatusCode();
+                account.getService().setLastCallStatus(callStatus.swigValue());
+            } catch(Exception ex) {
+                ex.printStackTrace();
+            }
             if (callState == pjsip_inv_state.PJSIP_INV_STATE_DISCONNECTED) {
                 account.getService().stopRingtone();
                 checkAndStopLocalRingBackTone();
@@ -103,7 +110,7 @@ public class SipCall extends Call {
             }
 
             account.getService().getBroadcastEmitter()
-                    .callState(account.getData().getIdUri(), callID, callState.swigValue(),
+                    .callState(account.getData().getIdUri(), callID, callState.swigValue(), callStatus != null ? callStatus.swigValue() : -1,
                                connectTimestamp, localHold, localMute);
 
         } catch (Exception exc) {

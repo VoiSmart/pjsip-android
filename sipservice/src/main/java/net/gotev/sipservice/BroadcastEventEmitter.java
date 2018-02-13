@@ -38,6 +38,7 @@ public class BroadcastEventEmitter {
         public static final String REMOTE_URI = "remote_uri";
         public static final String DISPLAY_NAME = "display_name";
         public static final String CALL_STATE = "call_state";
+        public static final String CALL_STATUS = "call_status";
         public static final String NUMBER = "number";
         public static final String CONNECT_TIMESTAMP = "connectTimestamp";
         public static final String STACK_STARTED = "stack_started";
@@ -99,14 +100,15 @@ public class BroadcastEventEmitter {
      * @param isLocalHold true if the call is held locally
      * @param isLocalMute true if the call is muted locally
      */
-    public void callState(String accountID, int callID, int callStateCode, long connectTimestamp,
-                          boolean isLocalHold, boolean isLocalMute) {
+    public synchronized  void callState(String accountID, int callID, int callStateCode, int callStateStatus,
+                          long connectTimestamp, boolean isLocalHold, boolean isLocalMute) {
         final Intent intent = new Intent();
 
         intent.setAction(getAction(BroadcastAction.CALL_STATE));
         intent.putExtra(BroadcastParameters.ACCOUNT_ID, accountID);
         intent.putExtra(BroadcastParameters.CALL_ID, callID);
         intent.putExtra(BroadcastParameters.CALL_STATE, callStateCode);
+        intent.putExtra(BroadcastParameters.CALL_STATUS, callStateStatus);
         intent.putExtra(BroadcastParameters.CONNECT_TIMESTAMP, connectTimestamp);
         intent.putExtra(BroadcastParameters.LOCAL_HOLD, isLocalHold);
         intent.putExtra(BroadcastParameters.LOCAL_MUTE, isLocalMute);
