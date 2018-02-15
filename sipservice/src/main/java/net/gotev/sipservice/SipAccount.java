@@ -119,7 +119,8 @@ public class SipAccount extends Account {
 
         SipCall call = addIncomingCall(prm.getCallId());
 
-        if (activeCalls.size() > 1) {
+        // Send 603 Decline whether there's an already ongoing call or we are in DND mode
+        if (activeCalls.size() > 1 || service.isDND()) {
             call.declineIncomingCall();
             Logger.debug(LOG_TAG, "sending busy to call ID: " + prm.getCallId());
             //TODO: notification of missed call

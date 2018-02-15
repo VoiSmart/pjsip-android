@@ -47,6 +47,7 @@ import static net.gotev.sipservice.SipServiceCommand.ACTION_RESTART_SIP_STACK;
 import static net.gotev.sipservice.SipServiceCommand.ACTION_SEND_DTMF;
 import static net.gotev.sipservice.SipServiceCommand.ACTION_SET_ACCOUNT;
 import static net.gotev.sipservice.SipServiceCommand.ACTION_SET_CODEC_PRIORITIES;
+import static net.gotev.sipservice.SipServiceCommand.ACTION_SET_DND;
 import static net.gotev.sipservice.SipServiceCommand.ACTION_SET_HOLD;
 import static net.gotev.sipservice.SipServiceCommand.ACTION_SET_MUTE;
 import static net.gotev.sipservice.SipServiceCommand.ACTION_TOGGLE_HOLD;
@@ -57,6 +58,7 @@ import static net.gotev.sipservice.SipServiceCommand.PARAM_ACCOUNT_DATA;
 import static net.gotev.sipservice.SipServiceCommand.PARAM_ACCOUNT_ID;
 import static net.gotev.sipservice.SipServiceCommand.PARAM_CALL_ID;
 import static net.gotev.sipservice.SipServiceCommand.PARAM_CODEC_PRIORITIES;
+import static net.gotev.sipservice.SipServiceCommand.PARAM_DND;
 import static net.gotev.sipservice.SipServiceCommand.PARAM_DTMF;
 import static net.gotev.sipservice.SipServiceCommand.PARAM_HOLD;
 import static net.gotev.sipservice.SipServiceCommand.PARAM_MUTE;
@@ -77,6 +79,7 @@ public class SipService extends BackgroundService {
     private static final String PREFS_NAME = TAG + "prefs";
     private static final String PREFS_KEY_ACCOUNTS = "accounts";
     private static final String PREFS_KEY_CODEC_PRIORITIES = "codec_priorities";
+    private static final String PREFS_KEY_DND = "dnd_pref";
 
     private List<SipAccountData> mConfiguredAccounts = new ArrayList<>();
     private static ConcurrentHashMap<String, SipAccount> mActiveSipAccounts = new ConcurrentHashMap<>();
@@ -184,6 +187,10 @@ public class SipService extends BackgroundService {
 
                 } else if (ACTION_REFRESH_REGISTRATION.equals(action)){
                     handleRefreshRegistration(intent);
+
+                } else if (ACTION_SET_DND.equals(action)) {
+                    handleSetDND(intent);
+
                 }
 
                 if (mConfiguredAccounts.isEmpty()) {
@@ -980,5 +987,16 @@ public class SipService extends BackgroundService {
 
     public void setLastCallStatus(int callStatus) {
         this.callStatus = callStatus;
+    }
+
+    private void handleSetDND(Intent intent) {
+        boolean dnd = intent.getBooleanExtra(PARAM_DND, false);
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        prefs.edit().putBoolean(PREFS_KEY_DND, dnd).apply();
+    }
+
+    public boolean isDND() {
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        return prefs.getBoolean(PREFS_KEY_DND, false);
     }
 }
