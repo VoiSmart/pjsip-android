@@ -25,7 +25,8 @@ public class BroadcastEventEmitter {
         OUTGOING_CALL,
         STACK_STATUS,
         CODEC_PRIORITIES,
-        CODEC_PRIORITIES_SET_STATUS
+        CODEC_PRIORITIES_SET_STATUS,
+        MISSED_CALL
     }
 
     /**
@@ -150,6 +151,15 @@ public class BroadcastEventEmitter {
 
         intent.setAction(getAction(BroadcastAction.CODEC_PRIORITIES_SET_STATUS));
         intent.putExtra(BroadcastParameters.SUCCESS, success);
+
+        mContext.sendBroadcast(intent);
+    }
+
+    void missedCall(String displayName) {
+        final Intent intent = new Intent();
+
+        intent.setAction(getAction(BroadcastAction.MISSED_CALL));
+        intent.putExtra(BroadcastParameters.DISPLAY_NAME, displayName);
 
         mContext.sendBroadcast(intent);
     }

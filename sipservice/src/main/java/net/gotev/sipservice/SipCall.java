@@ -83,9 +83,7 @@ public class SipCall extends Call {
             try {
                 callStatus = info.getLastStatusCode();
                 account.getService().setLastCallStatus(callStatus.swigValue());
-            } catch(Exception ex) {
-                ex.printStackTrace();
-            }
+            } catch(Exception ex) {}
             if (callState == pjsip_inv_state.PJSIP_INV_STATE_DISCONNECTED) {
                 account.getService().stopRingtone();
                 checkAndStopLocalRingBackTone();

@@ -16,6 +16,7 @@ import static net.gotev.sipservice.BroadcastEventEmitter.BroadcastAction.CALL_ST
 import static net.gotev.sipservice.BroadcastEventEmitter.BroadcastAction.CODEC_PRIORITIES;
 import static net.gotev.sipservice.BroadcastEventEmitter.BroadcastAction.CODEC_PRIORITIES_SET_STATUS;
 import static net.gotev.sipservice.BroadcastEventEmitter.BroadcastAction.INCOMING_CALL;
+import static net.gotev.sipservice.BroadcastEventEmitter.BroadcastAction.MISSED_CALL;
 import static net.gotev.sipservice.BroadcastEventEmitter.BroadcastAction.OUTGOING_CALL;
 import static net.gotev.sipservice.BroadcastEventEmitter.BroadcastAction.REGISTRATION;
 import static net.gotev.sipservice.BroadcastEventEmitter.BroadcastAction.STACK_STATUS;
@@ -77,6 +78,8 @@ public class BroadcastEventReceiver extends BroadcastReceiver {
         } else if (action.equals(BroadcastEventEmitter.getAction(CODEC_PRIORITIES_SET_STATUS))) {
             onCodecPrioritiesSetStatus(intent.getBooleanExtra(BroadcastParameters.SUCCESS, false));
 
+        } else if (action.equals(BroadcastEventEmitter.getAction(MISSED_CALL))) {
+            onMissedCall(intent.getStringExtra(intent.getStringExtra(BroadcastParameters.DISPLAY_NAME)));
         }
     }
 
@@ -154,5 +157,9 @@ public class BroadcastEventReceiver extends BroadcastReceiver {
 
     public void onCodecPrioritiesSetStatus(boolean success) {
         Logger.debug(LOG_TAG, "Codec priorities " + (success ? "successfully set" : "set error"));
+    }
+
+    public void onMissedCall(String number) {
+        Logger.debug(LOG_TAG, "Missed call from " + number);
     }
 }

@@ -121,9 +121,14 @@ public class SipAccount extends Account {
 
         // Send 603 Decline whether there's an already ongoing call or we are in DND mode
         if (activeCalls.size() > 1 || service.isDND()) {
-            call.declineIncomingCall();
-            Logger.debug(LOG_TAG, "sending busy to call ID: " + prm.getCallId());
-            //TODO: notification of missed call
+            try {
+                CallerInfo contactInfo = new CallerInfo(call.getInfo());
+                service.getBroadcastEmitter().missedCall(contactInfo.getDisplayName());
+                call.declineIncomingCall();
+                Logger.debug(LOG_TAG, "sending busy to call ID: " + prm.getCallId());
+            } catch(Exception ex) {
+                Logger.error(LOG_TAG, "Error while getting missed call info", ex);
+            }
             return;
         }
 
