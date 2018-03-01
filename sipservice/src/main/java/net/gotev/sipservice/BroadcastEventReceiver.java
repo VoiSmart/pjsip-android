@@ -58,7 +58,7 @@ public class BroadcastEventReceiver extends BroadcastReceiver {
             onCallState(intent.getStringExtra(BroadcastParameters.ACCOUNT_ID),
                         intent.getIntExtra(BroadcastParameters.CALL_ID, -1),
                         pjsip_inv_state.swigToEnum(callState),
-                        callStatus != -1 ? pjsip_status_code.swigToEnum(callStatus) : null,
+                        (callStatus > 0) ? pjsip_status_code.swigToEnum(callStatus) : null,
                         intent.getLongExtra(BroadcastParameters.CONNECT_TIMESTAMP, -1),
                         intent.getBooleanExtra(BroadcastParameters.LOCAL_HOLD, false),
                         intent.getBooleanExtra(BroadcastParameters.LOCAL_MUTE, false));
