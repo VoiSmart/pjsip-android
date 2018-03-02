@@ -345,6 +345,7 @@ public class SipCall extends Call {
         }
     }
 
+    // disable video programmatically
     @Override
     public void makeCall(String dst_uri, CallOpParam prm) throws java.lang.Exception {
         CallSetting settings = prm.getOpt();
