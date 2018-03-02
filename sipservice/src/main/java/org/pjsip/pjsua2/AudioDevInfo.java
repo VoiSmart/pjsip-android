@@ -91,13 +91,13 @@ public class AudioDevInfo {
     return pjsua2JNI.AudioDevInfo_routes_get(swigCPtr, this);
   }
 
-  public void setExtFmt(SWIGTYPE_p_std__vectorT_pj__MediaFormat_t value) {
-    pjsua2JNI.AudioDevInfo_extFmt_set(swigCPtr, this, SWIGTYPE_p_std__vectorT_pj__MediaFormat_t.getCPtr(value));
+  public void setExtFmt(MediaFormatVector value) {
+    pjsua2JNI.AudioDevInfo_extFmt_set(swigCPtr, this, MediaFormatVector.getCPtr(value), value);
   }
 
-  public SWIGTYPE_p_std__vectorT_pj__MediaFormat_t getExtFmt() {
+  public MediaFormatVector getExtFmt() {
     long cPtr = pjsua2JNI.AudioDevInfo_extFmt_get(swigCPtr, this);
-    return (cPtr == 0) ? null : new SWIGTYPE_p_std__vectorT_pj__MediaFormat_t(cPtr, false);
+    return (cPtr == 0) ? null : new MediaFormatVector(cPtr, false);
   }
 
   public AudioDevInfo() {

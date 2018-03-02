@@ -344,4 +344,14 @@ public class SipCall extends Call {
             toneGenerator = null;
         }
     }
+
+    @Override
+    public void makeCall(String dst_uri, CallOpParam prm) throws java.lang.Exception {
+        CallSetting settings = prm.getOpt();
+        settings.setAudioCount(1);
+        settings.setVideoCount(0);
+        settings.setFlag(pjsua_call_flag.PJSUA_CALL_INCLUDE_DISABLED_MEDIA.swigValue());
+        super.makeCall(dst_uri, prm);
+    }
+
 }

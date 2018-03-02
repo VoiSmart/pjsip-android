@@ -123,15 +123,6 @@ public class AccountConfig extends PersistentObject {
     return (cPtr == 0) ? null : new AccountVideoConfig(cPtr, false);
   }
 
-  public void setIpChangeConfig(AccountIpChangeConfig value) {
-    pjsua2JNI.AccountConfig_ipChangeConfig_set(swigCPtr, this, AccountIpChangeConfig.getCPtr(value), value);
-  }
-
-  public AccountIpChangeConfig getIpChangeConfig() {
-    long cPtr = pjsua2JNI.AccountConfig_ipChangeConfig_get(swigCPtr, this);
-    return (cPtr == 0) ? null : new AccountIpChangeConfig(cPtr, false);
-  }
-
   public AccountConfig() {
     this(pjsua2JNI.new_AccountConfig(), true);
   }

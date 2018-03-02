@@ -107,22 +107,13 @@ public class StreamInfo {
     return pjsua2JNI.StreamInfo_codecClockRate_get(swigCPtr, this);
   }
 
-  public void setAudCodecParam(CodecParam value) {
-    pjsua2JNI.StreamInfo_audCodecParam_set(swigCPtr, this, CodecParam.getCPtr(value), value);
+  public void setCodecParam(SWIGTYPE_p_void value) {
+    pjsua2JNI.StreamInfo_codecParam_set(swigCPtr, this, SWIGTYPE_p_void.getCPtr(value));
   }
 
-  public CodecParam getAudCodecParam() {
-    long cPtr = pjsua2JNI.StreamInfo_audCodecParam_get(swigCPtr, this);
-    return (cPtr == 0) ? null : new CodecParam(cPtr, false);
-  }
-
-  public void setVidCodecParam(VidCodecParam value) {
-    pjsua2JNI.StreamInfo_vidCodecParam_set(swigCPtr, this, VidCodecParam.getCPtr(value), value);
-  }
-
-  public VidCodecParam getVidCodecParam() {
-    long cPtr = pjsua2JNI.StreamInfo_vidCodecParam_get(swigCPtr, this);
-    return (cPtr == 0) ? null : new VidCodecParam(cPtr, false);
+  public SWIGTYPE_p_void getCodecParam() {
+    long cPtr = pjsua2JNI.StreamInfo_codecParam_get(swigCPtr, this);
+    return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
   }
 
   public StreamInfo() {

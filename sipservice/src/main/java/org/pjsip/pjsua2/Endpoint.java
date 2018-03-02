@@ -242,12 +242,13 @@ public class Endpoint {
     pjsua2JNI.Endpoint_codecSetPriority(swigCPtr, this, codec_id, priority);
   }
 
-  public CodecParam codecGetParam(String codec_id) throws java.lang.Exception {
-    return new CodecParam(pjsua2JNI.Endpoint_codecGetParam(swigCPtr, this, codec_id), true);
+  public SWIGTYPE_p_void codecGetParam(String codec_id) throws java.lang.Exception {
+    long cPtr = pjsua2JNI.Endpoint_codecGetParam(swigCPtr, this, codec_id);
+    return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
   }
 
-  public void codecSetParam(String codec_id, CodecParam param) throws java.lang.Exception {
-    pjsua2JNI.Endpoint_codecSetParam(swigCPtr, this, codec_id, CodecParam.getCPtr(param), param);
+  public void codecSetParam(String codec_id, SWIGTYPE_p_void param) throws java.lang.Exception {
+    pjsua2JNI.Endpoint_codecSetParam(swigCPtr, this, codec_id, SWIGTYPE_p_void.getCPtr(param));
   }
 
   public CodecInfoVector videoCodecEnum() throws java.lang.Exception {
@@ -270,10 +271,6 @@ public class Endpoint {
     pjsua2JNI.Endpoint_resetVideoCodecParam(swigCPtr, this, codec_id);
   }
 
-  public void handleIpChange(IpChangeParam param) throws java.lang.Exception {
-    pjsua2JNI.Endpoint_handleIpChange(swigCPtr, this, IpChangeParam.getCPtr(param), param);
-  }
-
   public void onNatDetectionComplete(OnNatDetectionCompleteParam prm) {
     if (getClass() == Endpoint.class) pjsua2JNI.Endpoint_onNatDetectionComplete(swigCPtr, this, OnNatDetectionCompleteParam.getCPtr(prm), prm); else pjsua2JNI.Endpoint_onNatDetectionCompleteSwigExplicitEndpoint(swigCPtr, this, OnNatDetectionCompleteParam.getCPtr(prm), prm);
   }
@@ -292,10 +289,6 @@ public class Endpoint {
 
   public void onSelectAccount(OnSelectAccountParam prm) {
     if (getClass() == Endpoint.class) pjsua2JNI.Endpoint_onSelectAccount(swigCPtr, this, OnSelectAccountParam.getCPtr(prm), prm); else pjsua2JNI.Endpoint_onSelectAccountSwigExplicitEndpoint(swigCPtr, this, OnSelectAccountParam.getCPtr(prm), prm);
-  }
-
-  public void onIpChangeProgress(OnIpChangeProgressParam prm) {
-    if (getClass() == Endpoint.class) pjsua2JNI.Endpoint_onIpChangeProgress(swigCPtr, this, OnIpChangeProgressParam.getCPtr(prm), prm); else pjsua2JNI.Endpoint_onIpChangeProgressSwigExplicitEndpoint(swigCPtr, this, OnIpChangeProgressParam.getCPtr(prm), prm);
   }
 
 }

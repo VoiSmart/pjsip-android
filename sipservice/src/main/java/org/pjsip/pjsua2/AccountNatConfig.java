@@ -51,14 +51,6 @@ public class AccountNatConfig extends PersistentObject {
     return pjsua_stun_use.swigToEnum(pjsua2JNI.AccountNatConfig_mediaStunUse_get(swigCPtr, this));
   }
 
-  public void setNat64Opt(pjsua_nat64_opt value) {
-    pjsua2JNI.AccountNatConfig_nat64Opt_set(swigCPtr, this, value.swigValue());
-  }
-
-  public pjsua_nat64_opt getNat64Opt() {
-    return pjsua_nat64_opt.swigToEnum(pjsua2JNI.AccountNatConfig_nat64Opt_get(swigCPtr, this));
-  }
-
   public void setIceEnabled(boolean value) {
     pjsua2JNI.AccountNatConfig_iceEnabled_set(swigCPtr, this, value);
   }

@@ -75,13 +75,13 @@ public class VideoDevInfo {
     return pjsua2JNI.VideoDevInfo_caps_get(swigCPtr, this);
   }
 
-  public void setFmt(SWIGTYPE_p_std__vectorT_pj__MediaFormat_t value) {
-    pjsua2JNI.VideoDevInfo_fmt_set(swigCPtr, this, SWIGTYPE_p_std__vectorT_pj__MediaFormat_t.getCPtr(value));
+  public void setFmt(MediaFormatVector value) {
+    pjsua2JNI.VideoDevInfo_fmt_set(swigCPtr, this, MediaFormatVector.getCPtr(value), value);
   }
 
-  public SWIGTYPE_p_std__vectorT_pj__MediaFormat_t getFmt() {
+  public MediaFormatVector getFmt() {
     long cPtr = pjsua2JNI.VideoDevInfo_fmt_get(swigCPtr, this);
-    return (cPtr == 0) ? null : new SWIGTYPE_p_std__vectorT_pj__MediaFormat_t(cPtr, false);
+    return (cPtr == 0) ? null : new MediaFormatVector(cPtr, false);
   }
 
   public VideoDevInfo() {

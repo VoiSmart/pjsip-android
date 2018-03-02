@@ -85,14 +85,6 @@ public class UaConfig extends PersistentObject {
     return (cPtr == 0) ? null : new StringVector(cPtr, false);
   }
 
-  public void setStunTryIpv6(boolean value) {
-    pjsua2JNI.UaConfig_stunTryIpv6_set(swigCPtr, this, value);
-  }
-
-  public boolean getStunTryIpv6() {
-    return pjsua2JNI.UaConfig_stunTryIpv6_get(swigCPtr, this);
-  }
-
   public void setStunIgnoreFailure(boolean value) {
     pjsua2JNI.UaConfig_stunIgnoreFailure_set(swigCPtr, this, value);
   }
