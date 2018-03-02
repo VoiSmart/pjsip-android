@@ -499,11 +499,11 @@ public class SipService extends BackgroundService {
                 SipAccount sipAccount = mActiveSipAccounts.get(accountID);
                 if (regExpTimeout != 0 && regExpTimeout != sipAccount.getData().getRegExpirationTimeout()) {
                     sipAccount.getData().setRegExpirationTimeout(regExpTimeout);
-                    Logger.error(TAG, String.valueOf(regExpTimeout));
+                    Logger.debug(TAG, String.valueOf(regExpTimeout));
                     refresh = false;
                 }
                 if (regContactParams != null && !(String.valueOf(";"+regContactParams).equals(sipAccount.getData().getContactUriParams()))) {
-                    Logger.error(TAG, regContactParams);
+                    Logger.debug(TAG, regContactParams);
                     sipAccount.getData().setContactUriParams(regContactParams);
                     refresh = false;
                     mActiveSipAccounts.put(accountID, sipAccount);
