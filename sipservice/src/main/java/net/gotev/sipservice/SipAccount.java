@@ -110,7 +110,9 @@ public class SipAccount extends Account {
         service.getBroadcastEmitter()
                .registrationState(data.getIdUri(), prm.getCode().swigValue());
 
-        this.service.checkRegistrationTimeout(prm.getRdata().getWholeMsg(), data.getIdUri());
+        if (!data.isPushDisabled()) {
+            this.service.checkRegistrationTimeout(prm.getRdata().getWholeMsg(), data.getIdUri());
+        }
 
     }
 

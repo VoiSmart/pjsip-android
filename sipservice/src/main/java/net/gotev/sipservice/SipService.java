@@ -502,7 +502,7 @@ public class SipService extends BackgroundService {
                     Logger.debug(TAG, String.valueOf(regExpTimeout));
                     refresh = false;
                 }
-                if (regContactParams != null && !(String.valueOf(";"+regContactParams).equals(sipAccount.getData().getContactUriParams()))) {
+                if (regContactParams != null && !(String.valueOf(regContactParams).equals(sipAccount.getData().getContactUriParams()))) {
                     Logger.debug(TAG, regContactParams);
                     sipAccount.getData().setContactUriParams(regContactParams);
                     refresh = false;
@@ -850,16 +850,19 @@ public class SipService extends BackgroundService {
     private void addAccount(SipAccountData account) throws Exception {
         String accountString = account.getIdUri();
 
-        if (!mActiveSipAccounts.containsKey(accountString) ||
-                !mActiveSipAccounts.get(accountString).isValid() ||
-                !account.equals(mActiveSipAccounts.get(accountString).getData())) {
+        SipAccount sipAccount = mActiveSipAccounts.get(accountString);
+
+        if (sipAccount == null || !sipAccount.isValid() || !account.equals(sipAccount.getData())) {
+            if (mActiveSipAccounts.containsKey(accountString)) {
+                sipAccount.delete();
+            }
             startStack();
             SipAccount pjSipAndroidAccount = new SipAccount(this, account);
             pjSipAndroidAccount.create();
             mActiveSipAccounts.put(accountString, pjSipAndroidAccount);
             Logger.debug(TAG, "SIP account " + account.getIdUri() + " successfully added");
         } else {
-            mActiveSipAccounts.get(accountString).setRegistration(true);
+            sipAccount.setRegistration(true);
         }
     }
 
