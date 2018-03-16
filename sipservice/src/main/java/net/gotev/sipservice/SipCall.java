@@ -171,7 +171,10 @@ public class SipCall extends Call {
     public void acceptIncomingCall() {
         CallOpParam param = new CallOpParam();
         param.setStatusCode(pjsip_status_code.PJSIP_SC_OK);
-
+        CallSetting settings = param.getOpt();
+        settings.setAudioCount(1);
+        settings.setVideoCount(0);
+        settings.setFlag(pjsua_call_flag.PJSUA_CALL_INCLUDE_DISABLED_MEDIA.swigValue());
         try {
             answer(param);
         } catch (Exception exc) {
