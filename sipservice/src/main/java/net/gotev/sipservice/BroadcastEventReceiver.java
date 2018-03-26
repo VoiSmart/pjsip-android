@@ -79,7 +79,7 @@ public class BroadcastEventReceiver extends BroadcastReceiver {
             onCodecPrioritiesSetStatus(intent.getBooleanExtra(BroadcastParameters.SUCCESS, false));
 
         } else if (action.equals(BroadcastEventEmitter.getAction(MISSED_CALL))) {
-            onMissedCall(intent.getStringExtra(intent.getStringExtra(BroadcastParameters.DISPLAY_NAME)));
+            onMissedCall(intent.getStringExtra(BroadcastParameters.DISPLAY_NAME));
         }
     }
 
