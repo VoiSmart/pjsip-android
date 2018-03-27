@@ -125,7 +125,7 @@ public class SipAccount extends Account {
         if (activeCalls.size() > 1 || service.isDND()) {
             try {
                 CallerInfo contactInfo = new CallerInfo(call.getInfo());
-                service.getBroadcastEmitter().missedCall(contactInfo.getDisplayName());
+                service.getBroadcastEmitter().missedCall(contactInfo.getDisplayName(), contactInfo.getRemoteUri());
                 call.declineIncomingCall();
                 Logger.debug(LOG_TAG, "sending busy to call ID: " + prm.getCallId());
             } catch(Exception ex) {

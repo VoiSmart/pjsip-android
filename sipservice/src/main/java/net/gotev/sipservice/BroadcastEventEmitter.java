@@ -155,11 +155,12 @@ public class BroadcastEventEmitter {
         mContext.sendBroadcast(intent);
     }
 
-    void missedCall(String displayName) {
+    void missedCall(String displayName, String uri) {
         final Intent intent = new Intent();
 
         intent.setAction(getAction(BroadcastAction.MISSED_CALL));
         intent.putExtra(BroadcastParameters.DISPLAY_NAME, displayName);
+        intent.putExtra(BroadcastParameters.REMOTE_URI, uri);
 
         mContext.sendBroadcast(intent);
     }

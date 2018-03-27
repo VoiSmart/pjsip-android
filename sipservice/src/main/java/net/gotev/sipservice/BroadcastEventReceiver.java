@@ -79,7 +79,8 @@ public class BroadcastEventReceiver extends BroadcastReceiver {
             onCodecPrioritiesSetStatus(intent.getBooleanExtra(BroadcastParameters.SUCCESS, false));
 
         } else if (action.equals(BroadcastEventEmitter.getAction(MISSED_CALL))) {
-            onMissedCall(intent.getStringExtra(BroadcastParameters.DISPLAY_NAME));
+            onMissedCall(intent.getStringExtra(BroadcastParameters.DISPLAY_NAME),
+                    intent.getStringExtra(BroadcastParameters.REMOTE_URI));
         }
     }
 
@@ -159,7 +160,7 @@ public class BroadcastEventReceiver extends BroadcastReceiver {
         Logger.debug(LOG_TAG, "Codec priorities " + (success ? "successfully set" : "set error"));
     }
 
-    public void onMissedCall(String number) {
-        Logger.debug(LOG_TAG, "Missed call from " + number);
+    public void onMissedCall(String displayName, String uri) {
+        Logger.debug(LOG_TAG, "Missed call from " + displayName);
     }
 }
