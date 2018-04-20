@@ -61,12 +61,14 @@ public class BroadcastEventReceiver extends BroadcastReceiver {
                         (callStatus > 0) ? pjsip_status_code.swigToEnum(callStatus) : null,
                         intent.getLongExtra(BroadcastParameters.CONNECT_TIMESTAMP, -1),
                         intent.getBooleanExtra(BroadcastParameters.LOCAL_HOLD, false),
-                        intent.getBooleanExtra(BroadcastParameters.LOCAL_MUTE, false));
+                        intent.getBooleanExtra(BroadcastParameters.LOCAL_MUTE, false),
+                        intent.getBooleanExtra(BroadcastParameters.LOCAL_VIDEO_MUTE, false));
 
         } else if (action.equals(BroadcastEventEmitter.getAction(OUTGOING_CALL))) {
             onOutgoingCall(intent.getStringExtra(BroadcastParameters.ACCOUNT_ID),
-                           intent.getIntExtra(BroadcastParameters.CALL_ID, -1),
-                           intent.getStringExtra(BroadcastParameters.NUMBER));
+                    intent.getIntExtra(BroadcastParameters.CALL_ID, -1),
+                    intent.getStringExtra(BroadcastParameters.NUMBER),
+                    intent.getBooleanExtra(BroadcastParameters.IS_VIDEO, false));
 
         } else if (action.equals(BroadcastEventEmitter.getAction(STACK_STATUS))) {
             onStackStatus(intent.getBooleanExtra(BroadcastParameters.STACK_STARTED, false));
@@ -130,16 +132,18 @@ public class BroadcastEventReceiver extends BroadcastReceiver {
     }
 
     public void onCallState(String accountID, int callID, pjsip_inv_state callStateCode, pjsip_status_code callStatusCode,
-                            long connectTimestamp, boolean isLocalHold, boolean isLocalMute) {
+                            long connectTimestamp, boolean isLocalHold, boolean isLocalMute, boolean isLocalVideoMute) {
         Logger.debug(LOG_TAG, "onCallState - accountID: " + accountID +
                 ", callID: " + callID +
                 ", callStateCode: " + callStateCode +
+                ", callStatusCode: " + callStatusCode +
                 ", connectTimestamp: " + connectTimestamp +
                 ", isLocalHold: " + isLocalHold +
-                ", isLocalMute: " + isLocalMute);
+                ", isLocalMute: " + isLocalMute +
+                ", isLocalVideoMute: " + isLocalVideoMute);
     }
 
-    public void onOutgoingCall(String accountID, int callID, String number) {
+    public void onOutgoingCall(String accountID, int callID, String number, boolean isVideo) {
         Logger.debug(LOG_TAG, "onOutgoingCall - accountID: " + accountID +
                 ", callID: " + callID +
                 ", number: " + number);

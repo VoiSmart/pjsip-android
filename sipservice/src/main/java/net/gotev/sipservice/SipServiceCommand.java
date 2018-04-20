@@ -2,7 +2,10 @@ package net.gotev.sipservice;
 
 import android.content.Context;
 import android.content.Intent;
+import android.view.Surface;
 
+
+import org.pjsip.pjsua2.pjmedia_orient;
 import org.pjsip.pjsua2.pjsip_inv_state;
 import org.pjsip.pjsua2.pjsip_status_code;
 
@@ -37,6 +40,11 @@ public class SipServiceCommand {
     protected static final String ACTION_GET_REGISTRATION_STATUS = "getRegistrationStatus";
     protected static final String ACTION_REFRESH_REGISTRATION = "refreshRegistration";
     protected static final String ACTION_SET_DND = "setDND";
+    protected static final String ACTION_SET_INCOMING_VIDEO = "setIncomingVideo";
+    protected static final String ACTION_SET_SELF_VIDEO_ORIENTATION = "setSelfVideoOrientation";
+    protected static final String ACTION_TOGGLE_VIDEO_MUTE = "toggleVideoMute";
+    protected static final String ACTION_START_VIDEO_PREVIEW = "startVideoPreview";
+    protected static final String ACTION_STOP_VIDEO_PREVIEW = "stopVideoPreview";
 
     protected static final String PARAM_ACCOUNT_DATA = "accountData";
     protected static final String PARAM_ACCOUNT_ID = "accountID";
@@ -49,6 +57,10 @@ public class SipServiceCommand {
     protected static final String PARAM_REG_EXP_TIMEOUT = "regExpTimeout";
     protected static final String PARAM_REG_CONTACT_PARAMS = "regContactParams";
     protected static final String PARAM_DND = "dnd";
+    protected static final String PARAM_IS_VIDEO = "isVideo";
+    protected static final String PARAM_SURFACE = "surface";
+    protected static final String PARAM_ORIENTATION = "orientation";
+
 
     /**
      * Adds a new SIP account.
@@ -144,20 +156,26 @@ public class SipServiceCommand {
      * @param context application context
      * @param accountID account ID used to make the call
      * @param numberToCall number to call
+     * @param isVideo whether the call has video or not
      */
-    public static void makeCall(Context context, String accountID, String numberToCall) {
+    public static void makeCall(Context context, String accountID, String numberToCall, boolean isVideo) {
         checkAccount(accountID);
 
         Intent intent = new Intent(context, SipService.class);
         intent.setAction(ACTION_MAKE_CALL);
         intent.putExtra(PARAM_ACCOUNT_ID, accountID);
         intent.putExtra(PARAM_NUMBER, numberToCall);
+        intent.putExtra(PARAM_IS_VIDEO, isVideo);
         context.startService(intent);
+    }
+
+    public static void makeCall(Context context, String accountID, String numberToCall) {
+        makeCall(context, accountID, numberToCall, false);
     }
 
     /**
      * Checks the status of a call. You will receive the result in
-     * {@link BroadcastEventReceiver#onCallState(String, int, pjsip_inv_state, pjsip_status_code, long, boolean, boolean)}
+     * {@link BroadcastEventReceiver#onCallState(String, int, pjsip_inv_state, pjsip_status_code, long, boolean, boolean, boolean)}
      * @param context application context
      * @param accountID account ID used to make the call
      * @param callID call ID
@@ -175,7 +193,7 @@ public class SipServiceCommand {
     /**
      * Hangs up an active call. If the call does not exist or has been terminated, a disconnected
      * state will be sent to
-     * {@link BroadcastEventReceiver#onCallState(String, int, pjsip_inv_state, pjsip_status_code, long, boolean, boolean)}
+     * {@link BroadcastEventReceiver#onCallState(String, int, pjsip_inv_state, pjsip_status_code, long, boolean, boolean, boolean)}
      * @param context application context
      * @param accountID account ID
      * @param callID call ID to hang up
@@ -221,7 +239,7 @@ public class SipServiceCommand {
     /**
      * Send DTMF. If the call does not exist or has been terminated, a disconnected
      * state will be sent to
-     * {@link BroadcastEventReceiver#onCallState(String, int, pjsip_inv_state, pjsip_status_code, long, boolean, boolean)}
+     * {@link BroadcastEventReceiver#onCallState(String, int, pjsip_inv_state, pjsip_status_code, long, boolean, boolean, boolean)}
      * @param context application context
      * @param accountID account ID
      * @param callID call ID to hang up
@@ -242,25 +260,31 @@ public class SipServiceCommand {
     /**
      * Accept an incoming call. If the call does not exist or has been terminated, a disconnected
      * state will be sent to
-     * {@link BroadcastEventReceiver#onCallState(String, int, pjsip_inv_state, pjsip_status_code, long, boolean, boolean)}
+     * {@link BroadcastEventReceiver#onCallState(String, int, pjsip_inv_state, pjsip_status_code, long, boolean, boolean, boolean)}
      * @param context application context
      * @param accountID account ID
      * @param callID call ID to hang up
+     * @param isVideo video call or not
      */
-    public static void acceptIncomingCall(Context context, String accountID, int callID) {
+    public static void acceptIncomingCall(Context context, String accountID, int callID, boolean isVideo) {
         checkAccount(accountID);
 
         Intent intent = new Intent(context, SipService.class);
         intent.setAction(ACTION_ACCEPT_INCOMING_CALL);
         intent.putExtra(PARAM_ACCOUNT_ID, accountID);
         intent.putExtra(PARAM_CALL_ID, callID);
+        intent.putExtra(PARAM_IS_VIDEO, isVideo);
         context.startService(intent);
+    }
+
+    public static void acceptIncomingCall(Context context, String accountID, int callID) {
+        acceptIncomingCall(context, accountID, callID, false);
     }
 
     /**
      * Decline an incoming call. If the call does not exist or has been terminated, a disconnected
      * state will be sent to
-     * {@link BroadcastEventReceiver#onCallState(String, int, pjsip_inv_state, pjsip_status_code, long, boolean, boolean)}
+     * {@link BroadcastEventReceiver#onCallState(String, int, pjsip_inv_state, pjsip_status_code, long, boolean, boolean, boolean)}
      * @param context application context
      * @param accountID account ID
      * @param callID call ID to hang up
@@ -278,7 +302,7 @@ public class SipServiceCommand {
     /**
      * Blind call transfer. If the call does not exist or has been terminated, a disconnected
      * state will be sent to
-     * {@link BroadcastEventReceiver#onCallState(String, int, pjsip_inv_state, pjsip_status_code, long, boolean, boolean)}
+     * {@link BroadcastEventReceiver#onCallState(String, int, pjsip_inv_state, pjsip_status_code, long, boolean, boolean, boolean)}
      * @param context application context
      * @param accountID account ID
      * @param callID call ID
@@ -298,7 +322,7 @@ public class SipServiceCommand {
     /**
      * Sets hold status for a call. If the call does not exist or has been terminated, a disconnected
      * state will be sent to
-     * {@link BroadcastEventReceiver#onCallState(String, int, pjsip_inv_state, pjsip_status_code, long, boolean, boolean)}
+     * {@link BroadcastEventReceiver#onCallState(String, int, pjsip_inv_state, pjsip_status_code, long, boolean, boolean, boolean)}
      * @param context application context
      * @param accountID account ID
      * @param callID call ID
@@ -318,7 +342,7 @@ public class SipServiceCommand {
     /**
      * Toggle hold status for a call. If the call does not exist or has been terminated, a disconnected
      * state will be sent to
-     * {@link BroadcastEventReceiver#onCallState(String, int, pjsip_inv_state, pjsip_status_code, long, boolean, boolean)}
+     * {@link BroadcastEventReceiver#onCallState(String, int, pjsip_inv_state, pjsip_status_code, long, boolean, boolean, boolean)}
      * @param context application context
      * @param accountID account ID
      * @param callID call ID
@@ -336,7 +360,7 @@ public class SipServiceCommand {
     /**
      * Sets mute status for a call. If the call does not exist or has been terminated, a disconnected
      * state will be sent to
-     * {@link BroadcastEventReceiver#onCallState(String, int, pjsip_inv_state, pjsip_status_code, long, boolean, boolean)}
+     * {@link BroadcastEventReceiver#onCallState(String, int, pjsip_inv_state, pjsip_status_code, long, boolean, boolean, boolean)}
      * @param context application context
      * @param accountID account ID
      * @param callID call ID
@@ -356,7 +380,7 @@ public class SipServiceCommand {
     /**
      * Toggle mute status for a call. If the call does not exist or has been terminated, a disconnected
      * state will be sent to
-     * {@link BroadcastEventReceiver#onCallState(String, int, pjsip_inv_state, pjsip_status_code, long, boolean, boolean)}
+     * {@link BroadcastEventReceiver#onCallState(String, int, pjsip_inv_state, pjsip_status_code, long, boolean, boolean, boolean)}
      * @param context application context
      * @param accountID account ID
      * @param callID call ID
@@ -416,6 +440,8 @@ public class SipServiceCommand {
     }
 
     public static void refreshRegistration(Context context, String accountID, int regExpTimeout, String regContactParams){
+        checkAccount(accountID);
+
         Intent intent = new Intent(context, SipService.class);
         intent.setAction(ACTION_REFRESH_REGISTRATION);
         intent.putExtra(PARAM_ACCOUNT_ID, accountID);
@@ -428,6 +454,100 @@ public class SipServiceCommand {
         Intent intent = new Intent(context, SipService.class);
         intent.setAction(ACTION_SET_DND);
         intent.putExtra(PARAM_DND, dnd);
+        context.startService(intent);
+    }
+
+    /**
+     * Sets up the incoming video feed. If the call does not exist or has been terminated, a disconnected
+     * state will be sent to
+     * {@link BroadcastEventReceiver#onCallState(String, int, pjsip_inv_state, pjsip_status_code, long, boolean, boolean, boolean)}
+     * @param context application context
+     * @param accountID account ID
+     * @param callID call ID
+     * @param surface surface on which to render the incoming video
+     */
+    public static void setupIncomingVideoFeed(Context context, String accountID, int callID, Surface surface) {
+        checkAccount(accountID);
+
+        Intent intent = new Intent(context, SipService.class);
+        intent.setAction(ACTION_SET_INCOMING_VIDEO);
+        intent.putExtra(PARAM_ACCOUNT_ID, accountID);
+        intent.putExtra(PARAM_CALL_ID, callID);
+        intent.putExtra(PARAM_SURFACE, surface);
+        context.startService(intent);
+    }
+
+    /**
+     * Toggle mute video status for a call. If the call does not exist or has been terminated, a disconnected
+     * state will be sent to
+     * {@link BroadcastEventReceiver#onCallState(String, int, pjsip_inv_state, pjsip_status_code, long, boolean, boolean, boolean)}
+     * @param context application context
+     * @param accountID account ID
+     * @param callID call ID
+     */
+    public static void toggleVideoMute(Context context, String accountID, int callID) {
+        checkAccount(accountID);
+
+        Intent intent = new Intent(context, SipService.class);
+        intent.setAction(ACTION_TOGGLE_VIDEO_MUTE);
+        intent.putExtra(PARAM_ACCOUNT_ID, accountID);
+        intent.putExtra(PARAM_CALL_ID, callID);
+        context.startService(intent);
+    }
+
+    /**
+     * Starts the preview for a call. If the call does not exist or has been terminated, a disconnected
+     * state will be sent to
+     * {@link BroadcastEventReceiver#onCallState(String, int, pjsip_inv_state, pjsip_status_code, long, boolean, boolean, boolean)}
+     * @param context application context
+     * @param accountID account ID
+     * @param callID call ID
+     * @param surface surface on which to render the preview
+     */
+    public static void startVideoPreview(Context context, String accountID,  int callID, Surface surface) {
+        checkAccount(accountID);
+
+        Intent intent = new Intent(context, SipService.class);
+        intent.setAction(ACTION_START_VIDEO_PREVIEW);
+        intent.putExtra(PARAM_ACCOUNT_ID, accountID);
+        intent.putExtra(PARAM_CALL_ID, callID);
+        intent.putExtra(PARAM_SURFACE, surface);
+        context.startService(intent);
+    }
+
+    /**
+     * Rotates the transmitting video (heads up always), according to the device orientation.
+     * If the call does not exist or has been terminated, a disconnected state will be sent to
+     * {@link BroadcastEventReceiver#onCallState(String, int, pjsip_inv_state, pjsip_status_code, long, boolean, boolean, boolean)}
+     * @param context application context
+     * @param accountID account ID
+     * @param orientation call ID
+     */
+    public static void changeVideoOrientation(Context context, String accountID, pjmedia_orient orientation) {
+        checkAccount(accountID);
+
+        Intent intent = new Intent(context, SipService.class);
+        intent.setAction(ACTION_SET_SELF_VIDEO_ORIENTATION);
+        intent.putExtra(PARAM_ACCOUNT_ID, accountID);
+        intent.putExtra(PARAM_ORIENTATION, orientation.swigValue());
+        context.startService(intent);
+    }
+
+    /**
+     * Stops the preview for a call. If the call does not exist or has been terminated, a disconnected
+     * state will be sent to
+     * {@link BroadcastEventReceiver#onCallState(String, int, pjsip_inv_state, pjsip_status_code, long, boolean, boolean, boolean)}
+     * @param context application context
+     * @param accountID account ID
+     * @param callID call ID
+     */
+    public static void stopVideoPreview(Context context, String accountID, int callID) {
+        checkAccount(accountID);
+
+        Intent intent = new Intent(context, SipService.class);
+        intent.setAction(ACTION_STOP_VIDEO_PREVIEW);
+        intent.putExtra(PARAM_ACCOUNT_ID, accountID);
+        intent.putExtra(PARAM_CALL_ID, callID);
         context.startService(intent);
     }
 }

@@ -46,7 +46,9 @@ public class BroadcastEventEmitter {
         public static final String CODEC_PRIORITIES_LIST = "codec_priorities_list";
         public static final String LOCAL_HOLD = "local_hold";
         public static final String LOCAL_MUTE = "local_mute";
+        public static final String LOCAL_VIDEO_MUTE = "local_video_mute";
         public static final String SUCCESS = "success";
+        public static final String IS_VIDEO = "is_video";
     }
 
     public BroadcastEventEmitter(Context context) {
@@ -100,9 +102,10 @@ public class BroadcastEventEmitter {
      * @param connectTimestamp call start timestamp
      * @param isLocalHold true if the call is held locally
      * @param isLocalMute true if the call is muted locally
+     * @param isLocalVideoMute true if the video is muted locally
      */
     public synchronized  void callState(String accountID, int callID, int callStateCode, int callStateStatus,
-                          long connectTimestamp, boolean isLocalHold, boolean isLocalMute) {
+                          long connectTimestamp, boolean isLocalHold, boolean isLocalMute, boolean isLocalVideoMute) {
         final Intent intent = new Intent();
 
         intent.setAction(getAction(BroadcastAction.CALL_STATE));
@@ -113,17 +116,19 @@ public class BroadcastEventEmitter {
         intent.putExtra(BroadcastParameters.CONNECT_TIMESTAMP, connectTimestamp);
         intent.putExtra(BroadcastParameters.LOCAL_HOLD, isLocalHold);
         intent.putExtra(BroadcastParameters.LOCAL_MUTE, isLocalMute);
+        intent.putExtra(BroadcastParameters.LOCAL_VIDEO_MUTE, isLocalVideoMute);
 
         mContext.sendBroadcast(intent);
     }
 
-    public void outgoingCall(String accountID, int callID, String number) {
+    public void outgoingCall(String accountID, int callID, String number, boolean isVideo) {
         final Intent intent = new Intent();
 
         intent.setAction(getAction(BroadcastAction.OUTGOING_CALL));
         intent.putExtra(BroadcastParameters.ACCOUNT_ID, accountID);
         intent.putExtra(BroadcastParameters.CALL_ID, callID);
         intent.putExtra(BroadcastParameters.NUMBER, number);
+        intent.putExtra(BroadcastParameters.IS_VIDEO, isVideo);
 
         mContext.sendBroadcast(intent);
     }

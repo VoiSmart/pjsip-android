@@ -15,6 +15,8 @@ public class SipAccountData implements Parcelable {
 
     public static final String AUTH_TYPE_DIGEST = "digest";
     public static final String AUTH_TYPE_PLAIN = "plain";
+    private static final int DEFAULT_CAPTURE_DEVICE = 1;    // Front Camera idx
+    private static final int DEFAULT_RENDER_DEVICE = 0;    // OpenGL Render
 
     private String username;
     private String password;
@@ -190,6 +192,10 @@ public class SipAccountData implements Parcelable {
         accountConfig.getSipConfig().getProxies().add(getProxyUri());
         accountConfig.getRegConfig().setTimeoutSec(regExpirationTimeout);
         accountConfig.getSipConfig().setContactUriParams(getContactUriParams());
+        accountConfig.getVideoConfig().setAutoTransmitOutgoing(false);
+        accountConfig.getVideoConfig().setAutoShowIncoming(true);
+        accountConfig.getVideoConfig().setDefaultCaptureDevice(DEFAULT_CAPTURE_DEVICE);
+        accountConfig.getVideoConfig().setDefaultRenderDevice(DEFAULT_RENDER_DEVICE);
         return accountConfig;
     }
 

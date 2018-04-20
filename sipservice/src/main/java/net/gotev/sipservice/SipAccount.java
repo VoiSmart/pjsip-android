@@ -64,8 +64,9 @@ public class SipAccount extends Account {
         return call;
     }
 
-    public SipCall addOutgoingCall(final String numberToDial) {
+    public SipCall addOutgoingCall(final String numberToDial, boolean isVideo) {
         SipCall call = new SipCall(this);
+        call.setVideoCall(isVideo);
 
         CallOpParam callOpParam = new CallOpParam();
         try {
@@ -87,6 +88,10 @@ public class SipAccount extends Account {
             Logger.error(LOG_TAG, "Error while making outgoing call", exc);
             return null;
         }
+    }
+
+    public SipCall addOutgoingCall(final String numberToDial) {
+        return addOutgoingCall(numberToDial, false);
     }
 
     @Override
