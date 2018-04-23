@@ -1,6 +1,7 @@
 package net.gotev.sipservice;
 
 import org.pjsip.pjsua2.Account;
+import org.pjsip.pjsua2.CallInfo;
 import org.pjsip.pjsua2.CallOpParam;
 import org.pjsip.pjsua2.OnIncomingCallParam;
 import org.pjsip.pjsua2.OnRegStateParam;
@@ -150,9 +151,13 @@ public class SipAccount extends Account {
 
             CallerInfo contactInfo = new CallerInfo(call.getInfo());
 
+            // check for video in remote SDP
+            CallInfo callInfo = call.getInfo();
+            boolean isVideo = (callInfo.getRemOfferer() && callInfo.getRemVideoCount() > 0);
+
             service.getBroadcastEmitter()
                    .incomingCall(data.getIdUri(), prm.getCallId(),
-                           contactInfo.getDisplayName(), contactInfo.getRemoteUri());
+                           contactInfo.getDisplayName(), contactInfo.getRemoteUri(), isVideo);
 
         } catch (Exception exc) {
             Logger.error(LOG_TAG, "Error while getting call info", exc);

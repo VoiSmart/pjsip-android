@@ -66,7 +66,7 @@ public class BroadcastEventEmitter {
      * @param displayName the display name of the remote party
      * @param remoteUri the IdUri of the remote party
      */
-    public void incomingCall(String accountID, int callID, String displayName, String remoteUri) {
+    public void incomingCall(String accountID, int callID, String displayName, String remoteUri, boolean isVideo) {
         final Intent intent = new Intent();
 
         intent.setAction(getAction(BroadcastAction.INCOMING_CALL));
@@ -74,6 +74,7 @@ public class BroadcastEventEmitter {
         intent.putExtra(BroadcastParameters.CALL_ID, callID);
         intent.putExtra(BroadcastParameters.DISPLAY_NAME, displayName);
         intent.putExtra(BroadcastParameters.REMOTE_URI, remoteUri);
+        intent.putExtra(BroadcastParameters.IS_VIDEO, isVideo);
         intent.addFlags(Intent.FLAG_RECEIVER_FOREGROUND);
 
         mContext.sendBroadcast(intent);

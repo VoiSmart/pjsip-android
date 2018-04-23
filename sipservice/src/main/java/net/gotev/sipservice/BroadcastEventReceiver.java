@@ -48,9 +48,10 @@ public class BroadcastEventReceiver extends BroadcastReceiver {
 
         } else if (action.equals(BroadcastEventEmitter.getAction(INCOMING_CALL))) {
             onIncomingCall(intent.getStringExtra(BroadcastParameters.ACCOUNT_ID),
-                           intent.getIntExtra(BroadcastParameters.CALL_ID, -1),
-                           intent.getStringExtra(BroadcastParameters.DISPLAY_NAME),
-                           intent.getStringExtra(BroadcastParameters.REMOTE_URI));
+                    intent.getIntExtra(BroadcastParameters.CALL_ID, -1),
+                    intent.getStringExtra(BroadcastParameters.DISPLAY_NAME),
+                    intent.getStringExtra(BroadcastParameters.REMOTE_URI),
+                    intent.getBooleanExtra(BroadcastParameters.IS_VIDEO, false));
 
         } else if (action.equals(BroadcastEventEmitter.getAction(CALL_STATE))) {
             int callState = intent.getIntExtra(BroadcastParameters.CALL_STATE, -1);
@@ -124,7 +125,7 @@ public class BroadcastEventReceiver extends BroadcastReceiver {
                 ", registrationStateCode: " + registrationStateCode);
     }
 
-    public void onIncomingCall(String accountID, int callID, String displayName, String remoteUri) {
+    public void onIncomingCall(String accountID, int callID, String displayName, String remoteUri, boolean isVideo) {
         Logger.debug(LOG_TAG, "onIncomingCall - accountID: " + accountID +
                 ", callID: " + callID +
                 ", displayName: " + displayName +
