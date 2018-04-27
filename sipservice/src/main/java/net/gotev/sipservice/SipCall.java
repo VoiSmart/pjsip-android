@@ -43,6 +43,7 @@ public class SipCall extends Call {
     private long connectTimestamp = 0;
     private ToneGenerator toneGenerator;
     private boolean videoCall = false;
+    private boolean videoConference = false;
 
     private VideoWindow mVideoWindow;
     private VideoPreview mVideoPreview;
@@ -399,7 +400,9 @@ public class SipCall extends Call {
         if (mVideoPreview != null) {
             mVideoPreview.delete();
         }
-        mVideoPreview = new VideoPreview(mediaInfo.getVideoCapDev());
+        if (!videoConference) {
+            mVideoPreview = new VideoPreview(mediaInfo.getVideoCapDev());
+        }
         mVideoWindow = new VideoWindow(mediaInfo.getVideoIncomingWindowId());
     }
 
@@ -454,7 +457,7 @@ public class SipCall extends Call {
         VideoWindow videoWindow = getVideoWindow();
         if (videoWindow != null) {
             try {
-                videoWindow.delete();;
+                videoWindow.delete();
             } catch (Exception ex) {
                 Logger.error(LOG_TAG, "Unable to stop remote video feed", ex);
             }
@@ -465,7 +468,7 @@ public class SipCall extends Call {
         VideoPreview videoPreview = getVideoPreview();
         if (videoPreview != null) {
             try {
-                videoPreview.stop();;
+                videoPreview.stop();
             } catch (Exception ex) {
                 Logger.error(LOG_TAG, "Unable to stop preview video feed", ex);
             }
@@ -476,8 +479,13 @@ public class SipCall extends Call {
         return videoCall;
     }
 
-    public void setVideoCall(boolean videoCall) {
+    public boolean isVideoConference() {
+        return videoConference;
+    }
+
+    public void setVideoParams(boolean videoCall, boolean videoConference) {
         this.videoCall = videoCall;
+        this.videoConference = videoConference;
     }
 
     private void setMediaParams(CallOpParam param) {

@@ -69,7 +69,8 @@ public class BroadcastEventReceiver extends BroadcastReceiver {
             onOutgoingCall(intent.getStringExtra(BroadcastParameters.ACCOUNT_ID),
                     intent.getIntExtra(BroadcastParameters.CALL_ID, -1),
                     intent.getStringExtra(BroadcastParameters.NUMBER),
-                    intent.getBooleanExtra(BroadcastParameters.IS_VIDEO, false));
+                    intent.getBooleanExtra(BroadcastParameters.IS_VIDEO, false),
+                    intent.getBooleanExtra(BroadcastParameters.IS_VIDEO_CONF, false));
 
         } else if (action.equals(BroadcastEventEmitter.getAction(STACK_STATUS))) {
             onStackStatus(intent.getBooleanExtra(BroadcastParameters.STACK_STARTED, false));
@@ -144,7 +145,7 @@ public class BroadcastEventReceiver extends BroadcastReceiver {
                 ", isLocalVideoMute: " + isLocalVideoMute);
     }
 
-    public void onOutgoingCall(String accountID, int callID, String number, boolean isVideo) {
+    public void onOutgoingCall(String accountID, int callID, String number, boolean isVideo, boolean isVideoConference) {
         Logger.debug(LOG_TAG, "onOutgoingCall - accountID: " + accountID +
                 ", callID: " + callID +
                 ", number: " + number);

@@ -65,9 +65,9 @@ public class SipAccount extends Account {
         return call;
     }
 
-    public SipCall addOutgoingCall(final String numberToDial, boolean isVideo) {
+    public SipCall addOutgoingCall(final String numberToDial, boolean isVideo, boolean isVideoConference) {
         SipCall call = new SipCall(this);
-        call.setVideoCall(isVideo);
+        call.setVideoParams(isVideo, isVideoConference);
 
         CallOpParam callOpParam = new CallOpParam();
         try {
@@ -92,7 +92,7 @@ public class SipAccount extends Account {
     }
 
     public SipCall addOutgoingCall(final String numberToDial) {
-        return addOutgoingCall(numberToDial, false);
+        return addOutgoingCall(numberToDial, false, false);
     }
 
     @Override

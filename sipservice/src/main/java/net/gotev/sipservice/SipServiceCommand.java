@@ -58,6 +58,7 @@ public class SipServiceCommand {
     protected static final String PARAM_REG_CONTACT_PARAMS = "regContactParams";
     protected static final String PARAM_DND = "dnd";
     protected static final String PARAM_IS_VIDEO = "isVideo";
+    protected static final String PARAM_IS_VIDEO_CONF = "isVideoConference";
     protected static final String PARAM_SURFACE = "surface";
     protected static final String PARAM_ORIENTATION = "orientation";
 
@@ -158,7 +159,7 @@ public class SipServiceCommand {
      * @param numberToCall number to call
      * @param isVideo whether the call has video or not
      */
-    public static void makeCall(Context context, String accountID, String numberToCall, boolean isVideo) {
+    public static void makeCall(Context context, String accountID, String numberToCall, boolean isVideo, boolean isVideoConference) {
         checkAccount(accountID);
 
         Intent intent = new Intent(context, SipService.class);
@@ -166,11 +167,12 @@ public class SipServiceCommand {
         intent.putExtra(PARAM_ACCOUNT_ID, accountID);
         intent.putExtra(PARAM_NUMBER, numberToCall);
         intent.putExtra(PARAM_IS_VIDEO, isVideo);
+        intent.putExtra(PARAM_IS_VIDEO_CONF, isVideoConference);
         context.startService(intent);
     }
 
     public static void makeCall(Context context, String accountID, String numberToCall) {
-        makeCall(context, accountID, numberToCall, false);
+        makeCall(context, accountID, numberToCall, false, false);
     }
 
     /**

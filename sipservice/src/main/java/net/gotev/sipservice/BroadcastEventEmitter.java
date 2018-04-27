@@ -49,6 +49,7 @@ public class BroadcastEventEmitter {
         public static final String LOCAL_VIDEO_MUTE = "local_video_mute";
         public static final String SUCCESS = "success";
         public static final String IS_VIDEO = "is_video";
+        public static final String IS_VIDEO_CONF = "is_video_conf";
     }
 
     public BroadcastEventEmitter(Context context) {
@@ -122,7 +123,7 @@ public class BroadcastEventEmitter {
         mContext.sendBroadcast(intent);
     }
 
-    public void outgoingCall(String accountID, int callID, String number, boolean isVideo) {
+    public void outgoingCall(String accountID, int callID, String number, boolean isVideo, boolean isVideoConference) {
         final Intent intent = new Intent();
 
         intent.setAction(getAction(BroadcastAction.OUTGOING_CALL));
@@ -130,6 +131,7 @@ public class BroadcastEventEmitter {
         intent.putExtra(BroadcastParameters.CALL_ID, callID);
         intent.putExtra(BroadcastParameters.NUMBER, number);
         intent.putExtra(BroadcastParameters.IS_VIDEO, isVideo);
+        intent.putExtra(BroadcastParameters.IS_VIDEO_CONF, isVideoConference);
 
         mContext.sendBroadcast(intent);
     }

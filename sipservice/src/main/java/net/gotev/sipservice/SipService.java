@@ -71,6 +71,7 @@ import static net.gotev.sipservice.SipServiceCommand.PARAM_DND;
 import static net.gotev.sipservice.SipServiceCommand.PARAM_DTMF;
 import static net.gotev.sipservice.SipServiceCommand.PARAM_HOLD;
 import static net.gotev.sipservice.SipServiceCommand.PARAM_IS_VIDEO;
+import static net.gotev.sipservice.SipServiceCommand.PARAM_IS_VIDEO_CONF;
 import static net.gotev.sipservice.SipServiceCommand.PARAM_MUTE;
 import static net.gotev.sipservice.SipServiceCommand.PARAM_NUMBER;
 import static net.gotev.sipservice.SipServiceCommand.PARAM_ORIENTATION;
@@ -315,7 +316,7 @@ public class SipService extends BackgroundService {
         }
 
         try {
-            sipCall.setVideoCall(isVideo);
+            sipCall.setVideoParams(isVideo, false);
             sipCall.acceptIncomingCall();
         } catch (Exception exc) {
             Logger.error(TAG, "Error while accepting incoming call. AccountID: "
@@ -513,16 +514,20 @@ public class SipService extends BackgroundService {
         String accountID = intent.getStringExtra(PARAM_ACCOUNT_ID);
         String number = intent.getStringExtra(PARAM_NUMBER);
         boolean isVideo = intent.getBooleanExtra(PARAM_IS_VIDEO, false);
+        boolean isVideoConference = false;
+        if (isVideo) {
+            isVideoConference = intent.getBooleanExtra(PARAM_IS_VIDEO_CONF, false);
+        }
 
         Logger.debug(TAG, "Making call to " + number);
 
         try {
-            SipCall call = mActiveSipAccounts.get(accountID).addOutgoingCall(number, isVideo);
-            call.setVideoCall(isVideo);
-            mBroadcastEmitter.outgoingCall(accountID, call.getId(), number, isVideo);
+            SipCall call = mActiveSipAccounts.get(accountID).addOutgoingCall(number, isVideo, isVideoConference);
+            call.setVideoParams(isVideo, isVideoConference);
+            mBroadcastEmitter.outgoingCall(accountID, call.getId(), number, isVideo, isVideoConference);
         } catch (Exception exc) {
             Logger.error(TAG, "Error while making outgoing call", exc);
-            mBroadcastEmitter.outgoingCall(accountID, -1, number, false);
+            mBroadcastEmitter.outgoingCall(accountID, -1, number, false, false);
         }
     }
 
