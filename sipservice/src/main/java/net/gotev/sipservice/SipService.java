@@ -36,55 +36,14 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
-import static net.gotev.sipservice.SipServiceCommand.ACTION_ACCEPT_INCOMING_CALL;
-import static net.gotev.sipservice.SipServiceCommand.ACTION_DECLINE_INCOMING_CALL;
-import static net.gotev.sipservice.SipServiceCommand.ACTION_GET_CALL_STATUS;
-import static net.gotev.sipservice.SipServiceCommand.ACTION_GET_CODEC_PRIORITIES;
-import static net.gotev.sipservice.SipServiceCommand.ACTION_GET_REGISTRATION_STATUS;
-import static net.gotev.sipservice.SipServiceCommand.ACTION_HANG_UP_CALL;
-import static net.gotev.sipservice.SipServiceCommand.ACTION_HANG_UP_CALLS;
-import static net.gotev.sipservice.SipServiceCommand.ACTION_HOLD_CALLS;
-import static net.gotev.sipservice.SipServiceCommand.ACTION_MAKE_CALL;
-import static net.gotev.sipservice.SipServiceCommand.ACTION_REFRESH_REGISTRATION;
-import static net.gotev.sipservice.SipServiceCommand.ACTION_REMOVE_ACCOUNT;
-import static net.gotev.sipservice.SipServiceCommand.ACTION_RESTART_SIP_STACK;
-import static net.gotev.sipservice.SipServiceCommand.ACTION_SEND_DTMF;
-import static net.gotev.sipservice.SipServiceCommand.ACTION_SET_ACCOUNT;
-import static net.gotev.sipservice.SipServiceCommand.ACTION_SET_CODEC_PRIORITIES;
-import static net.gotev.sipservice.SipServiceCommand.ACTION_SET_DND;
-import static net.gotev.sipservice.SipServiceCommand.ACTION_SET_HOLD;
-import static net.gotev.sipservice.SipServiceCommand.ACTION_SET_MUTE;
-import static net.gotev.sipservice.SipServiceCommand.ACTION_SET_INCOMING_VIDEO;
-import static net.gotev.sipservice.SipServiceCommand.ACTION_SET_SELF_VIDEO_ORIENTATION;
-import static net.gotev.sipservice.SipServiceCommand.ACTION_START_VIDEO_PREVIEW;
-import static net.gotev.sipservice.SipServiceCommand.ACTION_STOP_VIDEO_PREVIEW;
-import static net.gotev.sipservice.SipServiceCommand.ACTION_TOGGLE_HOLD;
-import static net.gotev.sipservice.SipServiceCommand.ACTION_TOGGLE_MUTE;
-import static net.gotev.sipservice.SipServiceCommand.ACTION_TOGGLE_VIDEO_MUTE;
-import static net.gotev.sipservice.SipServiceCommand.ACTION_TRANSFER_CALL;
 import static net.gotev.sipservice.SipServiceCommand.AGENT_NAME;
-import static net.gotev.sipservice.SipServiceCommand.PARAM_ACCOUNT_DATA;
-import static net.gotev.sipservice.SipServiceCommand.PARAM_ACCOUNT_ID;
-import static net.gotev.sipservice.SipServiceCommand.PARAM_CALL_ID;
-import static net.gotev.sipservice.SipServiceCommand.PARAM_CODEC_PRIORITIES;
-import static net.gotev.sipservice.SipServiceCommand.PARAM_DND;
-import static net.gotev.sipservice.SipServiceCommand.PARAM_DTMF;
-import static net.gotev.sipservice.SipServiceCommand.PARAM_HOLD;
-import static net.gotev.sipservice.SipServiceCommand.PARAM_IS_VIDEO;
-import static net.gotev.sipservice.SipServiceCommand.PARAM_IS_VIDEO_CONF;
-import static net.gotev.sipservice.SipServiceCommand.PARAM_MUTE;
-import static net.gotev.sipservice.SipServiceCommand.PARAM_NUMBER;
-import static net.gotev.sipservice.SipServiceCommand.PARAM_ORIENTATION;
-import static net.gotev.sipservice.SipServiceCommand.PARAM_REG_EXP_TIMEOUT;
-import static net.gotev.sipservice.SipServiceCommand.PARAM_REG_CONTACT_PARAMS;
-import static net.gotev.sipservice.SipServiceCommand.PARAM_SURFACE;
 import static net.gotev.sipservice.SipServiceCommand.refreshRegistration;
 
 /**
  * Sip Service.
  * @author gotev (Aleksandar Gotev)
  */
-public class SipService extends BackgroundService {
+public class SipService extends BackgroundService implements SipServiceConstants {
 
     private static final String TAG = SipService.class.getSimpleName();
     private static final long[] VIBRATOR_PATTERN = {0, 1000, 1000};

@@ -5,27 +5,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 
-import net.gotev.sipservice.BroadcastEventEmitter.BroadcastParameters;
-
 import org.pjsip.pjsua2.pjsip_inv_state;
 import org.pjsip.pjsua2.pjsip_status_code;
 
 import java.util.ArrayList;
 
-import static net.gotev.sipservice.BroadcastEventEmitter.BroadcastAction.CALL_STATE;
-import static net.gotev.sipservice.BroadcastEventEmitter.BroadcastAction.CODEC_PRIORITIES;
-import static net.gotev.sipservice.BroadcastEventEmitter.BroadcastAction.CODEC_PRIORITIES_SET_STATUS;
-import static net.gotev.sipservice.BroadcastEventEmitter.BroadcastAction.INCOMING_CALL;
-import static net.gotev.sipservice.BroadcastEventEmitter.BroadcastAction.MISSED_CALL;
-import static net.gotev.sipservice.BroadcastEventEmitter.BroadcastAction.OUTGOING_CALL;
-import static net.gotev.sipservice.BroadcastEventEmitter.BroadcastAction.REGISTRATION;
-import static net.gotev.sipservice.BroadcastEventEmitter.BroadcastAction.STACK_STATUS;
-
 /**
  * Reference implementation to receive events emitted by the sip service.
  * @author gotev (Aleksandar Gotev)
  */
-public class BroadcastEventReceiver extends BroadcastReceiver {
+public class BroadcastEventReceiver extends BroadcastReceiver implements SipServiceConstants{
 
     private static final String LOG_TAG = "SipServiceBR";
 
@@ -41,50 +30,50 @@ public class BroadcastEventReceiver extends BroadcastReceiver {
 
         String action = intent.getAction();
 
-        if (action.equals(BroadcastEventEmitter.getAction(REGISTRATION))) {
-            int stateCode = intent.getIntExtra(BroadcastParameters.CODE, -1);
-            onRegistration(intent.getStringExtra(BroadcastParameters.ACCOUNT_ID),
+        if (BroadcastEventEmitter.getAction(BroadcastEventEmitter.BroadcastAction.REGISTRATION).equals(action)) {
+            int stateCode = intent.getIntExtra(PARAM_REGISTRATION_CODE, -1);
+            onRegistration(intent.getStringExtra(PARAM_ACCOUNT_ID),
                            pjsip_status_code.swigToEnum(stateCode));
 
-        } else if (action.equals(BroadcastEventEmitter.getAction(INCOMING_CALL))) {
-            onIncomingCall(intent.getStringExtra(BroadcastParameters.ACCOUNT_ID),
-                    intent.getIntExtra(BroadcastParameters.CALL_ID, -1),
-                    intent.getStringExtra(BroadcastParameters.DISPLAY_NAME),
-                    intent.getStringExtra(BroadcastParameters.REMOTE_URI),
-                    intent.getBooleanExtra(BroadcastParameters.IS_VIDEO, false));
+        } else if (BroadcastEventEmitter.getAction(BroadcastEventEmitter.BroadcastAction.INCOMING_CALL).equals(action)) {
+            onIncomingCall(intent.getStringExtra(PARAM_ACCOUNT_ID),
+                    intent.getIntExtra(PARAM_CALL_ID, -1),
+                    intent.getStringExtra(PARAM_DISPLAY_NAME),
+                    intent.getStringExtra(PARAM_REMOTE_URI),
+                    intent.getBooleanExtra(PARAM_IS_VIDEO, false));
 
-        } else if (action.equals(BroadcastEventEmitter.getAction(CALL_STATE))) {
-            int callState = intent.getIntExtra(BroadcastParameters.CALL_STATE, -1);
-            int callStatus = intent.getIntExtra(BroadcastParameters.CALL_STATUS, -1);
-            onCallState(intent.getStringExtra(BroadcastParameters.ACCOUNT_ID),
-                        intent.getIntExtra(BroadcastParameters.CALL_ID, -1),
+        } else if (BroadcastEventEmitter.getAction(BroadcastEventEmitter.BroadcastAction.CALL_STATE).equals(action)) {
+            int callState = intent.getIntExtra(PARAM_CALL_STATE, -1);
+            int callStatus = intent.getIntExtra(PARAM_CALL_STATUS, -1);
+            onCallState(intent.getStringExtra(PARAM_ACCOUNT_ID),
+                        intent.getIntExtra(PARAM_CALL_ID, -1),
                         pjsip_inv_state.swigToEnum(callState),
                         (callStatus > 0) ? pjsip_status_code.swigToEnum(callStatus) : null,
-                        intent.getLongExtra(BroadcastParameters.CONNECT_TIMESTAMP, -1),
-                        intent.getBooleanExtra(BroadcastParameters.LOCAL_HOLD, false),
-                        intent.getBooleanExtra(BroadcastParameters.LOCAL_MUTE, false),
-                        intent.getBooleanExtra(BroadcastParameters.LOCAL_VIDEO_MUTE, false));
+                        intent.getLongExtra(PARAM_CONNECT_TIMESTAMP, -1),
+                        intent.getBooleanExtra(PARAM_LOCAL_HOLD, false),
+                        intent.getBooleanExtra(PARAM_LOCAL_MUTE, false),
+                        intent.getBooleanExtra(PARAM_LOCAL_VIDEO_MUTE, false));
 
-        } else if (action.equals(BroadcastEventEmitter.getAction(OUTGOING_CALL))) {
-            onOutgoingCall(intent.getStringExtra(BroadcastParameters.ACCOUNT_ID),
-                    intent.getIntExtra(BroadcastParameters.CALL_ID, -1),
-                    intent.getStringExtra(BroadcastParameters.NUMBER),
-                    intent.getBooleanExtra(BroadcastParameters.IS_VIDEO, false),
-                    intent.getBooleanExtra(BroadcastParameters.IS_VIDEO_CONF, false));
+        } else if (BroadcastEventEmitter.getAction(BroadcastEventEmitter.BroadcastAction.OUTGOING_CALL).equals(action)) {
+            onOutgoingCall(intent.getStringExtra(PARAM_ACCOUNT_ID),
+                    intent.getIntExtra(PARAM_CALL_ID, -1),
+                    intent.getStringExtra(PARAM_NUMBER),
+                    intent.getBooleanExtra(PARAM_IS_VIDEO, false),
+                    intent.getBooleanExtra(PARAM_IS_VIDEO_CONF, false));
 
-        } else if (action.equals(BroadcastEventEmitter.getAction(STACK_STATUS))) {
-            onStackStatus(intent.getBooleanExtra(BroadcastParameters.STACK_STARTED, false));
+        } else if (BroadcastEventEmitter.getAction(BroadcastEventEmitter.BroadcastAction.STACK_STATUS).equals(action)) {
+            onStackStatus(intent.getBooleanExtra(PARAM_STACK_STARTED, false));
 
-        } else if (action.equals(BroadcastEventEmitter.getAction(CODEC_PRIORITIES))) {
-            ArrayList<CodecPriority> codecList = intent.getParcelableArrayListExtra(BroadcastParameters.CODEC_PRIORITIES_LIST);
+        } else if (BroadcastEventEmitter.getAction(BroadcastEventEmitter.BroadcastAction.CODEC_PRIORITIES).equals(action)) {
+            ArrayList<CodecPriority> codecList = intent.getParcelableArrayListExtra(PARAM_CODEC_PRIORITIES_LIST);
             onReceivedCodecPriorities(codecList);
 
-        } else if (action.equals(BroadcastEventEmitter.getAction(CODEC_PRIORITIES_SET_STATUS))) {
-            onCodecPrioritiesSetStatus(intent.getBooleanExtra(BroadcastParameters.SUCCESS, false));
+        } else if (BroadcastEventEmitter.getAction(BroadcastEventEmitter.BroadcastAction.CODEC_PRIORITIES_SET_STATUS).equals(action)) {
+            onCodecPrioritiesSetStatus(intent.getBooleanExtra(PARAM_SUCCESS, false));
 
-        } else if (action.equals(BroadcastEventEmitter.getAction(MISSED_CALL))) {
-            onMissedCall(intent.getStringExtra(BroadcastParameters.DISPLAY_NAME),
-                    intent.getStringExtra(BroadcastParameters.REMOTE_URI));
+        } else if (BroadcastEventEmitter.getAction(BroadcastEventEmitter.BroadcastAction.MISSED_CALL).equals(action)) {
+            onMissedCall(intent.getStringExtra(PARAM_DISPLAY_NAME),
+                    intent.getStringExtra(PARAM_REMOTE_URI));
         }
     }
 
@@ -101,13 +90,22 @@ public class BroadcastEventReceiver extends BroadcastReceiver {
     public void register(final Context context) {
 
         final IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(BroadcastEventEmitter.getAction(REGISTRATION));
-        intentFilter.addAction(BroadcastEventEmitter.getAction(INCOMING_CALL));
-        intentFilter.addAction(BroadcastEventEmitter.getAction(CALL_STATE));
-        intentFilter.addAction(BroadcastEventEmitter.getAction(OUTGOING_CALL));
-        intentFilter.addAction(BroadcastEventEmitter.getAction(STACK_STATUS));
-        intentFilter.addAction(BroadcastEventEmitter.getAction(CODEC_PRIORITIES));
-        intentFilter.addAction(BroadcastEventEmitter.getAction(CODEC_PRIORITIES_SET_STATUS));
+        intentFilter.addAction(BroadcastEventEmitter.getAction(
+                BroadcastEventEmitter.BroadcastAction.REGISTRATION));
+        intentFilter.addAction(BroadcastEventEmitter.getAction(
+                BroadcastEventEmitter.BroadcastAction.INCOMING_CALL));
+        intentFilter.addAction(BroadcastEventEmitter.getAction(
+                BroadcastEventEmitter.BroadcastAction.CALL_STATE));
+        intentFilter.addAction(BroadcastEventEmitter.getAction(
+                BroadcastEventEmitter.BroadcastAction.OUTGOING_CALL));
+        intentFilter.addAction(BroadcastEventEmitter.getAction(
+                BroadcastEventEmitter.BroadcastAction.STACK_STATUS));
+        intentFilter.addAction(BroadcastEventEmitter.getAction(
+                BroadcastEventEmitter.BroadcastAction.CODEC_PRIORITIES));
+        intentFilter.addAction(BroadcastEventEmitter.getAction(
+                BroadcastEventEmitter.BroadcastAction.CODEC_PRIORITIES_SET_STATUS));
+        intentFilter.addAction(BroadcastEventEmitter.getAction(
+                BroadcastEventEmitter.BroadcastAction.MISSED_CALL));
         context.registerReceiver(this, intentFilter);
     }
 

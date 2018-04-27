@@ -15,53 +15,9 @@ import java.util.ArrayList;
  * Triggers sip service commands.
  * @author gotev (Aleksandar Gotev)
  */
-public class SipServiceCommand {
+public class SipServiceCommand implements SipServiceConstants {
 
     public static String AGENT_NAME = "AndroidSipService/" + BuildConfig.VERSION_CODE;
-
-    protected static final String ACTION_RESTART_SIP_STACK = "restartSipStack";
-    protected static final String ACTION_SET_ACCOUNT = "setAccount";
-    protected static final String ACTION_REMOVE_ACCOUNT = "removeAccount";
-    protected static final String ACTION_MAKE_CALL = "makeCall";
-    protected static final String ACTION_HANG_UP_CALL = "hangUpCall";
-    protected static final String ACTION_HANG_UP_CALLS = "hangUpCalls";
-    protected static final String ACTION_HOLD_CALLS = "holdCalls";
-    protected static final String ACTION_GET_CALL_STATUS = "getCallStatus";
-    protected static final String ACTION_SEND_DTMF = "sendDtmf";
-    protected static final String ACTION_ACCEPT_INCOMING_CALL = "acceptIncomingCall";
-    protected static final String ACTION_DECLINE_INCOMING_CALL = "declineIncomingCall";
-    protected static final String ACTION_SET_HOLD = "callSetHold";
-    protected static final String ACTION_SET_MUTE = "callSetMute";
-    protected static final String ACTION_TOGGLE_HOLD = "callToggleHold";
-    protected static final String ACTION_TOGGLE_MUTE = "callToggleMute";
-    protected static final String ACTION_TRANSFER_CALL = "callTransfer";
-    protected static final String ACTION_GET_CODEC_PRIORITIES = "codecPriorities";
-    protected static final String ACTION_SET_CODEC_PRIORITIES = "setCodecPriorities";
-    protected static final String ACTION_GET_REGISTRATION_STATUS = "getRegistrationStatus";
-    protected static final String ACTION_REFRESH_REGISTRATION = "refreshRegistration";
-    protected static final String ACTION_SET_DND = "setDND";
-    protected static final String ACTION_SET_INCOMING_VIDEO = "setIncomingVideo";
-    protected static final String ACTION_SET_SELF_VIDEO_ORIENTATION = "setSelfVideoOrientation";
-    protected static final String ACTION_TOGGLE_VIDEO_MUTE = "toggleVideoMute";
-    protected static final String ACTION_START_VIDEO_PREVIEW = "startVideoPreview";
-    protected static final String ACTION_STOP_VIDEO_PREVIEW = "stopVideoPreview";
-
-    protected static final String PARAM_ACCOUNT_DATA = "accountData";
-    protected static final String PARAM_ACCOUNT_ID = "accountID";
-    protected static final String PARAM_NUMBER = "number";
-    protected static final String PARAM_CALL_ID = "callId";
-    protected static final String PARAM_DTMF = "dtmf";
-    protected static final String PARAM_HOLD = "hold";
-    protected static final String PARAM_MUTE = "mute";
-    protected static final String PARAM_CODEC_PRIORITIES = "codecPriorities";
-    protected static final String PARAM_REG_EXP_TIMEOUT = "regExpTimeout";
-    protected static final String PARAM_REG_CONTACT_PARAMS = "regContactParams";
-    protected static final String PARAM_DND = "dnd";
-    protected static final String PARAM_IS_VIDEO = "isVideo";
-    protected static final String PARAM_IS_VIDEO_CONF = "isVideoConference";
-    protected static final String PARAM_SURFACE = "surface";
-    protected static final String PARAM_ORIENTATION = "orientation";
-
 
     /**
      * Adds a new SIP account.
