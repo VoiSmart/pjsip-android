@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.IBinder;
 import android.os.Vibrator;
 
+import com.crashlytics.android.Crashlytics;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -981,6 +982,8 @@ public class SipService extends BackgroundService {
                             }
                         } catch (NumberFormatException nex) {
                             Logger.error(TAG, "Unable to parse the expiration time");
+                            Crashlytics.log(message);
+                            Crashlytics.logException(nex);
                         }
 
                     }
