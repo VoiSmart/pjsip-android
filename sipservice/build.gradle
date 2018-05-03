@@ -2,6 +2,10 @@ apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.jfrog.bintray'
 
+repositories {
+    maven { url 'https://maven.fabric.io/public' }
+}
+
 def siteUrl = 'https://github.com/gotev/pjsip-android'
 def gitUrl = 'https://github.com/gotev/pjsip-android.git'
 def projectName = "pjsip-android"
@@ -31,6 +35,7 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.google.code.gson:gson:2.5'
+    compile('com.crashlytics.sdk.android:crashlytics:2.6.6@aar') { transitive = true }
 }
 
 // add the following information to the file: local.properties situated in the parent directory of
@@ -111,8 +116,8 @@ task javadoc(type: Javadoc) {
         locale = 'en_US'
         encoding = 'UTF-8'
         charSet = 'UTF-8'
-        links("http://docs.oracle.com/javase/7/docs/api/");
-        linksOffline("http://d.android.com/reference", "${android.sdkDirectory}/docs/reference");
+        links("http://docs.oracle.com/javase/7/docs/api/")
+        linksOffline("http://d.android.com/reference", "${android.sdkDirectory}/docs/reference")
         setMemberLevel(JavadocMemberLevel.PUBLIC)
     }
 }

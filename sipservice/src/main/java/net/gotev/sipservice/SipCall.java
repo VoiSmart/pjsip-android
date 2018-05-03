@@ -112,6 +112,10 @@ public class SipCall extends Call {
                     .callState(account.getData().getIdUri(), callID, callState.swigValue(), callStatus != null ? callStatus.swigValue() : -1,
                                connectTimestamp, localHold, localMute);
 
+            if (callState == pjsip_inv_state.PJSIP_INV_STATE_DISCONNECTED) {
+                account.getService().setLastCallStatus(0);
+            }
+
         } catch (Exception exc) {
             Logger.error(LOG_TAG, "onCallState: error while getting call info", exc);
         }
