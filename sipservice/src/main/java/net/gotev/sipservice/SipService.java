@@ -12,6 +12,7 @@ import android.os.IBinder;
 import android.os.Vibrator;
 import android.view.Surface;
 
+import com.crashlytics.android.Crashlytics;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -30,6 +31,8 @@ import org.pjsip.pjsua2.pjsip_inv_state;
 import org.pjsip.pjsua2.pjsip_transport_type_e;
 
 import java.lang.reflect.Type;
+import java.text.NumberFormat;
+import java.text.ParsePosition;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -974,7 +977,7 @@ public class SipService extends BackgroundService implements SipServiceConstants
                 String tok = preferences.getString("fcm_token", "");
                 int expire = 0;
                 boolean found = false, validMessage = false;
-                int indexTok = 0, indexLastTok = 0, indexExp = 0, indexLastExp = 0, indexSemiColon = 0;
+                int indexTok = 0, indexSemiColon = 0;
                 indexTok = message.indexOf("pn-tok=");
                 while (!found && !tok.isEmpty() && indexTok != -1) {
                     validMessage = true;
@@ -982,10 +985,20 @@ public class SipService extends BackgroundService implements SipServiceConstants
                     indexSemiColon = message.indexOf(";", indexTok);
                     if (message.substring(indexTok + 1, indexSemiColon).equals(tok)) {
                         String exp = message.substring((message.indexOf("=", indexSemiColon) + 1), message.indexOf("\r", indexSemiColon));
-                        expire = Integer.parseInt(exp);
-                        if (expire > TimeUnit.DAYS.toSeconds(4L)){
-                            found = true;
+                        if (!isNumeric(exp)) {
+                            exp = message.substring((message.indexOf("=", indexSemiColon) + 1), message.indexOf(",", indexSemiColon));
                         }
+                        try {
+                            expire = Integer.parseInt(exp);
+                            if (expire > TimeUnit.DAYS.toSeconds(4L)){
+                                found = true;
+                            }
+                        } catch (NumberFormatException nex) {
+                            Logger.error(TAG, "Unable to parse the expiration time");
+                            Crashlytics.log(message);
+                            Crashlytics.logException(nex);
+                        }
+
                     }
                     indexTok = message.indexOf("pn-tok=", indexTok);
                 }
@@ -1001,6 +1014,12 @@ public class SipService extends BackgroundService implements SipServiceConstants
         });
     }
 
+    private boolean isNumeric(String str) {
+        NumberFormat formatter = NumberFormat.getInstance();
+        ParsePosition pos = new ParsePosition(0);
+        formatter.parse(str, pos);
+        return str.length() == pos.getIndex();
+    }
     /****           END TEST STUFF               ****/
 
     public void setLastCallStatus(int callStatus) {

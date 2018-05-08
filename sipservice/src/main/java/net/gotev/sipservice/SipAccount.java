@@ -1,5 +1,7 @@
 package net.gotev.sipservice;
 
+import com.crashlytics.android.Crashlytics;
+
 import org.pjsip.pjsua2.Account;
 import org.pjsip.pjsua2.CallInfo;
 import org.pjsip.pjsua2.CallOpParam;
@@ -149,18 +151,26 @@ public class SipAccount extends Account {
 
             service.startRingtone();
 
-            CallerInfo contactInfo = new CallerInfo(call.getInfo());
+            String displayName = "", remoteUri = "";
+            try {
+                CallerInfo contactInfo = new CallerInfo(call.getInfo());
+                displayName = contactInfo.getDisplayName();
+                remoteUri = contactInfo.getRemoteUri();
+            } catch (Exception ex) {
+                Logger.error(LOG_TAG, "Error while getting caller info", ex);
+                Crashlytics.logException(ex);
+            }
 
             // check for video in remote SDP
             CallInfo callInfo = call.getInfo();
             boolean isVideo = (callInfo.getRemOfferer() && callInfo.getRemVideoCount() > 0);
 
-            service.getBroadcastEmitter()
-                   .incomingCall(data.getIdUri(), prm.getCallId(),
-                           contactInfo.getDisplayName(), contactInfo.getRemoteUri(), isVideo);
+            service.getBroadcastEmitter().incomingCall(data.getIdUri(), prm.getCallId(),
+                            displayName, remoteUri, isVideo);
 
-        } catch (Exception exc) {
-            Logger.error(LOG_TAG, "Error while getting call info", exc);
+        } catch (Exception ex) {
+            Logger.error(LOG_TAG, "Error while getting caller info", ex);
+            Crashlytics.logException(ex);
         }
     }
 }
