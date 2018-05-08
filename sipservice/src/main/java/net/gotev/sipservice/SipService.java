@@ -16,11 +16,13 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import org.pjsip.pjsua2.AudDevManager;
+import org.pjsip.pjsua2.CodecFmtpVector;
 import org.pjsip.pjsua2.CodecInfo;
 import org.pjsip.pjsua2.CodecInfoVector;
 import org.pjsip.pjsua2.Endpoint;
 import org.pjsip.pjsua2.EpConfig;
 import org.pjsip.pjsua2.TransportConfig;
+import org.pjsip.pjsua2.VidCodecParam;
 import org.pjsip.pjsua2.VidDevManager;
 import org.pjsip.pjsua2.pj_qos_type;
 import org.pjsip.pjsua2.pjmedia_orient;
@@ -678,6 +680,18 @@ public class SipService extends BackgroundService implements SipServiceConstants
                 mEndpoint.codecSetPriority("G7221/32000", (short) CodecPriority.PRIORITY_DISABLED);
                 mEndpoint.codecSetPriority("ilbc/8000", (short) CodecPriority.PRIORITY_DISABLED);
             }
+
+            // Set H264 Profile-Level-Id
+            VidCodecParam vidCodecParam = mEndpoint.getVideoCodecParam(H264_CODEC_ID);
+            CodecFmtpVector codecFmtpVector = vidCodecParam.getDecFmtp();
+            for (int i = 0; i < codecFmtpVector.size(); i++) {
+                if (PROFILE_LEVEL_ID_HEADER.equals(codecFmtpVector.get(i).getName())) {
+                    codecFmtpVector.get(i).setVal(PROFILE_LEVEL_ID_JANUS_BRIDGE);
+                    break;
+                }
+            }
+            vidCodecParam.setDecFmtp(codecFmtpVector);
+            mEndpoint.setVideoCodecParam(H264_CODEC_ID, vidCodecParam);
 
             Logger.debug(TAG, "PJSIP started!");
             mStarted = true;

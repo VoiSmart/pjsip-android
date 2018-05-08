@@ -66,4 +66,20 @@ public interface SipServiceConstants {
     String PARAM_LOCAL_MUTE = "localMute";
     String PARAM_LOCAL_VIDEO_MUTE = "localVideoMute";
     String PARAM_SUCCESS = "success";
+
+    /**
+     * Video Configuration Params in SipService
+     */
+    String H264_CODEC_ID = "H264/97";
+    int H264_DEF_WIDTH = 640;
+    int H264_DEF_HEIGHT = 480;
+
+    /**
+     * Janus Bridge call specific parameters.
+     */
+    String PROFILE_LEVEL_ID_HEADER = "profile-level-id";
+    String PROFILE_LEVEL_ID_LOCAL = "42e01e";
+    String PROFILE_LEVEL_ID_JANUS_BRIDGE = "42e01f";
+
+
 }
