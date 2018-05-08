@@ -74,6 +74,10 @@ public class BroadcastEventReceiver extends BroadcastReceiver implements SipServ
         } else if (BroadcastEventEmitter.getAction(BroadcastEventEmitter.BroadcastAction.MISSED_CALL).equals(action)) {
             onMissedCall(intent.getStringExtra(PARAM_DISPLAY_NAME),
                     intent.getStringExtra(PARAM_REMOTE_URI));
+
+        } else if (BroadcastEventEmitter.getAction(BroadcastEventEmitter.BroadcastAction.VIDEO_SIZE).equals(action)) {
+            onVideoSize(intent.getIntExtra(PARAM_INCOMING_VIDEO_WIDTH, H264_DEF_WIDTH),
+                    intent.getIntExtra(PARAM_INCOMING_VIDEO_HEIGHT, H264_DEF_HEIGHT));
         }
     }
 
@@ -106,6 +110,8 @@ public class BroadcastEventReceiver extends BroadcastReceiver implements SipServ
                 BroadcastEventEmitter.BroadcastAction.CODEC_PRIORITIES_SET_STATUS));
         intentFilter.addAction(BroadcastEventEmitter.getAction(
                 BroadcastEventEmitter.BroadcastAction.MISSED_CALL));
+        intentFilter.addAction(BroadcastEventEmitter.getAction(
+                BroadcastEventEmitter.BroadcastAction.VIDEO_SIZE));
         context.registerReceiver(this, intentFilter);
     }
 
@@ -166,5 +172,9 @@ public class BroadcastEventReceiver extends BroadcastReceiver implements SipServ
 
     public void onMissedCall(String displayName, String uri) {
         Logger.debug(LOG_TAG, "Missed call from " + displayName);
+    }
+
+    protected void onVideoSize(int width, int height) {
+        Logger.debug(LOG_TAG, "Video resolution " + width+"x"+height);
     }
 }

@@ -138,8 +138,6 @@ public class SipCall extends Call {
 
     }
 
-
-
     @Override
     public void onCallMediaState(OnCallMediaStateParam prm) {
 
@@ -433,6 +431,12 @@ public class SipCall extends Call {
             videoWindowHandle.getHandle().setWindow(surface);
             try {
                 mVideoWindow.setWindow(videoWindowHandle);
+                account.getService().getBroadcastEmitter().videoSize(
+                        (int) mVideoWindow.getInfo().getSize().getW(),
+                        (int) mVideoWindow.getInfo().getSize().getH());
+
+                // start video again if not mute
+                setVideoMute(localVideoMute);
             } catch (Exception ex) {
                 Logger.error(LOG_TAG, "Unable to setup Incoming Video Feed", ex);
             }

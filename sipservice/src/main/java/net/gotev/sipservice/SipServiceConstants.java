@@ -66,6 +66,8 @@ public interface SipServiceConstants {
     String PARAM_LOCAL_MUTE = "localMute";
     String PARAM_LOCAL_VIDEO_MUTE = "localVideoMute";
     String PARAM_SUCCESS = "success";
+    String PARAM_INCOMING_VIDEO_WIDTH = "incomingVideoWidth";
+    String PARAM_INCOMING_VIDEO_HEIGHT = "incomingVideoHeight";
 
     /**
      * Video Configuration Params in SipService

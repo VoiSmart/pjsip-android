@@ -26,7 +26,8 @@ public class BroadcastEventEmitter implements SipServiceConstants {
         STACK_STATUS,
         CODEC_PRIORITIES,
         CODEC_PRIORITIES_SET_STATUS,
-        MISSED_CALL
+        MISSED_CALL,
+        VIDEO_SIZE
     }
 
     public BroadcastEventEmitter(Context context) {
@@ -146,6 +147,16 @@ public class BroadcastEventEmitter implements SipServiceConstants {
         intent.setAction(getAction(BroadcastAction.MISSED_CALL));
         intent.putExtra(PARAM_DISPLAY_NAME, displayName);
         intent.putExtra(PARAM_REMOTE_URI, uri);
+
+        mContext.sendBroadcast(intent);
+    }
+
+    void videoSize(int width, int height) {
+        final Intent intent = new Intent();
+
+        intent.setAction(getAction(BroadcastAction.VIDEO_SIZE));
+        intent.putExtra(PARAM_INCOMING_VIDEO_WIDTH, width);
+        intent.putExtra(PARAM_INCOMING_VIDEO_HEIGHT, height);
 
         mContext.sendBroadcast(intent);
     }
