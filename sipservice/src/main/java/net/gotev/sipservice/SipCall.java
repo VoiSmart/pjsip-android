@@ -4,6 +4,8 @@ import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.view.Surface;
 
+import com.crashlytics.android.Crashlytics;
+
 import org.pjsip.pjsua2.AudDevManager;
 import org.pjsip.pjsua2.AudioMedia;
 import org.pjsip.pjsua2.Call;
@@ -112,7 +114,7 @@ public class SipCall extends Call {
                 checkAndStopLocalRingBackTone();
                 connectTimestamp = System.currentTimeMillis();
                 if (videoCall) {
-                    toggleVideoMute();
+                    setVideoMute(false);
                 }
 
                 // check whether the 183 has arrived or not
@@ -444,6 +446,7 @@ public class SipCall extends Call {
                 setVideoMute(localVideoMute);
             } catch (Exception ex) {
                 Logger.error(LOG_TAG, "Unable to setup Incoming Video Feed", ex);
+                Crashlytics.logException(ex);
             }
         }
     }
@@ -503,20 +506,17 @@ public class SipCall extends Call {
         callSetting.setVideoCount(videoCall ? 1 : 0);
     }
 
-    private void setVideoMute(boolean videoMute) {
+    public void setVideoMute(boolean videoMute) {
         try {
             vidSetStream(videoMute
                     ? pjsua_call_vid_strm_op.PJSUA_CALL_VID_STRM_STOP_TRANSMIT
                     : pjsua_call_vid_strm_op.PJSUA_CALL_VID_STRM_START_TRANSMIT,
                 new CallVidSetStreamParam());
+            localVideoMute = videoMute;
         } catch(Exception ex) {
             Logger.error(LOG_TAG, "Error while toggling video transmission", ex);
+            Crashlytics.logException(ex);
         }
-    }
-
-    public void toggleVideoMute() {
-        localVideoMute = !localVideoMute;
-        setVideoMute(localVideoMute);
     }
 
     public boolean isLocalVideoMute() {

@@ -436,20 +436,22 @@ public class SipServiceCommand implements SipServiceConstants {
     }
 
     /**
-     * Toggle mute video status for a call. If the call does not exist or has been terminated, a disconnected
+     * Mutes and Un-Mutes video for a call. If the call does not exist or has been terminated, a disconnected
      * state will be sent to
      * {@link BroadcastEventReceiver#onCallState(String, int, pjsip_inv_state, pjsip_status_code, long, boolean, boolean, boolean)}
      * @param context application context
      * @param accountID account ID
      * @param callID call ID
+     * @param mute whether to mute or un-mute the video
      */
-    public static void toggleVideoMute(Context context, String accountID, int callID) {
+    public static void setVideoMute(Context context, String accountID, int callID, boolean mute) {
         checkAccount(accountID);
 
         Intent intent = new Intent(context, SipService.class);
-        intent.setAction(ACTION_TOGGLE_VIDEO_MUTE);
+        intent.setAction(ACTION_SET_VIDEO_MUTE);
         intent.putExtra(PARAM_ACCOUNT_ID, accountID);
         intent.putExtra(PARAM_CALL_ID, callID);
+        intent.putExtra(PARAM_VIDEO_MUTE, mute);
         context.startService(intent);
     }
 

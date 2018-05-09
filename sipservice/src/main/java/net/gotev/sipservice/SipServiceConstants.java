@@ -28,7 +28,7 @@ public interface SipServiceConstants {
     String ACTION_SET_DND = "setDND";
     String ACTION_SET_INCOMING_VIDEO = "setIncomingVideo";
     String ACTION_SET_SELF_VIDEO_ORIENTATION = "setSelfVideoOrientation";
-    String ACTION_TOGGLE_VIDEO_MUTE = "toggleVideoMute";
+    String ACTION_SET_VIDEO_MUTE = "setVideoMute";
     String ACTION_START_VIDEO_PREVIEW = "startVideoPreview";
     String ACTION_STOP_VIDEO_PREVIEW = "stopVideoPreview";
     String ACTION_SWITCH_VIDEO_CAPTURE_DEVICE = "switchVideoCaptureDevice";
@@ -66,6 +66,7 @@ public interface SipServiceConstants {
     String PARAM_LOCAL_HOLD = "localHold";
     String PARAM_LOCAL_MUTE = "localMute";
     String PARAM_LOCAL_VIDEO_MUTE = "localVideoMute";
+    String PARAM_VIDEO_MUTE = "videoMute";
     String PARAM_SUCCESS = "success";
     String PARAM_INCOMING_VIDEO_WIDTH = "incomingVideoWidth";
     String PARAM_INCOMING_VIDEO_HEIGHT = "incomingVideoHeight";

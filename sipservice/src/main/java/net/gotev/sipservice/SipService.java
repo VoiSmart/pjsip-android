@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Vibrator;
+import android.util.Log;
 import android.view.Surface;
 
 import com.crashlytics.android.Crashlytics;
@@ -179,8 +180,8 @@ public class SipService extends BackgroundService implements SipServiceConstants
                     case ACTION_SET_SELF_VIDEO_ORIENTATION:
                         handleSetSelfVideoOrientation(intent);
                         break;
-                    case ACTION_TOGGLE_VIDEO_MUTE:
-                        handleToggleVideoMute(intent);
+                    case ACTION_SET_VIDEO_MUTE:
+                        handleSetVideoMute(intent);
                         break;
                     case ACTION_START_VIDEO_PREVIEW:
                         handleStartVideoPreview(intent);
@@ -1053,7 +1054,7 @@ public class SipService extends BackgroundService implements SipServiceConstants
         }
         Bundle bundle = intent.getExtras();
         if (bundle != null) {
-            Surface surface = intent.getExtras().getParcelable(PARAM_SURFACE);
+            Surface surface = bundle.getParcelable(PARAM_SURFACE);
             sipCall.setIncomingVideoFeed(surface);
         }
     }
@@ -1083,7 +1084,7 @@ public class SipService extends BackgroundService implements SipServiceConstants
         }
     }
 
-    private void handleToggleVideoMute(Intent intent) {
+    private void handleSetVideoMute(Intent intent) {
         String accountID = intent.getStringExtra(PARAM_ACCOUNT_ID);
         int callID = intent.getIntExtra(PARAM_CALL_ID, 0);
         SipCall sipCall = getCall(accountID, callID);
@@ -1092,8 +1093,8 @@ public class SipService extends BackgroundService implements SipServiceConstants
             notifyCallDisconnected(accountID, callID);
             return;
         }
-
-        sipCall.toggleVideoMute();
+        boolean mute = intent.getBooleanExtra(PARAM_VIDEO_MUTE, false);
+        sipCall.setVideoMute(mute);
     }
 
     private void handleStartVideoPreview(Intent intent) {
@@ -1146,7 +1147,6 @@ public class SipService extends BackgroundService implements SipServiceConstants
         } catch (Exception ex) {
             Logger.error(TAG, "Error while switching capture device", ex);
             Crashlytics.logException(ex);
-
         }
     }
 }
