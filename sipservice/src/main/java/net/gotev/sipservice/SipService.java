@@ -10,7 +10,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Vibrator;
-import android.util.Log;
 import android.view.Surface;
 
 import com.crashlytics.android.Crashlytics;
