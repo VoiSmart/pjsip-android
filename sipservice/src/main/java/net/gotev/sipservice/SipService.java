@@ -17,6 +17,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import org.pjsip.pjsua2.AudDevManager;
+import org.pjsip.pjsua2.CallVidSetStreamParam;
 import org.pjsip.pjsua2.CodecFmtpVector;
 import org.pjsip.pjsua2.CodecInfo;
 import org.pjsip.pjsua2.CodecInfoVector;
@@ -29,6 +30,7 @@ import org.pjsip.pjsua2.pj_qos_type;
 import org.pjsip.pjsua2.pjmedia_orient;
 import org.pjsip.pjsua2.pjsip_inv_state;
 import org.pjsip.pjsua2.pjsip_transport_type_e;
+import org.pjsip.pjsua2.pjsua_call_vid_strm_op;
 
 import java.lang.reflect.Type;
 import java.text.NumberFormat;
@@ -185,6 +187,9 @@ public class SipService extends BackgroundService implements SipServiceConstants
                         break;
                     case ACTION_STOP_VIDEO_PREVIEW:
                         handleStopVideoPreview(intent);
+                        break;
+                    case ACTION_SWITCH_VIDEO_CAPTURE_DEVICE:
+                        handleSwitchVideoCaptureDevice(intent);
                         break;
                     default: break;
                 }
@@ -1054,13 +1059,23 @@ public class SipService extends BackgroundService implements SipServiceConstants
     }
     private void handleSetSelfVideoOrientation(Intent intent) {
         String accountID = intent.getStringExtra(PARAM_ACCOUNT_ID);
+        int callID = intent.getIntExtra(PARAM_CALL_ID, 0);
         int orientSwigValue = intent.getIntExtra(PARAM_ORIENTATION, -1);
+
         SipAccount sipAccount = mActiveSipAccounts.get(accountID);
         if (sipAccount != null && orientSwigValue > 0) {
+            SipCall sipCall = getCall(accountID, callID);
+            if (sipCall == null) {
+                notifyCallDisconnected(accountID, callID);
+                return;
+            }
             try {
+                // set orientation to the correct current device
                 getVidDevManager().setCaptureOrient(
-                        sipAccount.getData().getAccountConfig().getVideoConfig().getDefaultCaptureDevice(),
-                        pjmedia_orient.swigToEnum(orientSwigValue), true);
+                    sipCall.isFrontCamera()
+                        ? FRONT_CAMERA_CAPTURE_DEVICE
+                        : BACK_CAMERA_CAPTURE_DEVICE,
+                    pjmedia_orient.swigToEnum(orientSwigValue), true);
 
             } catch (Exception iex) {
                 Logger.error(TAG, "Error while changing video orientation");
@@ -1108,5 +1123,30 @@ public class SipService extends BackgroundService implements SipServiceConstants
         }
 
         sipCall.stopPreviewVideoFeed();
+    }
+
+    // Switch Camera
+    private void handleSwitchVideoCaptureDevice(Intent intent) {
+        String accountID = intent.getStringExtra(PARAM_ACCOUNT_ID);
+        int callID = intent.getIntExtra(PARAM_CALL_ID, 0);
+
+        final SipCall sipCall = getCall(accountID, callID);
+        if (sipCall == null) {
+            notifyCallDisconnected(accountID, callID);
+            return;
+        }
+
+        try {
+            CallVidSetStreamParam callVidSetStreamParam = new CallVidSetStreamParam();
+            callVidSetStreamParam.setCapDev(sipCall.isFrontCamera()
+                    ? BACK_CAMERA_CAPTURE_DEVICE
+                    : FRONT_CAMERA_CAPTURE_DEVICE);
+            sipCall.setFrontCamera(!sipCall.isFrontCamera());
+            sipCall.vidSetStream(pjsua_call_vid_strm_op.PJSUA_CALL_VID_STRM_CHANGE_CAP_DEV, callVidSetStreamParam);
+        } catch (Exception ex) {
+            Logger.error(TAG, "Error while switching capture device", ex);
+            Crashlytics.logException(ex);
+
+        }
     }
 }

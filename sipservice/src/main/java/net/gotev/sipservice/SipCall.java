@@ -44,6 +44,7 @@ public class SipCall extends Call {
     private ToneGenerator toneGenerator;
     private boolean videoCall = false;
     private boolean videoConference = false;
+    private boolean frontCamera = true;
 
     private VideoWindow mVideoWindow;
     private VideoPreview mVideoPreview;
@@ -520,5 +521,13 @@ public class SipCall extends Call {
 
     public boolean isLocalVideoMute() {
         return localVideoMute;
+    }
+
+    public boolean isFrontCamera() {
+        return frontCamera;
+    }
+
+    public void setFrontCamera(boolean frontCamera) {
+        this.frontCamera = frontCamera;
     }
 }

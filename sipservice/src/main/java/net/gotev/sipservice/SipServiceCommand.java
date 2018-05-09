@@ -479,14 +479,16 @@ public class SipServiceCommand implements SipServiceConstants {
      * {@link BroadcastEventReceiver#onCallState(String, int, pjsip_inv_state, pjsip_status_code, long, boolean, boolean, boolean)}
      * @param context application context
      * @param accountID account ID
+     * @param callID call ID
      * @param orientation call ID
      */
-    public static void changeVideoOrientation(Context context, String accountID, pjmedia_orient orientation) {
+    public static void changeVideoOrientation(Context context, String accountID, int callID, pjmedia_orient orientation) {
         checkAccount(accountID);
 
         Intent intent = new Intent(context, SipService.class);
         intent.setAction(ACTION_SET_SELF_VIDEO_ORIENTATION);
         intent.putExtra(PARAM_ACCOUNT_ID, accountID);
+        intent.putExtra(PARAM_CALL_ID, callID);
         intent.putExtra(PARAM_ORIENTATION, orientation.swigValue());
         context.startService(intent);
     }
@@ -504,6 +506,24 @@ public class SipServiceCommand implements SipServiceConstants {
 
         Intent intent = new Intent(context, SipService.class);
         intent.setAction(ACTION_STOP_VIDEO_PREVIEW);
+        intent.putExtra(PARAM_ACCOUNT_ID, accountID);
+        intent.putExtra(PARAM_CALL_ID, callID);
+        context.startService(intent);
+    }
+
+    /**
+     * Switches between front and back camera. If the call does not exist or has been terminated, a disconnected
+     * state will be sent to
+     * {@link BroadcastEventReceiver#onCallState(String, int, pjsip_inv_state, pjsip_status_code, long, boolean, boolean, boolean)}
+     * @param context application context
+     * @param accountID account ID
+     * @param callID call ID
+     */
+    public static void switchVideoCaptureDevice(Context context, String accountID, int callID) {
+        checkAccount(accountID);
+
+        Intent intent = new Intent(context, SipService.class);
+        intent.setAction(ACTION_SWITCH_VIDEO_CAPTURE_DEVICE);
         intent.putExtra(PARAM_ACCOUNT_ID, accountID);
         intent.putExtra(PARAM_CALL_ID, callID);
         context.startService(intent);

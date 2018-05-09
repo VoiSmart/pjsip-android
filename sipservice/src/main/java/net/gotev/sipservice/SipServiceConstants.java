@@ -31,6 +31,7 @@ public interface SipServiceConstants {
     String ACTION_TOGGLE_VIDEO_MUTE = "toggleVideoMute";
     String ACTION_START_VIDEO_PREVIEW = "startVideoPreview";
     String ACTION_STOP_VIDEO_PREVIEW = "stopVideoPreview";
+    String ACTION_SWITCH_VIDEO_CAPTURE_DEVICE = "switchVideoCaptureDevice";
 
     /*
      * Generic Parameters
@@ -70,8 +71,12 @@ public interface SipServiceConstants {
     String PARAM_INCOMING_VIDEO_HEIGHT = "incomingVideoHeight";
 
     /**
-     * Video Configuration Params in SipService
+     * Video Configuration Params
      */
+
+    int FRONT_CAMERA_CAPTURE_DEVICE = 1;    // Front Camera idx
+    int BACK_CAMERA_CAPTURE_DEVICE = 2;     // Back Camera idx
+    int DEFAULT_RENDER_DEVICE = 0;          // OpenGL Render
     String H264_CODEC_ID = "H264/97";
     int H264_DEF_WIDTH = 640;
     int H264_DEF_HEIGHT = 480;
