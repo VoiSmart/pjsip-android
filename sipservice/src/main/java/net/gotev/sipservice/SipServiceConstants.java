@@ -32,6 +32,7 @@ public interface SipServiceConstants {
     String ACTION_START_VIDEO_PREVIEW = "startVideoPreview";
     String ACTION_STOP_VIDEO_PREVIEW = "stopVideoPreview";
     String ACTION_SWITCH_VIDEO_CAPTURE_DEVICE = "switchVideoCaptureDevice";
+    String ACTION_MAKE_DIRECT_CALL = "makeDirectCall";
 
     /*
      * Generic Parameters
@@ -51,6 +52,8 @@ public interface SipServiceConstants {
     String PARAM_IS_VIDEO_CONF = "isVideoConference";
     String PARAM_SURFACE = "surface";
     String PARAM_ORIENTATION = "orientation";
+    String PARAM_GUEST_NAME = "guestName";
+    String PARAM_DIRECT_CALL_URI = "sipUri";
 
     /**
      * Specific Parameters passed in the broadcast intents.

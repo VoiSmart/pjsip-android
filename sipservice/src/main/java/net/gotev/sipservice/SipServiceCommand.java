@@ -2,6 +2,7 @@ package net.gotev.sipservice;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.view.Surface;
 
 
@@ -129,6 +130,24 @@ public class SipServiceCommand implements SipServiceConstants {
 
     public static void makeCall(Context context, String accountID, String numberToCall) {
         makeCall(context, accountID, numberToCall, false, false);
+    }
+
+    /**
+     * Makes a Direct call.
+     * @param context application context
+     * @param guestName name to display when making guest calls
+     * @param sipUri sip uri to call -> format: sip:number@realm:port
+     * @param isVideo whether the call has video or not
+     */
+    public static void makeDirectCall(Context context, String guestName, Uri sipUri, boolean isVideo, boolean isVideoConference) {
+
+        Intent intent = new Intent(context, SipService.class);
+        intent.setAction(ACTION_MAKE_DIRECT_CALL);
+        intent.putExtra(PARAM_GUEST_NAME, guestName);
+        intent.putExtra(PARAM_DIRECT_CALL_URI, sipUri);
+        intent.putExtra(PARAM_IS_VIDEO, isVideo);
+        intent.putExtra(PARAM_IS_VIDEO_CONF, isVideoConference);
+        context.startService(intent);
     }
 
     /**

@@ -26,6 +26,7 @@ public class SipAccountData implements Parcelable {
     private String contactUriParams;
     private int regExpirationTimeout = 300;//(int) TimeUnit.DAYS.toSeconds(7L);
     private boolean pushDisabled = false;
+    private String guestDisplayName = "";
 
     public SipAccountData() { }
 
@@ -56,6 +57,7 @@ public class SipAccountData implements Parcelable {
         parcel.writeString(contactUriParams);
         parcel.writeInt(regExpirationTimeout);
         parcel.writeByte((byte) (pushDisabled ? 1 : 0));
+        parcel.writeString(guestDisplayName);
     }
 
     private SipAccountData(Parcel in) {
@@ -69,6 +71,7 @@ public class SipAccountData implements Parcelable {
         contactUriParams = in.readString();
         regExpirationTimeout = in.readInt();
         pushDisabled = in.readByte() == 1;
+        guestDisplayName = in.readString();
     }
 
     @Override
@@ -190,11 +193,37 @@ public class SipAccountData implements Parcelable {
         accountConfig.getSipConfig().getProxies().add(getProxyUri());
         accountConfig.getRegConfig().setTimeoutSec(regExpirationTimeout);
         accountConfig.getSipConfig().setContactUriParams(getContactUriParams());
+        setVideoConfig(accountConfig);
+        return accountConfig;
+    }
+
+    protected AccountConfig getGuestAccountConfig() {
+        AccountConfig accountConfig = new AccountConfig();
+        accountConfig.getMediaConfig().getTransportConfig().setQosType(pj_qos_type.PJ_QOS_TYPE_VIDEO);
+        String idUri = getGuestDisplayName().isEmpty()
+                ? getIdUri()
+                : "\""+getGuestDisplayName()+"\" <"+getIdUri()+">";
+        accountConfig.setIdUri(idUri);
+        accountConfig.getSipConfig().getProxies().add(getProxyUri());
+        accountConfig.getRegConfig().setRegisterOnAdd(false);
+        setVideoConfig(accountConfig);
+        return accountConfig;
+    }
+
+    protected SipAccountData setGuestDisplayName(String guestDisplayName) {
+        this.guestDisplayName = guestDisplayName;
+        return this;
+    }
+
+    protected String getGuestDisplayName() {
+        return this.guestDisplayName;
+    }
+
+    private void setVideoConfig(AccountConfig accountConfig) {
         accountConfig.getVideoConfig().setAutoTransmitOutgoing(false);
         accountConfig.getVideoConfig().setAutoShowIncoming(true);
         accountConfig.getVideoConfig().setDefaultCaptureDevice(SipServiceConstants.FRONT_CAMERA_CAPTURE_DEVICE);
         accountConfig.getVideoConfig().setDefaultRenderDevice(SipServiceConstants.DEFAULT_RENDER_DEVICE);
-        return accountConfig;
     }
 
     public String getAuthenticationType() {

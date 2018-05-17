@@ -42,6 +42,10 @@ public class SipAccount extends Account {
         create(data.getAccountConfig());
     }
 
+    public void createGuest() throws Exception {
+        create(data.getGuestAccountConfig());
+    }
+
     protected void removeCall(int callId) {
         SipCall call = activeCalls.get(callId);
 

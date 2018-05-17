@@ -15,12 +15,14 @@ import org.pjsip.pjsua2.CallOpParam;
 import org.pjsip.pjsua2.CallSetting;
 import org.pjsip.pjsua2.CallVidSetStreamParam;
 import org.pjsip.pjsua2.Media;
+import org.pjsip.pjsua2.OnCallMediaEventParam;
 import org.pjsip.pjsua2.OnCallMediaStateParam;
 import org.pjsip.pjsua2.OnCallStateParam;
 import org.pjsip.pjsua2.VideoPreview;
 import org.pjsip.pjsua2.VideoPreviewOpParam;
 import org.pjsip.pjsua2.VideoWindow;
 import org.pjsip.pjsua2.VideoWindowHandle;
+import org.pjsip.pjsua2.pjmedia_event_type;
 import org.pjsip.pjsua2.pjmedia_type;
 import org.pjsip.pjsua2.pjsip_inv_state;
 import org.pjsip.pjsua2.pjsip_role_e;
@@ -41,7 +43,7 @@ public class SipCall extends Call {
     private SipAccount account;
     private boolean localHold = false;
     private boolean localMute = false;
-    private boolean localVideoMute = true;
+    private boolean localVideoMute = false;
     private long connectTimestamp = 0;
     private ToneGenerator toneGenerator;
     private boolean videoCall = false;
@@ -174,6 +176,22 @@ public class SipCall extends Call {
             }
         }
     }
+
+    /*@Override
+    public void onCallMediaEvent(OnCallMediaEventParam prm) {
+        if (prm.getEv().getType() == pjmedia_event_type.PJMEDIA_EVENT_FMT_CHANGED) {
+            setVideoMute(false);
+            try {
+                account.getService().getBroadcastEmitter().videoSize(
+                        (int) mVideoWindow.getInfo().getSize().getW(),
+                        (int) mVideoWindow.getInfo().getSize().getH());
+            } catch (Exception ex) {
+                Logger.error(LOG_TAG, "Unable to get video dimensions", ex);
+                Crashlytics.logException(ex);
+            }
+        }
+        super.onCallMediaEvent(prm);
+    }*/
 
     /**
      * Get the total duration of the call.

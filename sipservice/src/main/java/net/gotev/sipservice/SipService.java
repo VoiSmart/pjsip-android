@@ -61,6 +61,7 @@ public class SipService extends BackgroundService implements SipServiceConstants
     private static final String PREFS_KEY_DND = "dnd_pref";
 
     private List<SipAccountData> mConfiguredAccounts = new ArrayList<>();
+    private SipAccountData mConfiguredGuestAccount;
     private static ConcurrentHashMap<String, SipAccount> mActiveSipAccounts = new ConcurrentHashMap<>();
     private Ringtone mRingTone;
     private Vibrator mVibrator;
@@ -191,10 +192,13 @@ public class SipService extends BackgroundService implements SipServiceConstants
                     case ACTION_SWITCH_VIDEO_CAPTURE_DEVICE:
                         handleSwitchVideoCaptureDevice(intent);
                         break;
+                    case ACTION_MAKE_DIRECT_CALL:
+                        handleMakeDirectCall(intent);
+                        break;
                     default: break;
                 }
 
-                if (mConfiguredAccounts.isEmpty()) {
+                if (mConfiguredAccounts.isEmpty() && mConfiguredGuestAccount == null) {
                     Logger.debug(TAG, "No more configured accounts. Shutting down service");
                     stopSelf();
                 }
@@ -1145,6 +1149,50 @@ public class SipService extends BackgroundService implements SipServiceConstants
             sipCall.vidSetStream(pjsua_call_vid_strm_op.PJSUA_CALL_VID_STRM_CHANGE_CAP_DEV, callVidSetStreamParam);
         } catch (Exception ex) {
             Logger.error(TAG, "Error while switching capture device", ex);
+            Crashlytics.logException(ex);
+        }
+    }
+
+    private void handleMakeDirectCall(Intent intent) {
+        Bundle bundle = intent.getExtras();
+        if (bundle == null) return;
+        Uri uri = bundle.getParcelable(PARAM_DIRECT_CALL_URI);
+        if (uri == null) return;
+        String name = intent.getStringExtra(PARAM_GUEST_NAME);
+        boolean isVideo = intent.getBooleanExtra(PARAM_IS_VIDEO, false);
+        boolean isVideoConference = false;
+        if (isVideo) {
+            isVideoConference = intent.getBooleanExtra(PARAM_IS_VIDEO_CONF, false);
+        }
+
+        Logger.debug(TAG, "Making call to " + uri.getUserInfo());
+        String accountID = "sip:"+name+"@"+uri.getHost();
+        String sipUri = "sip:" + uri.getAuthority();
+        try {
+            sipUri = "sip:" + uri.getAuthority().substring(0, uri.getAuthority().lastIndexOf(":"));
+        } catch(Exception ex) {
+
+        }
+        try {
+            startStack();
+            SipAccountData sipAccountData = new SipAccountData()
+                    .setHost(uri.getHost())
+                    .setUsername(name)
+                    .setPort(uri.getPort())
+                    .setRealm(uri.getHost());
+                    /* display name not yet implemented server side for direct calls */
+                    /* .setUsername("guest") */
+                    /* .setGuestDisplayName(name)*/
+            SipAccount pjSipAndroidAccount = new SipAccount(this, sipAccountData);
+            pjSipAndroidAccount.createGuest();
+            mConfiguredGuestAccount = pjSipAndroidAccount.getData();
+            mActiveSipAccounts.put(accountID, pjSipAndroidAccount);
+            SipCall call = mActiveSipAccounts.get(accountID).addOutgoingCall(sipUri, isVideo, isVideoConference);
+            call.setVideoParams(isVideo,isVideoConference);
+            mBroadcastEmitter.outgoingCall(accountID, call.getId(), uri.getUserInfo(), isVideo, isVideoConference);
+        } catch (Exception ex) {
+            Logger.error(TAG, "Error while making a direct call as Guest", ex);
+            mBroadcastEmitter.outgoingCall(accountID, -1, uri.getUserInfo(), false, false);
             Crashlytics.logException(ex);
         }
     }
