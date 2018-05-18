@@ -1159,6 +1159,7 @@ public class SipService extends BackgroundService implements SipServiceConstants
         if (bundle == null) return;
         Uri uri = bundle.getParcelable(PARAM_DIRECT_CALL_URI);
         if (uri == null) return;
+        String sipServer = intent.getStringExtra(PARAM_DIRECT_CALL_SIP_SERVER);
         String name = intent.getStringExtra(PARAM_GUEST_NAME);
         boolean isVideo = intent.getBooleanExtra(PARAM_IS_VIDEO, false);
         boolean isVideoConference = false;
@@ -1177,7 +1178,7 @@ public class SipService extends BackgroundService implements SipServiceConstants
         try {
             startStack();
             SipAccountData sipAccountData = new SipAccountData()
-                    .setHost(uri.getHost())
+                    .setHost(sipServer != null ? sipServer : uri.getHost())
                     .setUsername(name)
                     .setPort(uri.getPort())
                     .setRealm(uri.getHost());

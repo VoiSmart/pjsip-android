@@ -54,6 +54,7 @@ public interface SipServiceConstants {
     String PARAM_ORIENTATION = "orientation";
     String PARAM_GUEST_NAME = "guestName";
     String PARAM_DIRECT_CALL_URI = "sipUri";
+    String PARAM_DIRECT_CALL_SIP_SERVER = "sipServer";
 
     /**
      * Specific Parameters passed in the broadcast intents.
