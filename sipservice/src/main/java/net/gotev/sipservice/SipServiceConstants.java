@@ -84,7 +84,7 @@ public interface SipServiceConstants {
     int DEFAULT_RENDER_DEVICE = 0;          // OpenGL Render
     String H264_CODEC_ID = "H264/97";
     int H264_DEF_WIDTH = 640;
-    int H264_DEF_HEIGHT = 480;
+    int H264_DEF_HEIGHT = 360;
 
     /**
      * Janus Bridge call specific parameters.

@@ -23,6 +23,7 @@ import org.pjsip.pjsua2.CodecInfo;
 import org.pjsip.pjsua2.CodecInfoVector;
 import org.pjsip.pjsua2.Endpoint;
 import org.pjsip.pjsua2.EpConfig;
+import org.pjsip.pjsua2.MediaFormatVideo;
 import org.pjsip.pjsua2.TransportConfig;
 import org.pjsip.pjsua2.VidCodecParam;
 import org.pjsip.pjsua2.VidDevManager;
@@ -694,9 +695,14 @@ public class SipService extends BackgroundService implements SipServiceConstants
                 mEndpoint.codecSetPriority("ilbc/8000", (short) CodecPriority.PRIORITY_DISABLED);
             }
 
-            // Set H264 Profile-Level-Id
+            // Set H264 Parameters
             VidCodecParam vidCodecParam = mEndpoint.getVideoCodecParam(H264_CODEC_ID);
             CodecFmtpVector codecFmtpVector = vidCodecParam.getDecFmtp();
+            MediaFormatVideo mediaFormatVideo = vidCodecParam.getEncFmt();
+            mediaFormatVideo.setWidth(H264_DEF_WIDTH);
+            mediaFormatVideo.setHeight(H264_DEF_HEIGHT);
+            vidCodecParam.setEncFmt(mediaFormatVideo);
+
             for (int i = 0; i < codecFmtpVector.size(); i++) {
                 if (PROFILE_LEVEL_ID_HEADER.equals(codecFmtpVector.get(i).getName())) {
                     codecFmtpVector.get(i).setVal(PROFILE_LEVEL_ID_JANUS_BRIDGE);
