@@ -1071,26 +1071,50 @@ public class SipService extends BackgroundService implements SipServiceConstants
     private void handleSetSelfVideoOrientation(Intent intent) {
         String accountID = intent.getStringExtra(PARAM_ACCOUNT_ID);
         int callID = intent.getIntExtra(PARAM_CALL_ID, 0);
-        int orientSwigValue = intent.getIntExtra(PARAM_ORIENTATION, -1);
+        int orientation = intent.getIntExtra(PARAM_ORIENTATION, -1);
 
         SipAccount sipAccount = mActiveSipAccounts.get(accountID);
-        if (sipAccount != null && orientSwigValue > 0) {
+        if (sipAccount != null) {
             SipCall sipCall = getCall(accountID, callID);
             if (sipCall == null) {
                 notifyCallDisconnected(accountID, callID);
                 return;
             }
-            try {
-                // set orientation to the correct current device
-                getVidDevManager().setCaptureOrient(
-                    sipCall.isFrontCamera()
-                        ? FRONT_CAMERA_CAPTURE_DEVICE
-                        : BACK_CAMERA_CAPTURE_DEVICE,
-                    pjmedia_orient.swigToEnum(orientSwigValue), true);
+            setSelfVideoOrientation(sipCall, orientation);
+        }
+    }
 
-            } catch (Exception iex) {
-                Logger.error(TAG, "Error while changing video orientation");
+    void setSelfVideoOrientation(SipCall sipCall, int orientation) {
+        try {
+            pjmedia_orient pjmediaOrientation;
+
+            switch (orientation) {
+                case Surface.ROTATION_0:   // Portrait
+                    pjmediaOrientation = pjmedia_orient.PJMEDIA_ORIENT_ROTATE_270DEG;
+                    break;
+                case Surface.ROTATION_90:  // Landscape, home button on the right
+                    pjmediaOrientation = pjmedia_orient.PJMEDIA_ORIENT_NATURAL;
+                    break;
+                case Surface.ROTATION_180:
+                    pjmediaOrientation = pjmedia_orient.PJMEDIA_ORIENT_ROTATE_90DEG;
+                    break;
+                case Surface.ROTATION_270: // Landscape, home button on the left
+                    pjmediaOrientation = pjmedia_orient.PJMEDIA_ORIENT_ROTATE_180DEG;
+                    break;
+                default:
+                    pjmediaOrientation = pjmedia_orient.PJMEDIA_ORIENT_UNKNOWN;
             }
+
+            if (pjmediaOrientation != pjmedia_orient.PJMEDIA_ORIENT_UNKNOWN)
+            // set orientation to the correct current device
+            getVidDevManager().setCaptureOrient(
+                    sipCall.isFrontCamera()
+                            ? FRONT_CAMERA_CAPTURE_DEVICE
+                            : BACK_CAMERA_CAPTURE_DEVICE,
+                    pjmediaOrientation, true);
+
+        } catch (Exception iex) {
+            Logger.error(TAG, "Error while changing video orientation");
         }
     }
 

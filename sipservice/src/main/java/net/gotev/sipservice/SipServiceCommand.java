@@ -6,7 +6,6 @@ import android.net.Uri;
 import android.view.Surface;
 
 
-import org.pjsip.pjsua2.pjmedia_orient;
 import org.pjsip.pjsua2.pjsip_inv_state;
 import org.pjsip.pjsua2.pjsip_status_code;
 
@@ -504,14 +503,14 @@ public class SipServiceCommand implements SipServiceConstants {
      * @param callID call ID
      * @param orientation call ID
      */
-    public static void changeVideoOrientation(Context context, String accountID, int callID, pjmedia_orient orientation) {
+    public static void changeVideoOrientation(Context context, String accountID, int callID, int orientation) {
         checkAccount(accountID);
 
         Intent intent = new Intent(context, SipService.class);
         intent.setAction(ACTION_SET_SELF_VIDEO_ORIENTATION);
         intent.putExtra(PARAM_ACCOUNT_ID, accountID);
         intent.putExtra(PARAM_CALL_ID, callID);
-        intent.putExtra(PARAM_ORIENTATION, orientation.swigValue());
+        intent.putExtra(PARAM_ORIENTATION, orientation);
         context.startService(intent);
     }
 
