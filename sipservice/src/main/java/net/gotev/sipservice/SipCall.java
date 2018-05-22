@@ -1,8 +1,10 @@
 package net.gotev.sipservice;
 
+import android.content.Context;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.view.Surface;
+import android.view.WindowManager;
 
 import com.crashlytics.android.Crashlytics;
 
@@ -177,10 +179,23 @@ public class SipCall extends Call {
         }
     }
 
-    /*@Override
+    @Override
     public void onCallMediaEvent(OnCallMediaEventParam prm) {
         if (prm.getEv().getType() == pjmedia_event_type.PJMEDIA_EVENT_FMT_CHANGED) {
-            setVideoMute(false);
+            WindowManager windowManager;
+            int rotation;
+            try {
+                windowManager = (WindowManager)this.account.getService().getSystemService(Context.WINDOW_SERVICE);
+                if (windowManager != null) {
+
+                    rotation = windowManager.getDefaultDisplay().getRotation();
+                    account.getService().setSelfVideoOrientation(this, rotation);
+                }
+            } catch (Exception ex) {
+                Logger.error(LOG_TAG, "Unable to get device rotation", ex);
+                Crashlytics.logException(ex);
+            }
+
             try {
                 account.getService().getBroadcastEmitter().videoSize(
                         (int) mVideoWindow.getInfo().getSize().getW(),
@@ -191,7 +206,7 @@ public class SipCall extends Call {
             }
         }
         super.onCallMediaEvent(prm);
-    }*/
+    }
 
     /**
      * Get the total duration of the call.
