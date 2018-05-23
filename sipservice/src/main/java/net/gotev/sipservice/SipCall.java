@@ -112,6 +112,7 @@ public class SipCall extends Call {
                 account.getService().stopRingtone();
                 checkAndStopLocalRingBackTone();
                 stopVideoFeeds();
+                stopSendingKeyFrame();
                 account.removeCall(callID);
             } else if (callState == pjsip_inv_state.PJSIP_INV_STATE_CONFIRMED) {
                 account.getService().stopRingtone();
@@ -119,6 +120,7 @@ public class SipCall extends Call {
                 connectTimestamp = System.currentTimeMillis();
                 if (videoCall) {
                     setVideoMute(false);
+                    startSendingKeyFrame();
                 }
 
                 // check whether the 183 has arrived or not
@@ -179,7 +181,7 @@ public class SipCall extends Call {
         }
     }
 
-    @Override
+    /*@Override
     public void onCallMediaEvent(OnCallMediaEventParam prm) {
         if (prm.getEv().getType() == pjmedia_event_type.PJMEDIA_EVENT_FMT_CHANGED) {
             WindowManager windowManager;
@@ -206,7 +208,7 @@ public class SipCall extends Call {
             }
         }
         super.onCallMediaEvent(prm);
-    }
+    }*/
 
     /**
      * Get the total duration of the call.
@@ -562,5 +564,26 @@ public class SipCall extends Call {
 
     public void setFrontCamera(boolean frontCamera) {
         this.frontCamera = frontCamera;
+    }
+
+    private Runnable sendKeyFrameRunnable = new Runnable() {
+        @Override
+        public void run() {
+            try {
+                vidSetStream(pjsua_call_vid_strm_op.PJSUA_CALL_VID_STRM_SEND_KEYFRAME, new CallVidSetStreamParam());
+                startSendingKeyFrame();
+            } catch (Exception ex) {
+                Logger.error(LOG_TAG, "error while sending periodic keyframe");
+                Crashlytics.logException(ex);
+            }
+        }
+    };
+
+    private void startSendingKeyFrame() {
+        account.getService().enqueueDelayedJob(sendKeyFrameRunnable, 5000);
+    }
+
+    private void stopSendingKeyFrame() {
+        account.getService().dequeueJob(sendKeyFrameRunnable);
     }
 }
