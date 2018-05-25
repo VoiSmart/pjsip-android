@@ -94,7 +94,7 @@ public class SipCall extends Call {
             pjsip_inv_state callState = info.getState();
             pjsip_status_code callStatus = null;
 
-            /**
+            /*
              * From: http://www.pjsip.org/docs/book-latest/html/call.html#call-disconnection
              *
              * Call disconnection event is a special event since once the callback that
@@ -580,7 +580,7 @@ public class SipCall extends Call {
     };
 
     private void startSendingKeyFrame() {
-        account.getService().enqueueDelayedJob(sendKeyFrameRunnable, 5000);
+        account.getService().enqueueDelayedJob(sendKeyFrameRunnable, SipServiceConstants.DELAYED_JOB_DEFALT_DELAY);
     }
 
     private void stopSendingKeyFrame() {

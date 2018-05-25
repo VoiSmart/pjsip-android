@@ -93,5 +93,9 @@ public interface SipServiceConstants {
     String PROFILE_LEVEL_ID_LOCAL = "42e01e";
     String PROFILE_LEVEL_ID_JANUS_BRIDGE = "42e01f";
 
-
+    /**
+     * Generic Constants
+     */
+    int REGISTRATION_LONG_TIME = 604800;
+    int DELAYED_JOB_DEFALT_DELAY = 5000;
 }

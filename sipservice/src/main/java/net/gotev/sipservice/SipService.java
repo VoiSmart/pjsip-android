@@ -1022,9 +1022,9 @@ public class SipService extends BackgroundService implements SipServiceConstants
                     enqueueDelayedJob(new Runnable() {
                         @Override
                         public void run() {
-                            refreshRegistration(SipService.this, id, 604800, null);
+                            refreshRegistration(SipService.this, id, REGISTRATION_LONG_TIME, null);
                         }
-                    }, 5000);
+                    }, DELAYED_JOB_DEFALT_DELAY);
                 }
             }
         });
