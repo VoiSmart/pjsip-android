@@ -1228,4 +1228,8 @@ public class SipService extends BackgroundService implements SipServiceConstants
             Crashlytics.logException(ex);
         }
     }
+
+    public static ConcurrentHashMap<String, SipAccount> getActiveSipAccounts() {
+        return mActiveSipAccounts;
+    }
 }

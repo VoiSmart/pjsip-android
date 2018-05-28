@@ -133,13 +133,31 @@ public class SipAccount extends Account {
 
         SipCall call = addIncomingCall(prm.getCallId());
 
-        // Send 603 Decline whether there's an already ongoing call or we are in DND mode
-        if (activeCalls.size() > 1 || service.isDND()) {
+        // Send 603 Decline if in DND mode
+        if (service.isDND()) {
             try {
                 CallerInfo contactInfo = new CallerInfo(call.getInfo());
                 service.getBroadcastEmitter().missedCall(contactInfo.getDisplayName(), contactInfo.getRemoteUri());
                 call.declineIncomingCall();
-                Logger.debug(LOG_TAG, "sending busy to call ID: " + prm.getCallId());
+                Logger.debug(LOG_TAG, "Decline call with ID: " + prm.getCallId());
+            } catch(Exception ex) {
+                Logger.error(LOG_TAG, "Error while getting missed call info", ex);
+            }
+            return;
+        }
+
+        // Send 486 Busy Here if there's an already ongoing call
+        int totalCalls = 0;
+        for (SipAccount _sipAccount: SipService.getActiveSipAccounts().values()) {
+            totalCalls += _sipAccount.getCallIDs().size();
+        }
+
+        if (totalCalls > 1) {
+            try {
+                CallerInfo contactInfo = new CallerInfo(call.getInfo());
+                service.getBroadcastEmitter().missedCall(contactInfo.getDisplayName(), contactInfo.getRemoteUri());
+                call.sendBusyHereToIncomingCall();
+                Logger.debug(LOG_TAG, "Sending busy to call ID: " + prm.getCallId());
             } catch(Exception ex) {
                 Logger.error(LOG_TAG, "Error while getting missed call info", ex);
             }
