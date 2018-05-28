@@ -181,23 +181,10 @@ public class SipCall extends Call {
         }
     }
 
-    /*@Override
+    @Override
     public void onCallMediaEvent(OnCallMediaEventParam prm) {
         if (prm.getEv().getType() == pjmedia_event_type.PJMEDIA_EVENT_FMT_CHANGED) {
-            WindowManager windowManager;
-            int rotation;
-            try {
-                windowManager = (WindowManager)this.account.getService().getSystemService(Context.WINDOW_SERVICE);
-                if (windowManager != null) {
-
-                    rotation = windowManager.getDefaultDisplay().getRotation();
-                    account.getService().setSelfVideoOrientation(this, rotation);
-                }
-            } catch (Exception ex) {
-                Logger.error(LOG_TAG, "Unable to get device rotation", ex);
-                Crashlytics.logException(ex);
-            }
-
+            // Sending new video size
             try {
                 account.getService().getBroadcastEmitter().videoSize(
                         (int) mVideoWindow.getInfo().getSize().getW(),
@@ -208,7 +195,7 @@ public class SipCall extends Call {
             }
         }
         super.onCallMediaEvent(prm);
-    }*/
+    }
 
     /**
      * Get the total duration of the call.
