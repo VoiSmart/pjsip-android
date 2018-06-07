@@ -1203,14 +1203,14 @@ public class SipService extends BackgroundService implements SipServiceConstants
         try {
             sipUri = "sip:" + uri.getAuthority().substring(0, uri.getAuthority().lastIndexOf(":"));
         } catch(Exception ex) {
-
+            Logger.error(TAG, "Error creating uri", ex);
         }
         try {
             startStack();
             SipAccountData sipAccountData = new SipAccountData()
                     .setHost(sipServer != null ? sipServer : uri.getHost())
                     .setUsername(name)
-                    .setPort(uri.getPort())
+                    .setPort((uri.getPort() > 0) ? uri.getPort() : 5060)
                     .setRealm(uri.getHost());
                     /* display name not yet implemented server side for direct calls */
                     /* .setUsername("guest") */
