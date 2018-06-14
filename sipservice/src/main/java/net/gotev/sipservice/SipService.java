@@ -42,7 +42,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 
 import static net.gotev.sipservice.SipServiceCommand.AGENT_NAME;
 import static net.gotev.sipservice.SipServiceCommand.refreshRegistration;
@@ -548,7 +547,7 @@ public class SipService extends BackgroundService implements SipServiceConstants
         addAllConfiguredAccounts();
     }
 
-    private void handleResetAccounts(Intent intent) {
+    private void handleResetAccounts() {
         Logger.debug(TAG, "Removing all the configured accounts");
 
         Iterator<SipAccountData> iterator = mConfiguredAccounts.iterator();
@@ -595,7 +594,7 @@ public class SipService extends BackgroundService implements SipServiceConstants
 
         int index = mConfiguredAccounts.indexOf(data);
         if (index == -1) {
-            handleResetAccounts(intent);
+            handleResetAccounts();
             Logger.debug(TAG, "Adding " + data.getIdUri());
 
             try {
@@ -724,7 +723,6 @@ public class SipService extends BackgroundService implements SipServiceConstants
 
     /**
      * Shuts down PJSIP Stack
-     * @throws Exception if an error occurs while trying to shut down the stack
      */
     private void stopStack() {
 
@@ -881,7 +879,7 @@ public class SipService extends BackgroundService implements SipServiceConstants
         SipAccount sipAccount = mActiveSipAccounts.get(accountString);
 
         if (sipAccount == null || !sipAccount.isValid() || !account.equals(sipAccount.getData())) {
-            if (mActiveSipAccounts.containsKey(accountString)) {
+            if (mActiveSipAccounts.containsKey(accountString) && sipAccount != null) {
                 sipAccount.delete();
             }
             startStack();
@@ -897,7 +895,7 @@ public class SipService extends BackgroundService implements SipServiceConstants
     /**
      * Removes a SIP Account and performs un-registration.
      */
-    private void removeAccount(String accountID) throws Exception {
+    private void removeAccount(String accountID) {
         SipAccount account = mActiveSipAccounts.remove(accountID);
 
         if (account == null) {
@@ -949,12 +947,14 @@ public class SipService extends BackgroundService implements SipServiceConstants
         AudioManager audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
 
         try {
-            if (audioManager.getRingerMode() == AudioManager.RINGER_MODE_NORMAL) {
-                mVibrator.vibrate(VIBRATOR_PATTERN, 0);
-                mRingTone = RingtoneManager.getRingtone(this, mRingtoneUri);
-                mRingTone.play();
-            } else if (audioManager.getRingerMode() == AudioManager.RINGER_MODE_VIBRATE){
-                mVibrator.vibrate(VIBRATOR_PATTERN, 0);
+            if (audioManager != null) {
+                if (audioManager.getRingerMode() == AudioManager.RINGER_MODE_NORMAL) {
+                    mVibrator.vibrate(VIBRATOR_PATTERN, 0);
+                    mRingTone = RingtoneManager.getRingtone(this, mRingtoneUri);
+                    mRingTone.play();
+                } else if (audioManager.getRingerMode() == AudioManager.RINGER_MODE_VIBRATE) {
+                    mVibrator.vibrate(VIBRATOR_PATTERN, 0);
+                }
             }
         } catch (Exception exc) {
             Logger.error(TAG, "Error while trying to play ringtone!", exc);
