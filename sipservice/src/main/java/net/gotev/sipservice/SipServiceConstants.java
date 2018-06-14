@@ -1,5 +1,7 @@
 package net.gotev.sipservice;
 
+import java.util.concurrent.TimeUnit;
+
 public interface SipServiceConstants {
 
     /*
@@ -96,6 +98,7 @@ public interface SipServiceConstants {
     /**
      * Generic Constants
      */
-    int REGISTRATION_LONG_TIME = 604800;
+    int REGISTRATION_THRESHOLD_TIME = (int) TimeUnit.DAYS.toSeconds(7L);    // One week threshold
+    int REGISTRATION_LONG_TIME = (int) TimeUnit.DAYS.toSeconds(14L);        // Two weeks
     int DELAYED_JOB_DEFALT_DELAY = 5000;
 }

@@ -1006,7 +1006,7 @@ public class SipService extends BackgroundService implements SipServiceConstants
                         }
                         try {
                             expire = Integer.parseInt(exp);
-                            if (expire > TimeUnit.DAYS.toSeconds(4L)){
+                            if (expire > REGISTRATION_THRESHOLD_TIME){
                                 found = true;
                             }
                         } catch (NumberFormatException nex) {
