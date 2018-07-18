@@ -1199,12 +1199,8 @@ public class SipService extends BackgroundService implements SipServiceConstants
 
         Logger.debug(TAG, "Making call to " + uri.getUserInfo());
         String accountID = "sip:"+name+"@"+uri.getHost();
-        String sipUri = "sip:" + uri.getAuthority();
-        try {
-            sipUri = "sip:" + uri.getAuthority().substring(0, uri.getAuthority().lastIndexOf(":"));
-        } catch(Exception ex) {
-            Logger.error(TAG, "Error creating uri", ex);
-        }
+        String sipUri = "sip:" + uri.getUserInfo()+"@"+uri.getHost();
+
         try {
             startStack();
             SipAccountData sipAccountData = new SipAccountData()
