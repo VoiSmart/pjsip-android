@@ -72,29 +72,40 @@ public class SipAccount extends Account {
     }
 
     public SipCall addOutgoingCall(final String numberToDial, boolean isVideo, boolean isVideoConference) {
-        SipCall call = new SipCall(this);
-        call.setVideoParams(isVideo, isVideoConference);
 
-        CallOpParam callOpParam = new CallOpParam();
-        try {
-            if (numberToDial.startsWith("sip:")) {
-                call.makeCall(numberToDial, callOpParam);
-            } else {
-                if ("*".equals(data.getRealm())) {
-                    call.makeCall("sip:" + numberToDial, callOpParam);
-                } else {
-                    call.makeCall("sip:" + numberToDial + "@" + data.getRealm(), callOpParam);
-                }
-            }
-            activeCalls.put(call.getId(), call);
-            Logger.debug(LOG_TAG, "New outgoing call with ID: " + call.getId());
-
-            return call;
-
-        } catch (Exception exc) {
-            Logger.error(LOG_TAG, "Error while making outgoing call", exc);
-            return null;
+        // check if there's already an ongoing call
+        int totalCalls = 0;
+        for (SipAccount _sipAccount: SipService.getActiveSipAccounts().values()) {
+            totalCalls += _sipAccount.getCallIDs().size();
         }
+
+        // allow calls only if there are no other ongoing calls
+        if (totalCalls == 0) {
+            SipCall call = new SipCall(this);
+            call.setVideoParams(isVideo, isVideoConference);
+
+            CallOpParam callOpParam = new CallOpParam();
+            try {
+                if (numberToDial.startsWith("sip:")) {
+                    call.makeCall(numberToDial, callOpParam);
+                } else {
+                    if ("*".equals(data.getRealm())) {
+                        call.makeCall("sip:" + numberToDial, callOpParam);
+                    } else {
+                        call.makeCall("sip:" + numberToDial + "@" + data.getRealm(), callOpParam);
+                    }
+                }
+                activeCalls.put(call.getId(), call);
+                Logger.debug(LOG_TAG, "New outgoing call with ID: " + call.getId());
+
+                return call;
+
+            } catch (Exception exc) {
+                Logger.error(LOG_TAG, "Error while making outgoing call", exc);
+                return null;
+            }
+        }
+        return null;
     }
 
     public SipCall addOutgoingCall(final String numberToDial) {

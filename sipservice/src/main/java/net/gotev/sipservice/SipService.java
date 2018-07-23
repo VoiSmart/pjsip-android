@@ -1214,10 +1214,21 @@ public class SipService extends BackgroundService implements SipServiceConstants
             SipAccount pjSipAndroidAccount = new SipAccount(this, sipAccountData);
             pjSipAndroidAccount.createGuest();
             mConfiguredGuestAccount = pjSipAndroidAccount.getData();
-            mActiveSipAccounts.put(accountID, pjSipAndroidAccount);
+
+            /* do not add account if already present
+                [guest account are not added to the configured accounts]
+             */
+            if (mActiveSipAccounts.get(accountID) == null) {
+                mActiveSipAccounts.put(accountID, pjSipAndroidAccount);
+            }
             SipCall call = mActiveSipAccounts.get(accountID).addOutgoingCall(sipUri, isVideo, isVideoConference);
-            call.setVideoParams(isVideo,isVideoConference);
-            mBroadcastEmitter.outgoingCall(accountID, call.getId(), uri.getUserInfo(), isVideo, isVideoConference);
+            if (call != null) {
+                call.setVideoParams(isVideo, isVideoConference);
+                mBroadcastEmitter.outgoingCall(accountID, call.getId(), uri.getUserInfo(), isVideo, isVideoConference);
+            } else {
+                Logger.error(TAG, "Error while making a direct call as Guest");
+                mBroadcastEmitter.outgoingCall(accountID, -1, uri.getUserInfo(), false, false);
+            }
         } catch (Exception ex) {
             Logger.error(TAG, "Error while making a direct call as Guest", ex);
             mBroadcastEmitter.outgoingCall(accountID, -1, uri.getUserInfo(), false, false);
