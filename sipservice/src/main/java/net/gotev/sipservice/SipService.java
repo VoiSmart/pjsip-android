@@ -731,10 +731,20 @@ public class SipService extends BackgroundService implements SipServiceConstants
         try {
             Logger.debug(TAG, "Stopping PJSIP");
 
-            removeAllActiveAccounts();
+            /*
+             * Do not remove accounts on service stop anymore
+             * They should have already been removed (unregistered)
+             * In case they have not, it is ok, it means app has been just killed
+             * or service force stopped
+             *
+             * *************************************
+             * removeAllActiveAccounts();
+             * *************************************
+             */
 
-            // try to force GC to do its job before destroying the library, since it's
-            // recommended to do that by PJSUA examples
+            /* Try to force GC to do its job before destroying the library
+             * since it's recommended to do that by PJSUA examples
+             */
             Runtime.getRuntime().gc();
 
             mEndpoint.libDestroy();
