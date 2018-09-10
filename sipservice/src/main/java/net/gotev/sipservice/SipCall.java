@@ -1,10 +1,8 @@
 package net.gotev.sipservice;
 
-import android.content.Context;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.view.Surface;
-import android.view.WindowManager;
 
 import com.crashlytics.android.Crashlytics;
 
@@ -143,6 +141,7 @@ public class SipCall extends Call {
 
             if (callState == pjsip_inv_state.PJSIP_INV_STATE_DISCONNECTED) {
                 account.getService().setLastCallStatus(0);
+                delete();
             }
 
         } catch (Exception exc) {
