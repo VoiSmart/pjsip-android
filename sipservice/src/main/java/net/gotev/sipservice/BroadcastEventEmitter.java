@@ -1,9 +1,13 @@
 package net.gotev.sipservice;
 
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Emits the sip service broadcast intents.
@@ -56,7 +60,7 @@ public class BroadcastEventEmitter implements SipServiceConstants {
         intent.putExtra(PARAM_IS_VIDEO, isVideo);
         intent.addFlags(Intent.FLAG_RECEIVER_FOREGROUND);
 
-        mContext.sendBroadcast(intent);
+        sendExplicitBroadcast(intent);
     }
 
     /**
@@ -111,7 +115,7 @@ public class BroadcastEventEmitter implements SipServiceConstants {
         intent.putExtra(PARAM_IS_VIDEO, isVideo);
         intent.putExtra(PARAM_IS_VIDEO_CONF, isVideoConference);
 
-        mContext.sendBroadcast(intent);
+        sendExplicitBroadcast(intent);
     }
 
     public void stackStatus(boolean started) {
@@ -148,7 +152,7 @@ public class BroadcastEventEmitter implements SipServiceConstants {
         intent.putExtra(PARAM_DISPLAY_NAME, displayName);
         intent.putExtra(PARAM_REMOTE_URI, uri);
 
-        mContext.sendBroadcast(intent);
+        sendExplicitBroadcast(intent);
     }
 
     void videoSize(int width, int height) {
@@ -159,5 +163,23 @@ public class BroadcastEventEmitter implements SipServiceConstants {
         intent.putExtra(PARAM_INCOMING_VIDEO_HEIGHT, height);
 
         mContext.sendBroadcast(intent);
+    }
+
+    private boolean sendExplicitBroadcast(Intent intent) {
+        PackageManager pm=mContext.getPackageManager();
+        List<ResolveInfo> matches=pm.queryBroadcastReceivers(intent, 0);
+        boolean sent = false;
+
+        for (ResolveInfo resolveInfo : matches) {
+            ComponentName cn=
+                    new ComponentName(resolveInfo.activityInfo.applicationInfo.packageName,
+                            resolveInfo.activityInfo.name);
+
+            intent.setComponent(cn);
+            intent.addFlags(Intent.FLAG_RECEIVER_FOREGROUND);
+            mContext.sendBroadcast(intent);
+            sent = true;
+        }
+        return sent;
     }
 }
