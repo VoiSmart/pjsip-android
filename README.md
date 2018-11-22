@@ -12,18 +12,26 @@ This project wraps the standard PJSUA2 bindings in a background service and comp
 
 Native PJSIP library for Android is compiled using [PJSIP Android Builder](https://github.com/VoiSmart/pjsip-android-builder)
 
-Give it a try by checking out the project and running the [demo app](https://github.com/VoiSmart/pjsip-android/tree/master/examples/demoapp).
-
 # State of the art
-## What is tested and is working:
+## What is tested and working:
 - Single account
 - Make a single call
-- In-Call operations: mute, unmute, hold, un-hold, transfer, send DTMF (RFC 2833)
+- In-Call operations
+ - mute
+ - unmute
+ - hold
+ - un-hold
+ - blind transfer
+ - send DTMF (RFC 2833)
 - Accept an incoming call
+- Answer with video an incoming call
 - Decline an incoming call
 - Get/Set codec priorities
 - Hang up all active calls
 - Hold all active calls
+- Hold/Decline sip call when incoming/outgoing gsm call
+- Video support: switch camera, mute/unmute video, video preview
+- Use of a fixed SIP `Call-ID Header`. Refer to [this](https://github.com/VoiSmart/pjsip-android-builder/tree/master/patches/fixed_callid) for more details
 
 ## What is missing (contributions are welcome):
 - Multiple calls support
@@ -31,20 +39,10 @@ Give it a try by checking out the project and running the [demo app](https://git
   - be able to hold the current call and make another one (this is the base for attended transfers and conference calls)
 - Conference calls
 - Attended call transfer
-- Video support
 - Complete multiple accounts support
 - Respond to a call and play a sound file
 - Support for In-Call RTCP signaling to get call statistics
 - Other things which I'm not aware at the moment...
 
 # Recompile native libraries
-You need to install [Vagrant](https://www.vagrantup.com/) and [VirtualBox](https://www.virtualbox.org/) and to checkout the project. On OSX or Linux, to recompile the native libraries, just execute:
-```shell
-./build-native-libraries
-```
-What happens under the hood is:
-* a new virtual machine with pjsip-android-builder gets prepared
-* the virtual machine gets booted
-* the build scripts gets executed
-* the final libraries gets copied to the proper locations in the Android Studio project
-* the virtual machine gets halted
+Refer to [PJSIP Android Builder](https://github.com/VoiSmart/pjsip-android-builder)
