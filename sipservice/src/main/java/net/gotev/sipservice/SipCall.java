@@ -566,7 +566,7 @@ public class SipCall extends Call {
     };
 
     private void startSendingKeyFrame() {
-        account.getService().enqueueDelayedJob(sendKeyFrameRunnable, SipServiceConstants.DELAYED_JOB_DEFALT_DELAY);
+        account.getService().enqueueDelayedJob(sendKeyFrameRunnable, SipServiceConstants.DELAYED_JOB_DEFAULT_DELAY);
     }
 
     private void stopSendingKeyFrame() {

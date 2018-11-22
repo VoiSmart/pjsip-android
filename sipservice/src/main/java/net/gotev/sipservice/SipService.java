@@ -34,8 +34,6 @@ import org.pjsip.pjsua2.pjsip_transport_type_e;
 import org.pjsip.pjsua2.pjsua_call_vid_strm_op;
 
 import java.lang.reflect.Type;
-import java.text.NumberFormat;
-import java.text.ParsePosition;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -44,7 +42,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static net.gotev.sipservice.SipServiceCommand.AGENT_NAME;
-import static net.gotev.sipservice.SipServiceCommand.refreshRegistration;
 
 /**
  * Sip Service.
@@ -993,60 +990,6 @@ public class SipService extends BackgroundService implements SipServiceConstants
     protected BroadcastEventEmitter getBroadcastEmitter() {
         return mBroadcastEmitter;
     }
-
-    /****           TEST STUFF DO NOT USE               ****/
-    public void checkRegistrationTimeout(final String message, final String id){
-        enqueueJob(new Runnable() {
-            @Override
-            public void run() {
-                SharedPreferences preferences = getSharedPreferences("push_preferences", Context.MODE_PRIVATE);
-                String tok = preferences.getString("fcm_token", "");
-                int expire = 0;
-                boolean found = false, validMessage = false;
-                int indexTok = 0, indexSemiColon = 0;
-                indexTok = message.indexOf("pn-tok=");
-                while (!found && !tok.isEmpty() && indexTok != -1) {
-                    validMessage = true;
-                    indexTok += 6;
-                    indexSemiColon = message.indexOf(";", indexTok);
-                    if (message.substring(indexTok + 1, indexSemiColon).equals(tok)) {
-                        String exp = message.substring((message.indexOf("=", indexSemiColon) + 1), message.indexOf("\r", indexSemiColon));
-                        if (!isNumeric(exp)) {
-                            exp = message.substring((message.indexOf("=", indexSemiColon) + 1), message.indexOf(",", indexSemiColon));
-                        }
-                        try {
-                            expire = Integer.parseInt(exp);
-                            if (expire > REGISTRATION_THRESHOLD_TIME){
-                                found = true;
-                            }
-                        } catch (NumberFormatException nex) {
-                            Logger.error(TAG, "Unable to parse the expiration time");
-                            Crashlytics.log(message);
-                            Crashlytics.logException(nex);
-                        }
-
-                    }
-                    indexTok = message.indexOf("pn-tok=", indexTok);
-                }
-                if (!found && validMessage){
-                    enqueueDelayedJob(new Runnable() {
-                        @Override
-                        public void run() {
-                            refreshRegistration(SipService.this, id, REGISTRATION_LONG_TIME, null);
-                        }
-                    }, DELAYED_JOB_DEFALT_DELAY);
-                }
-            }
-        });
-    }
-
-    private boolean isNumeric(String str) {
-        NumberFormat formatter = NumberFormat.getInstance();
-        ParsePosition pos = new ParsePosition(0);
-        formatter.parse(str, pos);
-        return str.length() == pos.getIndex();
-    }
-    /****           END TEST STUFF               ****/
 
     public void setLastCallStatus(int callStatus) {
         this.callStatus = callStatus;

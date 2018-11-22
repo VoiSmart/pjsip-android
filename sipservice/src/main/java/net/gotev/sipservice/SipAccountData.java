@@ -24,8 +24,7 @@ public class SipAccountData implements Parcelable {
     private boolean tcpTransport = false;
     private String authenticationType = AUTH_TYPE_DIGEST;
     private String contactUriParams;
-    private int regExpirationTimeout = 300;//(int) TimeUnit.DAYS.toSeconds(7L);
-    private boolean pushDisabled = false;
+    private int regExpirationTimeout = 300;     // 300s
     private String guestDisplayName = "";
 
     public SipAccountData() { }
@@ -56,7 +55,6 @@ public class SipAccountData implements Parcelable {
         parcel.writeString(authenticationType);
         parcel.writeString(contactUriParams);
         parcel.writeInt(regExpirationTimeout);
-        parcel.writeByte((byte) (pushDisabled ? 1 : 0));
         parcel.writeString(guestDisplayName);
     }
 
@@ -70,7 +68,6 @@ public class SipAccountData implements Parcelable {
         authenticationType = in.readString();
         contactUriParams = in.readString();
         regExpirationTimeout = in.readInt();
-        pushDisabled = in.readByte() == 1;
         guestDisplayName = in.readString();
     }
 
@@ -235,15 +232,6 @@ public class SipAccountData implements Parcelable {
         return this;
     }
 
-    public boolean isPushDisabled() {
-        return pushDisabled;
-    }
-
-    public SipAccountData setPushDisabled(boolean pushDisabled) {
-        this.pushDisabled = pushDisabled;
-        return this;
-    }
-
 
     @Override
     public boolean equals(Object o) {
@@ -260,7 +248,6 @@ public class SipAccountData implements Parcelable {
         if (tcpTransport != that.isTcpTransport()) return false;
         if (contactUriParams != null ? !contactUriParams.equals(that.getContactUriParams()) : that.getContactUriParams() != null) return false;
         if (regExpirationTimeout != that.getRegExpirationTimeout()) return false;
-        if (pushDisabled != that.isPushDisabled()) return false;
 
         return getIdUri().equals(that.getIdUri());
 
