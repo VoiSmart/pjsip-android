@@ -17,12 +17,12 @@ Native PJSIP library for Android is compiled using [PJSIP Android Builder](https
 - Single account
 - Make a single call
 - In-Call operations
- - mute
- - unmute
- - hold
- - un-hold
- - blind transfer
- - send DTMF (RFC 2833)
+  - mute
+  - unmute
+  - hold
+  - un-hold
+  - blind transfer
+  - send DTMF (RFC 2833)
 - Accept an incoming call
 - Answer with video an incoming call
 - Decline an incoming call
@@ -30,7 +30,10 @@ Native PJSIP library for Android is compiled using [PJSIP Android Builder](https
 - Hang up all active calls
 - Hold all active calls
 - Hold/Decline sip call when incoming/outgoing gsm call
-- Video support: switch camera, mute/unmute video, video preview
+- Video support
+  - switch camera
+  - mute/unmute video
+  - video preview
 - Use of a fixed SIP `Call-ID Header`. Refer to [this](https://github.com/VoiSmart/pjsip-android-builder/tree/master/patches/fixed_callid) for more details
 
 ## What is missing (contributions are welcome):
