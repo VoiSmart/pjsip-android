@@ -23,6 +23,9 @@ public class SipAccountData implements Parcelable {
     private long port = 5060;
     private boolean tcpTransport = false;
     private String authenticationType = AUTH_TYPE_DIGEST;
+    private String contactUriParams;
+    private int regExpirationTimeout = 300;     // 300s
+    private String guestDisplayName = "";
 
     public SipAccountData() { }
 
@@ -50,6 +53,9 @@ public class SipAccountData implements Parcelable {
         parcel.writeLong(port);
         parcel.writeByte((byte) (tcpTransport ? 1 : 0));
         parcel.writeString(authenticationType);
+        parcel.writeString(contactUriParams);
+        parcel.writeInt(regExpirationTimeout);
+        parcel.writeString(guestDisplayName);
     }
 
     private SipAccountData(Parcel in) {
@@ -60,6 +66,9 @@ public class SipAccountData implements Parcelable {
         port = in.readLong();
         tcpTransport = in.readByte() == 1;
         authenticationType = in.readString();
+        contactUriParams = in.readString();
+        regExpirationTimeout = in.readInt();
+        guestDisplayName = in.readString();
     }
 
     @Override
@@ -144,6 +153,24 @@ public class SipAccountData implements Parcelable {
         return proxyUri.toString();
     }
 
+    public SipAccountData setContactUriParams(String contactUriParams){
+        this.contactUriParams = contactUriParams;
+        return this;
+    }
+
+    public String getContactUriParams(){
+        return contactUriParams;
+    }
+
+    public SipAccountData setRegExpirationTimeout(int regExpirationTimeout){
+        this.regExpirationTimeout = regExpirationTimeout;
+        return this;
+    }
+
+    public int getRegExpirationTimeout(){
+        return this.regExpirationTimeout;
+    }
+
     public boolean isValid() {
         return ((username != null) && !username.isEmpty()
                 && (password != null) && !password.isEmpty()
@@ -161,8 +188,39 @@ public class SipAccountData implements Parcelable {
                                              getUsername(), 0, getPassword());
         accountConfig.getSipConfig().getAuthCreds().add(cred);
         accountConfig.getSipConfig().getProxies().add(getProxyUri());
-
+        accountConfig.getRegConfig().setTimeoutSec(regExpirationTimeout);
+        accountConfig.getSipConfig().setContactUriParams(getContactUriParams());
+        setVideoConfig(accountConfig);
         return accountConfig;
+    }
+
+    protected AccountConfig getGuestAccountConfig() {
+        AccountConfig accountConfig = new AccountConfig();
+        accountConfig.getMediaConfig().getTransportConfig().setQosType(pj_qos_type.PJ_QOS_TYPE_VIDEO);
+        String idUri = getGuestDisplayName().isEmpty()
+                ? getIdUri()
+                : "\""+getGuestDisplayName()+"\" <"+getIdUri()+">";
+        accountConfig.setIdUri(idUri);
+        accountConfig.getSipConfig().getProxies().add(getProxyUri());
+        accountConfig.getRegConfig().setRegisterOnAdd(false);
+        setVideoConfig(accountConfig);
+        return accountConfig;
+    }
+
+    protected SipAccountData setGuestDisplayName(String guestDisplayName) {
+        this.guestDisplayName = guestDisplayName;
+        return this;
+    }
+
+    protected String getGuestDisplayName() {
+        return this.guestDisplayName;
+    }
+
+    private void setVideoConfig(AccountConfig accountConfig) {
+        accountConfig.getVideoConfig().setAutoTransmitOutgoing(false);
+        accountConfig.getVideoConfig().setAutoShowIncoming(true);
+        accountConfig.getVideoConfig().setDefaultCaptureDevice(SipServiceConstants.FRONT_CAMERA_CAPTURE_DEVICE);
+        accountConfig.getVideoConfig().setDefaultRenderDevice(SipServiceConstants.DEFAULT_RENDER_DEVICE);
     }
 
     public String getAuthenticationType() {
@@ -174,12 +232,22 @@ public class SipAccountData implements Parcelable {
         return this;
     }
 
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
         SipAccountData that = (SipAccountData) o;
+
+        if (username != null ? !username.equals(that.getUsername()) : that.getUsername() != null) return false;
+        if (password != null ? !password.equals(that.getPassword()) : that.getPassword() != null) return false;
+        if (realm != null ? !realm.equals(that.getRealm()) : that.getRealm() != null) return false;
+        if (host != null ? !host.equals(that.getHost()) : that.getHost() != null) return false;
+        if (port != that.getPort()) return false;
+        if (tcpTransport != that.isTcpTransport()) return false;
+        if (contactUriParams != null ? !contactUriParams.equals(that.getContactUriParams()) : that.getContactUriParams() != null) return false;
+        if (regExpirationTimeout != that.getRegExpirationTimeout()) return false;
 
         return getIdUri().equals(that.getIdUri());
 

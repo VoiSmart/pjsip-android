@@ -1,15 +1,19 @@
 package net.gotev.sipservice;
 
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Emits the sip service broadcast intents.
  * @author gotev (Aleksandar Gotev)
  */
-public class BroadcastEventEmitter {
+public class BroadcastEventEmitter implements SipServiceConstants {
 
     public static String NAMESPACE = "net.gotev";
 
@@ -25,26 +29,9 @@ public class BroadcastEventEmitter {
         OUTGOING_CALL,
         STACK_STATUS,
         CODEC_PRIORITIES,
-        CODEC_PRIORITIES_SET_STATUS
-    }
-
-    /**
-     * Parameters passed in the broadcast intents.
-     */
-    public class BroadcastParameters {
-        public static final String ACCOUNT_ID = "account_id";
-        public static final String CALL_ID = "call_id";
-        public static final String CODE = "code";
-        public static final String REMOTE_URI = "remote_uri";
-        public static final String DISPLAY_NAME = "display_name";
-        public static final String CALL_STATE = "call_state";
-        public static final String NUMBER = "number";
-        public static final String CONNECT_TIMESTAMP = "connectTimestamp";
-        public static final String STACK_STARTED = "stack_started";
-        public static final String CODEC_PRIORITIES_LIST = "codec_priorities_list";
-        public static final String LOCAL_HOLD = "local_hold";
-        public static final String LOCAL_MUTE = "local_mute";
-        public static final String SUCCESS = "success";
+        CODEC_PRIORITIES_SET_STATUS,
+        MISSED_CALL,
+        VIDEO_SIZE
     }
 
     public BroadcastEventEmitter(Context context) {
@@ -62,17 +49,18 @@ public class BroadcastEventEmitter {
      * @param displayName the display name of the remote party
      * @param remoteUri the IdUri of the remote party
      */
-    public void incomingCall(String accountID, int callID, String displayName, String remoteUri) {
+    public void incomingCall(String accountID, int callID, String displayName, String remoteUri, boolean isVideo) {
         final Intent intent = new Intent();
 
         intent.setAction(getAction(BroadcastAction.INCOMING_CALL));
-        intent.putExtra(BroadcastParameters.ACCOUNT_ID, accountID);
-        intent.putExtra(BroadcastParameters.CALL_ID, callID);
-        intent.putExtra(BroadcastParameters.DISPLAY_NAME, displayName);
-        intent.putExtra(BroadcastParameters.REMOTE_URI, remoteUri);
+        intent.putExtra(PARAM_ACCOUNT_ID, accountID);
+        intent.putExtra(PARAM_CALL_ID, callID);
+        intent.putExtra(PARAM_DISPLAY_NAME, displayName);
+        intent.putExtra(PARAM_REMOTE_URI, remoteUri);
+        intent.putExtra(PARAM_IS_VIDEO, isVideo);
         intent.addFlags(Intent.FLAG_RECEIVER_FOREGROUND);
 
-        mContext.sendBroadcast(intent);
+        sendExplicitBroadcast(intent);
     }
 
     /**
@@ -84,8 +72,8 @@ public class BroadcastEventEmitter {
         final Intent intent = new Intent();
 
         intent.setAction(getAction(BroadcastAction.REGISTRATION));
-        intent.putExtra(BroadcastParameters.ACCOUNT_ID, accountID);
-        intent.putExtra(BroadcastParameters.CODE, registrationStateCode);
+        intent.putExtra(PARAM_ACCOUNT_ID, accountID);
+        intent.putExtra(PARAM_REGISTRATION_CODE, registrationStateCode);
 
         mContext.sendBroadcast(intent);
     }
@@ -98,38 +86,43 @@ public class BroadcastEventEmitter {
      * @param connectTimestamp call start timestamp
      * @param isLocalHold true if the call is held locally
      * @param isLocalMute true if the call is muted locally
+     * @param isLocalVideoMute true if the video is muted locally
      */
-    public void callState(String accountID, int callID, int callStateCode, long connectTimestamp,
-                          boolean isLocalHold, boolean isLocalMute) {
+    public synchronized  void callState(String accountID, int callID, int callStateCode, int callStateStatus,
+                          long connectTimestamp, boolean isLocalHold, boolean isLocalMute, boolean isLocalVideoMute) {
         final Intent intent = new Intent();
 
         intent.setAction(getAction(BroadcastAction.CALL_STATE));
-        intent.putExtra(BroadcastParameters.ACCOUNT_ID, accountID);
-        intent.putExtra(BroadcastParameters.CALL_ID, callID);
-        intent.putExtra(BroadcastParameters.CALL_STATE, callStateCode);
-        intent.putExtra(BroadcastParameters.CONNECT_TIMESTAMP, connectTimestamp);
-        intent.putExtra(BroadcastParameters.LOCAL_HOLD, isLocalHold);
-        intent.putExtra(BroadcastParameters.LOCAL_MUTE, isLocalMute);
+        intent.putExtra(PARAM_ACCOUNT_ID, accountID);
+        intent.putExtra(PARAM_CALL_ID, callID);
+        intent.putExtra(PARAM_CALL_STATE, callStateCode);
+        intent.putExtra(PARAM_CALL_STATUS, callStateStatus);
+        intent.putExtra(PARAM_CONNECT_TIMESTAMP, connectTimestamp);
+        intent.putExtra(PARAM_LOCAL_HOLD, isLocalHold);
+        intent.putExtra(PARAM_LOCAL_MUTE, isLocalMute);
+        intent.putExtra(PARAM_LOCAL_VIDEO_MUTE, isLocalVideoMute);
 
         mContext.sendBroadcast(intent);
     }
 
-    public void outgoingCall(String accountID, int callID, String number) {
+    public void outgoingCall(String accountID, int callID, String number, boolean isVideo, boolean isVideoConference) {
         final Intent intent = new Intent();
 
         intent.setAction(getAction(BroadcastAction.OUTGOING_CALL));
-        intent.putExtra(BroadcastParameters.ACCOUNT_ID, accountID);
-        intent.putExtra(BroadcastParameters.CALL_ID, callID);
-        intent.putExtra(BroadcastParameters.NUMBER, number);
+        intent.putExtra(PARAM_ACCOUNT_ID, accountID);
+        intent.putExtra(PARAM_CALL_ID, callID);
+        intent.putExtra(PARAM_NUMBER, number);
+        intent.putExtra(PARAM_IS_VIDEO, isVideo);
+        intent.putExtra(PARAM_IS_VIDEO_CONF, isVideoConference);
 
-        mContext.sendBroadcast(intent);
+        sendExplicitBroadcast(intent);
     }
 
     public void stackStatus(boolean started) {
         final Intent intent = new Intent();
 
         intent.setAction(getAction(BroadcastAction.STACK_STATUS));
-        intent.putExtra(BroadcastParameters.STACK_STARTED, started);
+        intent.putExtra(PARAM_STACK_STARTED, started);
 
         mContext.sendBroadcast(intent);
     }
@@ -138,7 +131,7 @@ public class BroadcastEventEmitter {
         final Intent intent = new Intent();
 
         intent.setAction(getAction(BroadcastAction.CODEC_PRIORITIES));
-        intent.putParcelableArrayListExtra(BroadcastParameters.CODEC_PRIORITIES_LIST, codecPriorities);
+        intent.putParcelableArrayListExtra(PARAM_CODEC_PRIORITIES_LIST, codecPriorities);
 
         mContext.sendBroadcast(intent);
     }
@@ -147,8 +140,46 @@ public class BroadcastEventEmitter {
         final Intent intent = new Intent();
 
         intent.setAction(getAction(BroadcastAction.CODEC_PRIORITIES_SET_STATUS));
-        intent.putExtra(BroadcastParameters.SUCCESS, success);
+        intent.putExtra(PARAM_SUCCESS, success);
 
         mContext.sendBroadcast(intent);
+    }
+
+    void missedCall(String displayName, String uri) {
+        final Intent intent = new Intent();
+
+        intent.setAction(getAction(BroadcastAction.MISSED_CALL));
+        intent.putExtra(PARAM_DISPLAY_NAME, displayName);
+        intent.putExtra(PARAM_REMOTE_URI, uri);
+
+        sendExplicitBroadcast(intent);
+    }
+
+    void videoSize(int width, int height) {
+        final Intent intent = new Intent();
+
+        intent.setAction(getAction(BroadcastAction.VIDEO_SIZE));
+        intent.putExtra(PARAM_INCOMING_VIDEO_WIDTH, width);
+        intent.putExtra(PARAM_INCOMING_VIDEO_HEIGHT, height);
+
+        mContext.sendBroadcast(intent);
+    }
+
+    private boolean sendExplicitBroadcast(Intent intent) {
+        PackageManager pm=mContext.getPackageManager();
+        List<ResolveInfo> matches=pm.queryBroadcastReceivers(intent, 0);
+        boolean sent = false;
+
+        for (ResolveInfo resolveInfo : matches) {
+            ComponentName cn=
+                    new ComponentName(resolveInfo.activityInfo.applicationInfo.packageName,
+                            resolveInfo.activityInfo.name);
+
+            intent.setComponent(cn);
+            intent.addFlags(Intent.FLAG_RECEIVER_FOREGROUND);
+            mContext.sendBroadcast(intent);
+            sent = true;
+        }
+        return sent;
     }
 }

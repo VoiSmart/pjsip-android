@@ -1,3 +1,0 @@
-include ':app'
-include ':sipservice'
-project(':sipservice').projectDir = file('../../sipservice')

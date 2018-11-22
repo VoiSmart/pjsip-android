@@ -2,6 +2,9 @@ package net.gotev.sipservice;
 
 import android.media.AudioManager;
 import android.media.ToneGenerator;
+import android.view.Surface;
+
+import com.crashlytics.android.Crashlytics;
 
 import org.pjsip.pjsua2.AudDevManager;
 import org.pjsip.pjsua2.AudioMedia;
@@ -10,15 +13,24 @@ import org.pjsip.pjsua2.CallInfo;
 import org.pjsip.pjsua2.CallMediaInfo;
 import org.pjsip.pjsua2.CallOpParam;
 import org.pjsip.pjsua2.CallSetting;
+import org.pjsip.pjsua2.CallVidSetStreamParam;
 import org.pjsip.pjsua2.Media;
+import org.pjsip.pjsua2.OnCallMediaEventParam;
 import org.pjsip.pjsua2.OnCallMediaStateParam;
 import org.pjsip.pjsua2.OnCallStateParam;
+import org.pjsip.pjsua2.VideoPreview;
+import org.pjsip.pjsua2.VideoPreviewOpParam;
+import org.pjsip.pjsua2.VideoWindow;
+import org.pjsip.pjsua2.VideoWindowHandle;
+import org.pjsip.pjsua2.pjmedia_event_type;
 import org.pjsip.pjsua2.pjmedia_type;
 import org.pjsip.pjsua2.pjsip_inv_state;
 import org.pjsip.pjsua2.pjsip_role_e;
 import org.pjsip.pjsua2.pjsip_status_code;
+import org.pjsip.pjsua2.pjsua2;
 import org.pjsip.pjsua2.pjsua_call_flag;
 import org.pjsip.pjsua2.pjsua_call_media_status;
+import org.pjsip.pjsua2.pjsua_call_vid_strm_op;
 
 /**
  * Wrapper around PJSUA2 Call object.
@@ -31,8 +43,15 @@ public class SipCall extends Call {
     private SipAccount account;
     private boolean localHold = false;
     private boolean localMute = false;
+    private boolean localVideoMute = false;
     private long connectTimestamp = 0;
     private ToneGenerator toneGenerator;
+    private boolean videoCall = false;
+    private boolean videoConference = false;
+    private boolean frontCamera = true;
+
+    private VideoWindow mVideoWindow;
+    private VideoPreview mVideoPreview;
 
     /**
      * Incoming call constructor.
@@ -42,6 +61,8 @@ public class SipCall extends Call {
     public SipCall(SipAccount account, int callID) {
         super(account, callID);
         this.account = account;
+        mVideoPreview = null;
+        mVideoWindow = null;
     }
 
     /**
@@ -69,8 +90,9 @@ public class SipCall extends Call {
             CallInfo info = getInfo();
             int callID = info.getId();
             pjsip_inv_state callState = info.getState();
+            pjsip_status_code callStatus = null;
 
-            /**
+            /*
              * From: http://www.pjsip.org/docs/book-latest/html/call.html#call-disconnection
              *
              * Call disconnection event is a special event since once the callback that
@@ -79,14 +101,25 @@ public class SipCall extends Call {
              * Thus, it is recommended to delete the call object inside the callback.
              */
 
+            try {
+                callStatus = info.getLastStatusCode();
+                account.getService().setLastCallStatus(callStatus.swigValue());
+            } catch(Exception ex) {}
+
             if (callState == pjsip_inv_state.PJSIP_INV_STATE_DISCONNECTED) {
                 account.getService().stopRingtone();
                 checkAndStopLocalRingBackTone();
+                stopVideoFeeds();
+                stopSendingKeyFrame();
                 account.removeCall(callID);
             } else if (callState == pjsip_inv_state.PJSIP_INV_STATE_CONFIRMED) {
                 account.getService().stopRingtone();
                 checkAndStopLocalRingBackTone();
                 connectTimestamp = System.currentTimeMillis();
+                if (videoCall) {
+                    setVideoMute(false);
+                    startSendingKeyFrame();
+                }
 
                 // check whether the 183 has arrived or not
             } else if (callState == pjsip_inv_state.PJSIP_INV_STATE_EARLY){
@@ -103,8 +136,13 @@ public class SipCall extends Call {
             }
 
             account.getService().getBroadcastEmitter()
-                    .callState(account.getData().getIdUri(), callID, callState.swigValue(),
-                               connectTimestamp, localHold, localMute);
+                    .callState(account.getData().getIdUri(), callID, callState.swigValue(), callStatus != null ? callStatus.swigValue() : -1,
+                               connectTimestamp, localHold, localMute, localVideoMute);
+
+            if (callState == pjsip_inv_state.PJSIP_INV_STATE_DISCONNECTED) {
+                account.getService().setLastCallStatus(0);
+                delete();
+            }
 
         } catch (Exception exc) {
             Logger.error(LOG_TAG, "onCallState: error while getting call info", exc);
@@ -130,28 +168,32 @@ public class SipCall extends Call {
             if (mediaInfo.getType() == pjmedia_type.PJMEDIA_TYPE_AUDIO
                     && media != null
                     && mediaInfo.getStatus() == pjsua_call_media_status.PJSUA_CALL_MEDIA_ACTIVE) {
-                AudioMedia audioMedia = AudioMedia.typecastFromMedia(media);
 
-                account.getService().stopRingtone();
+                handleAudioMedia(media);
 
-                // connect the call audio media to sound device
-                try {
-                    AudDevManager mgr = account.getService().getAudDevManager();
+            } else if (mediaInfo.getType() == pjmedia_type.PJMEDIA_TYPE_VIDEO
+                    && mediaInfo.getStatus() == pjsua_call_media_status.PJSUA_CALL_MEDIA_ACTIVE
+                    && mediaInfo.getVideoIncomingWindowId() != pjsua2.INVALID_ID) {
 
-                    try {
-                        audioMedia.adjustRxLevel((float) 1.5);
-                        audioMedia.adjustTxLevel((float) 1.5);
-                    } catch (Exception exc) {
-                        Logger.error(LOG_TAG, "Error while adjusting levels", exc);
-                    }
-
-                    audioMedia.startTransmit(mgr.getPlaybackDevMedia());
-                    mgr.getCaptureDevMedia().startTransmit(audioMedia);
-                } catch (Exception exc) {
-                    Logger.error(LOG_TAG, "Error while connecting audio media to sound device", exc);
-                }
+                handleVideoMedia(mediaInfo);
             }
         }
+    }
+
+    @Override
+    public void onCallMediaEvent(OnCallMediaEventParam prm) {
+        if (prm.getEv().getType() == pjmedia_event_type.PJMEDIA_EVENT_FMT_CHANGED) {
+            // Sending new video size
+            try {
+                account.getService().getBroadcastEmitter().videoSize(
+                        (int) mVideoWindow.getInfo().getSize().getW(),
+                        (int) mVideoWindow.getInfo().getSize().getH());
+            } catch (Exception ex) {
+                Logger.error(LOG_TAG, "Unable to get video dimensions", ex);
+                Crashlytics.logException(ex);
+            }
+        }
+        super.onCallMediaEvent(prm);
     }
 
     /**
@@ -165,7 +207,11 @@ public class SipCall extends Call {
     public void acceptIncomingCall() {
         CallOpParam param = new CallOpParam();
         param.setStatusCode(pjsip_status_code.PJSIP_SC_OK);
-
+        setMediaParams(param);
+        if (!videoCall) {
+            CallSetting callSetting = param.getOpt();
+            callSetting.setFlag(pjsua_call_flag.PJSUA_CALL_INCLUDE_DISABLED_MEDIA.swigValue());
+        }
         try {
             answer(param);
         } catch (Exception exc) {
@@ -303,9 +349,8 @@ public class SipCall extends Call {
             } else {
                 // http://lists.pjsip.org/pipermail/pjsip_lists.pjsip.org/2015-March/018246.html
                 Logger.debug(LOG_TAG, "un-holding call with ID " + getId());
+                setMediaParams(param);
                 CallSetting opt = param.getOpt();
-                opt.setAudioCount(1);
-                opt.setVideoCount(0);
                 opt.setFlag(pjsua_call_flag.PJSUA_CALL_UNHOLD.swigValue());
                 reinvite(param);
                 localHold = false;
@@ -337,5 +382,194 @@ public class SipCall extends Call {
             toneGenerator.release();
             toneGenerator = null;
         }
+    }
+
+    // disable video programmatically
+    @Override
+    public void makeCall(String dst_uri, CallOpParam prm) throws java.lang.Exception {
+        setMediaParams(prm);
+        if (!videoCall) {
+            CallSetting callSetting = prm.getOpt();
+            callSetting.setFlag(pjsua_call_flag.PJSUA_CALL_INCLUDE_DISABLED_MEDIA.swigValue());
+        }
+        super.makeCall(dst_uri, prm);
+    }
+
+    private void handleAudioMedia(Media media) {
+        AudioMedia audioMedia = AudioMedia.typecastFromMedia(media);
+
+        account.getService().stopRingtone();
+
+        // connect the call audio media to sound device
+        try {
+            AudDevManager audDevManager = account.getService().getAudDevManager();
+            if (audioMedia != null) {
+                try {
+                    audioMedia.adjustRxLevel((float) 1.5);
+                    audioMedia.adjustTxLevel((float) 1.5);
+                } catch (Exception exc) {
+                    Logger.error(LOG_TAG, "Error while adjusting levels", exc);
+                }
+
+                audioMedia.startTransmit(audDevManager.getPlaybackDevMedia());
+                audDevManager.getCaptureDevMedia().startTransmit(audioMedia);
+            }
+        } catch (Exception exc) {
+            Logger.error(LOG_TAG, "Error while connecting audio media to sound device", exc);
+        }
+    }
+
+    private void handleVideoMedia(CallMediaInfo mediaInfo) {
+        if (mVideoWindow != null) {
+            mVideoWindow.delete();
+        }
+        if (mVideoPreview != null) {
+            mVideoPreview.delete();
+        }
+        if (!videoConference) {
+            mVideoPreview = new VideoPreview(mediaInfo.getVideoCapDev());
+        }
+        mVideoWindow = new VideoWindow(mediaInfo.getVideoIncomingWindowId());
+    }
+
+    public VideoWindow getVideoWindow() {
+        return mVideoWindow;
+    }
+
+    public void setVideoWindow(VideoWindow mVideoWindow) {
+        this.mVideoWindow = mVideoWindow;
+    }
+
+    public VideoPreview getVideoPreview() {
+        return mVideoPreview;
+    }
+
+    public void setVideoPreview(VideoPreview mVideoPreview) {
+        this.mVideoPreview = mVideoPreview;
+    }
+
+    private void stopVideoFeeds() {
+        stopIncomingVideoFeed();
+        stopPreviewVideoFeed();
+    }
+
+    public void setIncomingVideoFeed(Surface surface) {
+        if (mVideoWindow != null) {
+            VideoWindowHandle videoWindowHandle = new VideoWindowHandle();
+            videoWindowHandle.getHandle().setWindow(surface);
+            try {
+                mVideoWindow.setWindow(videoWindowHandle);
+                account.getService().getBroadcastEmitter().videoSize(
+                        (int) mVideoWindow.getInfo().getSize().getW(),
+                        (int) mVideoWindow.getInfo().getSize().getH());
+
+                // start video again if not mute
+                setVideoMute(localVideoMute);
+            } catch (Exception ex) {
+                Logger.error(LOG_TAG, "Unable to setup Incoming Video Feed", ex);
+                Crashlytics.logException(ex);
+            }
+        }
+    }
+
+    public void startPreviewVideoFeed(Surface surface) {
+        if (mVideoPreview != null) {
+            VideoWindowHandle videoWindowHandle = new VideoWindowHandle();
+            videoWindowHandle.getHandle().setWindow(surface);
+            VideoPreviewOpParam videoPreviewOpParam = new VideoPreviewOpParam();
+            videoPreviewOpParam.setWindow(videoWindowHandle);
+            try {
+                mVideoPreview.start(videoPreviewOpParam);
+            } catch (Exception ex) {
+                Logger.error(LOG_TAG, "Unable to start Video Preview", ex);
+            }
+        }
+    }
+
+    public void stopIncomingVideoFeed() {
+        VideoWindow videoWindow = getVideoWindow();
+        if (videoWindow != null) {
+            try {
+                videoWindow.delete();
+            } catch (Exception ex) {
+                Logger.error(LOG_TAG, "Unable to stop remote video feed", ex);
+            }
+        }
+    }
+
+    public void stopPreviewVideoFeed() {
+        VideoPreview videoPreview = getVideoPreview();
+        if (videoPreview != null) {
+            try {
+                videoPreview.stop();
+            } catch (Exception ex) {
+                Logger.error(LOG_TAG, "Unable to stop preview video feed", ex);
+            }
+        }
+    }
+
+    public boolean isVideoCall() {
+        return videoCall;
+    }
+
+    public boolean isVideoConference() {
+        return videoConference;
+    }
+
+    public void setVideoParams(boolean videoCall, boolean videoConference) {
+        this.videoCall = videoCall;
+        this.videoConference = videoConference;
+    }
+
+    private void setMediaParams(CallOpParam param) {
+        CallSetting callSetting = param.getOpt();
+        callSetting.setAudioCount(1);
+        callSetting.setVideoCount(videoCall ? 1 : 0);
+    }
+
+    public void setVideoMute(boolean videoMute) {
+        try {
+            vidSetStream(videoMute
+                    ? pjsua_call_vid_strm_op.PJSUA_CALL_VID_STRM_STOP_TRANSMIT
+                    : pjsua_call_vid_strm_op.PJSUA_CALL_VID_STRM_START_TRANSMIT,
+                new CallVidSetStreamParam());
+            localVideoMute = videoMute;
+        } catch(Exception ex) {
+            Logger.error(LOG_TAG, "Error while toggling video transmission", ex);
+            Crashlytics.logException(ex);
+        }
+    }
+
+    public boolean isLocalVideoMute() {
+        return localVideoMute;
+    }
+
+    public boolean isFrontCamera() {
+        return frontCamera;
+    }
+
+    public void setFrontCamera(boolean frontCamera) {
+        this.frontCamera = frontCamera;
+    }
+
+    private Runnable sendKeyFrameRunnable = new Runnable() {
+        @Override
+        public void run() {
+            try {
+                vidSetStream(pjsua_call_vid_strm_op.PJSUA_CALL_VID_STRM_SEND_KEYFRAME, new CallVidSetStreamParam());
+                startSendingKeyFrame();
+            } catch (Exception ex) {
+                Logger.error(LOG_TAG, "error while sending periodic keyframe");
+                Crashlytics.logException(ex);
+            }
+        }
+    };
+
+    private void startSendingKeyFrame() {
+        account.getService().enqueueDelayedJob(sendKeyFrameRunnable, SipServiceConstants.DELAYED_JOB_DEFAULT_DELAY);
+    }
+
+    private void stopSendingKeyFrame() {
+        account.getService().dequeueJob(sendKeyFrameRunnable);
     }
 }

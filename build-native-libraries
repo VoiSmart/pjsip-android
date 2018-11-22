@@ -1,5 +1,0 @@
-#!/bin/bash -e
-vagrant up
-vagrant ssh -c "./build-with-g729 && cp -a pjsip-build/lib/* /host-dir/sipservice/src/main/jniLibs/"
-vagrant halt
-echo "Native libraries successfully generated!"

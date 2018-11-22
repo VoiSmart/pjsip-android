@@ -45,4 +45,12 @@ class BackgroundService extends Service {
     protected void enqueueJob(Runnable job) {
         mHandler.post(job);
     }
+
+    protected void enqueueDelayedJob(Runnable job, long delayMillis) {
+        mHandler.postDelayed(job, delayMillis);
+    }
+
+    protected void dequeueJob(Runnable job) {
+        mHandler.removeCallbacks(job);
+    }
 }

@@ -1,6 +1,10 @@
 package net.gotev.sipservice;
 
+import com.crashlytics.android.Crashlytics;
+
+import org.pjsip.PjCallID;
 import org.pjsip.pjsua2.Account;
+import org.pjsip.pjsua2.CallInfo;
 import org.pjsip.pjsua2.CallOpParam;
 import org.pjsip.pjsua2.OnIncomingCallParam;
 import org.pjsip.pjsua2.OnRegStateParam;
@@ -36,7 +40,12 @@ public class SipAccount extends Account {
     }
 
     public void create() throws Exception {
+        PjCallID.USER = data.getUsername();
         create(data.getAccountConfig());
+    }
+
+    public void createGuest() throws Exception {
+        create(data.getGuestAccountConfig());
     }
 
     protected void removeCall(int callId) {
@@ -64,29 +73,45 @@ public class SipAccount extends Account {
         return call;
     }
 
-    public SipCall addOutgoingCall(final String numberToDial) {
-        SipCall call = new SipCall(this);
+    public SipCall addOutgoingCall(final String numberToDial, boolean isVideo, boolean isVideoConference) {
 
-        CallOpParam callOpParam = new CallOpParam();
-        try {
-            if (numberToDial.startsWith("sip:")) {
-                call.makeCall(numberToDial, callOpParam);
-            } else {
-                if ("*".equals(data.getRealm())) {
-                    call.makeCall("sip:" + numberToDial, callOpParam);
-                } else {
-                    call.makeCall("sip:" + numberToDial + "@" + data.getRealm(), callOpParam);
-                }
-            }
-            activeCalls.put(call.getId(), call);
-            Logger.debug(LOG_TAG, "New outgoing call with ID: " + call.getId());
-
-            return call;
-
-        } catch (Exception exc) {
-            Logger.error(LOG_TAG, "Error while making outgoing call", exc);
-            return null;
+        // check if there's already an ongoing call
+        int totalCalls = 0;
+        for (SipAccount _sipAccount: SipService.getActiveSipAccounts().values()) {
+            totalCalls += _sipAccount.getCallIDs().size();
         }
+
+        // allow calls only if there are no other ongoing calls
+        if (totalCalls == 0) {
+            SipCall call = new SipCall(this);
+            call.setVideoParams(isVideo, isVideoConference);
+
+            CallOpParam callOpParam = new CallOpParam();
+            try {
+                if (numberToDial.startsWith("sip:")) {
+                    call.makeCall(numberToDial, callOpParam);
+                } else {
+                    if ("*".equals(data.getRealm())) {
+                        call.makeCall("sip:" + numberToDial, callOpParam);
+                    } else {
+                        call.makeCall("sip:" + numberToDial + "@" + data.getRealm(), callOpParam);
+                    }
+                }
+                activeCalls.put(call.getId(), call);
+                Logger.debug(LOG_TAG, "New outgoing call with ID: " + call.getId());
+
+                return call;
+
+            } catch (Exception exc) {
+                Logger.error(LOG_TAG, "Error while making outgoing call", exc);
+                return null;
+            }
+        }
+        return null;
+    }
+
+    public SipCall addOutgoingCall(final String numberToDial) {
+        return addOutgoingCall(numberToDial, false, false);
     }
 
     @Override
@@ -116,10 +141,34 @@ public class SipAccount extends Account {
 
         SipCall call = addIncomingCall(prm.getCallId());
 
-        if (activeCalls.size() > 1) {
-            call.declineIncomingCall();
-            Logger.debug(LOG_TAG, "sending busy to call ID: " + prm.getCallId());
-            //TODO: notification of missed call
+        // Send 603 Decline if in DND mode
+        if (service.isDND()) {
+            try {
+                CallerInfo contactInfo = new CallerInfo(call.getInfo());
+                service.getBroadcastEmitter().missedCall(contactInfo.getDisplayName(), contactInfo.getRemoteUri());
+                call.declineIncomingCall();
+                Logger.debug(LOG_TAG, "Decline call with ID: " + prm.getCallId());
+            } catch(Exception ex) {
+                Logger.error(LOG_TAG, "Error while getting missed call info", ex);
+            }
+            return;
+        }
+
+        // Send 486 Busy Here if there's an already ongoing call
+        int totalCalls = 0;
+        for (SipAccount _sipAccount: SipService.getActiveSipAccounts().values()) {
+            totalCalls += _sipAccount.getCallIDs().size();
+        }
+
+        if (totalCalls > 1) {
+            try {
+                CallerInfo contactInfo = new CallerInfo(call.getInfo());
+                service.getBroadcastEmitter().missedCall(contactInfo.getDisplayName(), contactInfo.getRemoteUri());
+                call.sendBusyHereToIncomingCall();
+                Logger.debug(LOG_TAG, "Sending busy to call ID: " + prm.getCallId());
+            } catch(Exception ex) {
+                Logger.error(LOG_TAG, "Error while getting missed call info", ex);
+            }
             return;
         }
 
@@ -132,14 +181,26 @@ public class SipAccount extends Account {
 
             service.startRingtone();
 
-            CallerInfo contactInfo = new CallerInfo(call.getInfo());
+            String displayName = "", remoteUri = "";
+            try {
+                CallerInfo contactInfo = new CallerInfo(call.getInfo());
+                displayName = contactInfo.getDisplayName();
+                remoteUri = contactInfo.getRemoteUri();
+            } catch (Exception ex) {
+                Logger.error(LOG_TAG, "Error while getting caller info", ex);
+                Crashlytics.logException(ex);
+            }
 
-            service.getBroadcastEmitter()
-                   .incomingCall(data.getIdUri(), prm.getCallId(),
-                           contactInfo.getDisplayName(), contactInfo.getRemoteUri());
+            // check for video in remote SDP
+            CallInfo callInfo = call.getInfo();
+            boolean isVideo = (callInfo.getRemOfferer() && callInfo.getRemVideoCount() > 0);
 
-        } catch (Exception exc) {
-            Logger.error(LOG_TAG, "Error while getting call info", exc);
+            service.getBroadcastEmitter().incomingCall(data.getIdUri(), prm.getCallId(),
+                            displayName, remoteUri, isVideo);
+
+        } catch (Exception ex) {
+            Logger.error(LOG_TAG, "Error while getting caller info", ex);
+            Crashlytics.logException(ex);
         }
     }
 }
