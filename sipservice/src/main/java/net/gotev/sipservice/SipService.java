@@ -32,6 +32,7 @@ import org.pjsip.pjsua2.pjmedia_orient;
 import org.pjsip.pjsua2.pjsip_inv_state;
 import org.pjsip.pjsua2.pjsip_transport_type_e;
 import org.pjsip.pjsua2.pjsua_call_vid_strm_op;
+import org.pjsip.pjsua2.pjsua_destroy_flag;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -744,7 +745,7 @@ public class SipService extends BackgroundService implements SipServiceConstants
              */
             Runtime.getRuntime().gc();
 
-            mEndpoint.libDestroy();
+            mEndpoint.libDestroy(pjsua_destroy_flag.PJSUA_DESTROY_NO_NETWORK.swigValue());
             mEndpoint.delete();
             mEndpoint = null;
 
