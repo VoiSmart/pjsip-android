@@ -1,15 +1,10 @@
 package net.gotev.sipservice;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.media.AudioManager;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.os.Vibrator;
 import android.view.Surface;
 
 import com.crashlytics.android.Crashlytics;
@@ -61,9 +56,6 @@ public class SipService extends BackgroundService implements SipServiceConstants
     private List<SipAccountData> mConfiguredAccounts = new ArrayList<>();
     private SipAccountData mConfiguredGuestAccount;
     private static ConcurrentHashMap<String, SipAccount> mActiveSipAccounts = new ConcurrentHashMap<>();
-    private Ringtone mRingTone;
-    private Vibrator mVibrator;
-    private Uri mRingtoneUri;
     private BroadcastEventEmitter mBroadcastEmitter;
     private Endpoint mEndpoint;
     private volatile boolean mStarted;
@@ -84,9 +76,6 @@ public class SipService extends BackgroundService implements SipServiceConstants
                 Logger.debug(TAG, "Creating SipService with priority: " + Thread.currentThread().getPriority());
 
                 loadNativeLibraries();
-
-                mRingtoneUri = RingtoneManager.getActualDefaultRingtoneUri(SipService.this, RingtoneManager.TYPE_RINGTONE);
-                mVibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
                 mBroadcastEmitter = new BroadcastEventEmitter(SipService.this);
                 loadConfiguredAccounts();
@@ -948,35 +937,6 @@ public class SipService extends BackgroundService implements SipServiceConstants
         } else {
             Type listType = new TypeToken<ArrayList<SipAccountData>>(){}.getType();
             mConfiguredAccounts = new Gson().fromJson(accounts, listType);
-        }
-    }
-
-    protected synchronized void startRingtone() {
-        AudioManager audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
-
-        try {
-            if (audioManager != null) {
-                if (audioManager.getRingerMode() == AudioManager.RINGER_MODE_NORMAL) {
-                    mVibrator.vibrate(VIBRATOR_PATTERN, 0);
-                    mRingTone = RingtoneManager.getRingtone(this, mRingtoneUri);
-                    mRingTone.play();
-                } else if (audioManager.getRingerMode() == AudioManager.RINGER_MODE_VIBRATE) {
-                    mVibrator.vibrate(VIBRATOR_PATTERN, 0);
-                }
-            }
-        } catch (Exception exc) {
-            Logger.error(TAG, "Error while trying to play ringtone!", exc);
-        }
-    }
-
-    protected synchronized void stopRingtone() {
-        mVibrator.cancel();
-
-        if (mRingTone != null) {
-            try {
-                if (mRingTone.isPlaying())
-                    mRingTone.stop();
-            } catch (Exception ignored) { }
         }
     }
 

@@ -179,8 +179,6 @@ public class SipAccount extends Account {
             call.answer(callOpParam);
             Logger.debug(LOG_TAG, "Sending 180 ringing");
 
-            service.startRingtone();
-
             String displayName = "", remoteUri = "";
             try {
                 CallerInfo contactInfo = new CallerInfo(call.getInfo());

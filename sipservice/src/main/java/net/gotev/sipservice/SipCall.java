@@ -107,13 +107,11 @@ public class SipCall extends Call {
             } catch(Exception ex) {}
 
             if (callState == pjsip_inv_state.PJSIP_INV_STATE_DISCONNECTED) {
-                account.getService().stopRingtone();
                 checkAndStopLocalRingBackTone();
                 stopVideoFeeds();
                 stopSendingKeyFrame();
                 account.removeCall(callID);
             } else if (callState == pjsip_inv_state.PJSIP_INV_STATE_CONFIRMED) {
-                account.getService().stopRingtone();
                 checkAndStopLocalRingBackTone();
                 connectTimestamp = System.currentTimeMillis();
                 if (videoCall) {
@@ -397,8 +395,6 @@ public class SipCall extends Call {
 
     private void handleAudioMedia(Media media) {
         AudioMedia audioMedia = AudioMedia.typecastFromMedia(media);
-
-        account.getService().stopRingtone();
 
         // connect the call audio media to sound device
         try {
