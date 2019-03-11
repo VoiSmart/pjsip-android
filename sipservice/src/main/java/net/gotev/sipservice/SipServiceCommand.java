@@ -114,6 +114,7 @@ public class SipServiceCommand implements SipServiceConstants {
      * @param accountID account ID used to make the call
      * @param numberToCall number to call
      * @param isVideo whether the call has video or not
+     * @param isVideoConference whether the call is video conference or not
      */
     public static void makeCall(Context context, String accountID, String numberToCall, boolean isVideo, boolean isVideoConference) {
         checkAccount(accountID);
@@ -135,8 +136,10 @@ public class SipServiceCommand implements SipServiceConstants {
      * Makes a Direct call.
      * @param context application context
      * @param guestName name to display when making guest calls
-     * @param sipUri sip uri to call -> format: sip:number@realm:port
+     * @param host sip host
+     * @param sipUri sip uri to call in the format: sip:number@realm:port
      * @param isVideo whether the call has video or not
+     * @param isVideoConference whether the call is video conference or not
      */
     public static void makeDirectCall(Context context, String guestName, Uri sipUri, String host, boolean isVideo, boolean isVideoConference) {
 

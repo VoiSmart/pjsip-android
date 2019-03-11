@@ -48,6 +48,7 @@ public class BroadcastEventEmitter implements SipServiceConstants {
      * @param callID call ID number
      * @param displayName the display name of the remote party
      * @param remoteUri the IdUri of the remote party
+     * @param isVideo whether the call has video or not
      */
     public void incomingCall(String accountID, int callID, String displayName, String remoteUri, boolean isVideo) {
         final Intent intent = new Intent();
@@ -83,6 +84,7 @@ public class BroadcastEventEmitter implements SipServiceConstants {
      * @param accountID call's account IdUri
      * @param callID call ID number
      * @param callStateCode SIP call state code
+     * @param callStateStatus SIP call state status
      * @param connectTimestamp call start timestamp
      * @param isLocalHold true if the call is held locally
      * @param isLocalMute true if the call is muted locally
