@@ -14,19 +14,17 @@ public class CodecPriority implements Parcelable, Comparable<CodecPriority> {
     public static int PRIORITY_DISABLED = 0;
 
     private static final String G729_LABEL = "G.729";
-    private static final String G711U_LABEL = "G.711u";
-    private static final String G711A_LABEL = "G.711a";
+    private static final String PCMU_LABEL = "PCMU";
+    private static final String PCMA_LABEL = "PCMA";
     private static final String SPEEX_LABEL = "Speex";
     private static final String G722_LABEL = "G.722";
     private static final String G7221_LABEL = "G.722.1";
+    private static final String OPUS_LABEL = "Opus";
 
     private String mCodecId;
     private int mPriority;
 
-    public CodecPriority() {
-    }
-
-    public CodecPriority(String codecId, short priority) {
+    CodecPriority(String codecId, short priority) {
         mCodecId = codecId;
         mPriority = priority;
     }
@@ -46,7 +44,7 @@ public class CodecPriority implements Parcelable, Comparable<CodecPriority> {
                 }
             };
 
-    public CodecPriority(Parcel in) {
+    private CodecPriority(Parcel in) {
         mCodecId = in.readString();
         mPriority = in.readInt();
     }
@@ -62,7 +60,7 @@ public class CodecPriority implements Parcelable, Comparable<CodecPriority> {
         return 0;
     }
 
-    public String getCodecId() {
+    String getCodecId() {
         return mCodecId;
     }
 
@@ -70,7 +68,7 @@ public class CodecPriority implements Parcelable, Comparable<CodecPriority> {
         return mPriority;
     }
 
-    public CodecPriority setPriority(int mPriority) {
+    public void setPriority(int mPriority) {
         if (mPriority > PRIORITY_MAX) {
             this.mPriority = PRIORITY_MAX;
         } else if (mPriority < PRIORITY_DISABLED) {
@@ -78,35 +76,24 @@ public class CodecPriority implements Parcelable, Comparable<CodecPriority> {
         } else {
             this.mPriority = mPriority;
         }
-        return this;
     }
 
     public String getCodecName() {
         String name = mCodecId.split("/")[0];
 
-        if (name.equals("G729"))
-            return G729_LABEL;
-
-        if (name.equals("PCMU"))
-            return G711U_LABEL;
-
-        if (name.equals("PCMA"))
-            return G711A_LABEL;
-
-        if (name.equals("speex"))
-            return SPEEX_LABEL;
-
-        if (name.equals("G722"))
-            return G722_LABEL;
-
-        if (name.equals("G7221"))
-            return G7221_LABEL;
-
-        return name;
-
+        switch (name) {
+            case "G729": return G729_LABEL;
+            case "PCMU": return PCMU_LABEL;
+            case "PCMA": return PCMA_LABEL;
+            case "speex": return SPEEX_LABEL;
+            case "G722": return G722_LABEL;
+            case "G7221": return G7221_LABEL;
+            case "opus": return OPUS_LABEL;
+            default: return name;
+        }
     }
 
-    public int getCodecBitrateInKbitPerSecond() {
+    public int getCodecSampleRateInKhz() {
         return Integer.parseInt(mCodecId.split("/")[1]) / 1000;
     }
 
