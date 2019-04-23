@@ -12,7 +12,7 @@ def projectName = "pjsip-android"
 def projectDesc = "SIP Service for Android based on PJSIP."
 def projectGroup = "net.gotev"
 group = projectGroup
-version = "2.0.2"
+version = "2.1.0"
 
 android {
     compileSdkVersion 27
@@ -21,7 +21,7 @@ android {
     defaultConfig {
         minSdkVersion 18
         targetSdkVersion 27
-        versionCode 11
+        versionCode 12
         versionName version
     }
     buildTypes {
