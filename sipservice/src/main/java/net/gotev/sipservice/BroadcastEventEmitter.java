@@ -31,7 +31,8 @@ public class BroadcastEventEmitter implements SipServiceConstants {
         CODEC_PRIORITIES,
         CODEC_PRIORITIES_SET_STATUS,
         MISSED_CALL,
-        VIDEO_SIZE
+        VIDEO_SIZE,
+        CALL_STATS
     }
 
     public BroadcastEventEmitter(Context context) {
@@ -163,6 +164,19 @@ public class BroadcastEventEmitter implements SipServiceConstants {
         intent.setAction(getAction(BroadcastAction.VIDEO_SIZE));
         intent.putExtra(PARAM_INCOMING_VIDEO_WIDTH, width);
         intent.putExtra(PARAM_INCOMING_VIDEO_HEIGHT, height);
+
+        mContext.sendBroadcast(intent);
+    }
+
+    void callStats(int duration, String audioCodec, int callStateStatus, RtpStreamStats rx, RtpStreamStats tx) {
+        final Intent intent = new Intent();
+
+        intent.setAction(getAction(BroadcastAction.CALL_STATS));
+        intent.putExtra(PARAM_CALL_STATS_DURATION, duration);
+        intent.putExtra(PARAM_CALL_STATS_AUDIO_CODEC, audioCodec);
+        intent.putExtra(PARAM_CALL_STATS_CALL_STATUS, callStateStatus);
+        intent.putExtra(PARAM_CALL_STATS_RX_STREAM, rx);
+        intent.putExtra(PARAM_CALL_STATS_TX_STREAM, tx);
 
         mContext.sendBroadcast(intent);
     }

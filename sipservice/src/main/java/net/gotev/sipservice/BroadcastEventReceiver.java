@@ -78,6 +78,13 @@ public class BroadcastEventReceiver extends BroadcastReceiver implements SipServ
         } else if (BroadcastEventEmitter.getAction(BroadcastEventEmitter.BroadcastAction.VIDEO_SIZE).equals(action)) {
             onVideoSize(intent.getIntExtra(PARAM_INCOMING_VIDEO_WIDTH, H264_DEF_WIDTH),
                     intent.getIntExtra(PARAM_INCOMING_VIDEO_HEIGHT, H264_DEF_HEIGHT));
+        } else if (BroadcastEventEmitter.getAction(BroadcastEventEmitter.BroadcastAction.CALL_STATS).equals(action)) {
+            int callStatus = intent.getIntExtra(PARAM_CALL_STATUS, -1);
+            onCallStats(intent.getIntExtra(PARAM_CALL_STATS_DURATION, 0),
+                intent.getStringExtra(PARAM_CALL_STATS_AUDIO_CODEC),
+                (callStatus > 0) ? pjsip_status_code.swigToEnum(callStatus) : null,
+                (RtpStreamStats) intent.getParcelableExtra(PARAM_CALL_STATS_RX_STREAM),
+                (RtpStreamStats) intent.getParcelableExtra(PARAM_CALL_STATS_TX_STREAM));
         }
     }
 
@@ -112,6 +119,8 @@ public class BroadcastEventReceiver extends BroadcastReceiver implements SipServ
                 BroadcastEventEmitter.BroadcastAction.MISSED_CALL));
         intentFilter.addAction(BroadcastEventEmitter.getAction(
                 BroadcastEventEmitter.BroadcastAction.VIDEO_SIZE));
+        intentFilter.addAction(BroadcastEventEmitter.getAction(
+                BroadcastEventEmitter.BroadcastAction.CALL_STATS));
         context.registerReceiver(this, intentFilter);
     }
 
@@ -176,5 +185,9 @@ public class BroadcastEventReceiver extends BroadcastReceiver implements SipServ
 
     protected void onVideoSize(int width, int height) {
         Logger.debug(LOG_TAG, "Video resolution " + width+"x"+height);
+    }
+
+    protected void onCallStats(int duration, String audioCodec, pjsip_status_code callStatusCode, RtpStreamStats rx, RtpStreamStats tx) {
+        Logger.debug(LOG_TAG, "Call Stats sent "+duration+" "+audioCodec);
     }
 }

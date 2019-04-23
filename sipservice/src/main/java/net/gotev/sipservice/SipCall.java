@@ -18,6 +18,9 @@ import org.pjsip.pjsua2.Media;
 import org.pjsip.pjsua2.OnCallMediaEventParam;
 import org.pjsip.pjsua2.OnCallMediaStateParam;
 import org.pjsip.pjsua2.OnCallStateParam;
+import org.pjsip.pjsua2.RtcpStreamStat;
+import org.pjsip.pjsua2.StreamInfo;
+import org.pjsip.pjsua2.StreamStat;
 import org.pjsip.pjsua2.VideoPreview;
 import org.pjsip.pjsua2.VideoPreviewOpParam;
 import org.pjsip.pjsua2.VideoWindow;
@@ -111,6 +114,15 @@ public class SipCall extends Call {
                 stopVideoFeeds();
                 stopSendingKeyFrame();
                 account.removeCall(callID);
+                try {
+                    sendCallStats(
+                            info.getTotalDuration().getSec(),
+                            callStatus != null ? callStatus.swigValue() : -1,
+                            getStreamInfo(0),
+                            getStreamStat(0));
+                } catch (Exception ex) {
+                    Crashlytics.logException(ex);
+                }
             } else if (callState == pjsip_inv_state.PJSIP_INV_STATE_CONFIRMED) {
                 checkAndStopLocalRingBackTone();
                 connectTimestamp = System.currentTimeMillis();
@@ -567,5 +579,42 @@ public class SipCall extends Call {
 
     private void stopSendingKeyFrame() {
         account.getService().dequeueJob(sendKeyFrameRunnable);
+    }
+
+    private void sendCallStats(int duration, int callStatus, StreamInfo streamInfo, StreamStat streamStat) {
+        String audioCodec = streamInfo.getCodecName().toLowerCase()+"_"+streamInfo.getCodecClockRate();
+
+        RtcpStreamStat rxStat = streamStat.getRtcp().getRxStat();
+        RtcpStreamStat txStat = streamStat.getRtcp().getTxStat();
+
+        Jitter rxJitter = new Jitter(
+                rxStat.getJitterUsec().getMax(),
+                rxStat.getJitterUsec().getMean(),
+                rxStat.getJitterUsec().getMin());
+
+        Jitter txJitter = new Jitter(
+                rxStat.getJitterUsec().getMax(),
+                rxStat.getJitterUsec().getMean(),
+                rxStat.getJitterUsec().getMin());
+
+        RtpStreamStats rx = new RtpStreamStats(
+                (int)rxStat.getPkt(),
+                (int)rxStat.getDiscard(),
+                (int)rxStat.getLoss(),
+                (int)rxStat.getReorder(),
+                (int)rxStat.getDup(),
+                rxJitter
+        );
+
+        RtpStreamStats tx = new RtpStreamStats(
+                (int)txStat.getPkt(),
+                (int)txStat.getDiscard(),
+                (int)txStat.getLoss(),
+                (int)txStat.getReorder(),
+                (int)txStat.getDup(),
+                txJitter
+        );
+
+        account.getService().getBroadcastEmitter().callStats(duration, audioCodec, callStatus, rx, tx);
     }
 }

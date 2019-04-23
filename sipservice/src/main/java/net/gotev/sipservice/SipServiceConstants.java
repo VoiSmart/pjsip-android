@@ -76,6 +76,15 @@ public interface SipServiceConstants {
     String PARAM_INCOMING_VIDEO_HEIGHT = "incomingVideoHeight";
 
     /**
+     * Specific Parameters passed in the broadcast intents for call stats.
+     */
+    String PARAM_CALL_STATS_DURATION = "callStatsDuration";
+    String PARAM_CALL_STATS_AUDIO_CODEC = "callStatsAudioCodec";
+    String PARAM_CALL_STATS_CALL_STATUS = "callStatsCallStatus";
+    String PARAM_CALL_STATS_RX_STREAM = "callStatsRxStream";
+    String PARAM_CALL_STATS_TX_STREAM = "callStatsTxStream";
+
+    /**
      * Video Configuration Params
      */
 
