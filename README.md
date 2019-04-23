@@ -35,6 +35,7 @@ Native PJSIP library for Android is compiled using [PJSIP Android Builder](https
   - mute/unmute video
   - video preview
 - Use of a fixed SIP `Call-ID Header`. Refer to [this](https://github.com/VoiSmart/pjsip-android-builder/tree/master/patches/fixed_callid) for more details
+- Get Call Statistics on call disconnected
 
 ## What is missing (contributions are welcome):
 - Multiple calls support
