@@ -2,7 +2,6 @@ package net.gotev.sipservice;
 
 import com.crashlytics.android.Crashlytics;
 
-import org.pjsip.PjCallID;
 import org.pjsip.pjsua2.Account;
 import org.pjsip.pjsua2.CallInfo;
 import org.pjsip.pjsua2.CallOpParam;
@@ -40,7 +39,6 @@ public class SipAccount extends Account {
     }
 
     public void create() throws Exception {
-        PjCallID.USER = data.getUsername();
         create(data.getAccountConfig());
     }
 

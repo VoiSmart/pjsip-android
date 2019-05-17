@@ -11,6 +11,7 @@ import org.pjsip.pjsua2.pj_qos_type;
  * Contains the account's configuration data.
  * @author gotev (Aleksandar Gotev)
  */
+@SuppressWarnings("unused")
 public class SipAccountData implements Parcelable {
 
     public static final String AUTH_TYPE_DIGEST = "digest";
@@ -25,12 +26,12 @@ public class SipAccountData implements Parcelable {
     private String authenticationType = AUTH_TYPE_DIGEST;
     private String contactUriParams;
     private int regExpirationTimeout = 300;     // 300s
-    private String guestDisplayName = "";
+    private String guestDisplayName;
+    private String callId;
 
     public SipAccountData() { }
 
-    // This is used to regenerate the object.
-    // All Parcelables must have a CREATOR that implements these two methods
+    /*****          Parcelable overrides        ******/
     public static final Parcelable.Creator<SipAccountData> CREATOR =
             new Parcelable.Creator<SipAccountData>() {
                 @Override
@@ -56,6 +57,7 @@ public class SipAccountData implements Parcelable {
         parcel.writeString(contactUriParams);
         parcel.writeInt(regExpirationTimeout);
         parcel.writeString(guestDisplayName);
+        parcel.writeString(callId);
     }
 
     private SipAccountData(Parcel in) {
@@ -69,13 +71,16 @@ public class SipAccountData implements Parcelable {
         contactUriParams = in.readString();
         regExpirationTimeout = in.readInt();
         guestDisplayName = in.readString();
+        callId = in.readString();
     }
 
     @Override
     public int describeContents() {
         return 0;
     }
+    /*          Parcelable overrides end        */
 
+    /*****          Getters and Setters        ******/
     public String getUsername() {
         return username;
     }
@@ -130,27 +135,13 @@ public class SipAccountData implements Parcelable {
         return this;
     }
 
-    public String getIdUri() {
-        if ("*".equals(realm))
-            return "sip:" + username;
-
-        return "sip:" + username + "@" + realm;
+    public String getAuthenticationType() {
+        return authenticationType;
     }
 
-    public String getRegistrarUri() {
-        return "sip:" + host + ":" + port;
-    }
-
-    public String getProxyUri() {
-        StringBuilder proxyUri = new StringBuilder();
-
-        proxyUri.append("sip:").append(host).append(":").append(port);
-
-        if (tcpTransport) {
-            proxyUri.append(";transport=tcp");
-        }
-
-        return proxyUri.toString();
+    public SipAccountData setAuthenticationType(String authenticationType) {
+        this.authenticationType = authenticationType;
+        return this;
     }
 
     public SipAccountData setContactUriParams(String contactUriParams){
@@ -171,6 +162,54 @@ public class SipAccountData implements Parcelable {
         return this.regExpirationTimeout;
     }
 
+    public String getGuestDisplayName() {
+        return this.guestDisplayName;
+    }
+
+    public SipAccountData setGuestDisplayName(String guestDisplayName) {
+        this.guestDisplayName = guestDisplayName;
+        return this;
+    }
+
+    public String getCallId() {
+        return callId;
+    }
+
+    public SipAccountData setCallId(String callId) {
+        this.callId = callId;
+        return this;
+    }
+    /*          Getters and Setters end        */
+
+    /*****          Utilities        ******/
+    AuthCredInfo getAuthCredInfo() {
+        return new AuthCredInfo(authenticationType, realm,
+                username, 0, password);
+    }
+
+    String getIdUri() {
+        if ("*".equals(realm))
+            return "sip:" + username;
+
+        return "sip:" + username + "@" + realm;
+    }
+
+    String getProxyUri() {
+        StringBuilder proxyUri = new StringBuilder();
+
+        proxyUri.append("sip:").append(host).append(":").append(port);
+
+        if (tcpTransport) {
+            proxyUri.append(";transport=tcp");
+        }
+
+        return proxyUri.toString();
+    }
+
+    String getRegistrarUri() {
+        return "sip:" + host + ":" + port;
+    }
+
     public boolean isValid() {
         return ((username != null) && !username.isEmpty()
                 && (password != null) && !password.isEmpty()
@@ -178,23 +217,32 @@ public class SipAccountData implements Parcelable {
                 && (realm != null) && !realm.isEmpty());
     }
 
-    protected AccountConfig getAccountConfig() {
+    AccountConfig getAccountConfig() {
         AccountConfig accountConfig = new AccountConfig();
-        accountConfig.getMediaConfig().getTransportConfig().setQosType(pj_qos_type.PJ_QOS_TYPE_VOICE);
-        accountConfig.setIdUri(getIdUri());
-        accountConfig.getRegConfig().setRegistrarUri(getRegistrarUri());
 
-        AuthCredInfo cred = new AuthCredInfo(authenticationType, getRealm(),
-                                             getUsername(), 0, getPassword());
-        accountConfig.getSipConfig().getAuthCreds().add(cred);
-        accountConfig.getSipConfig().getProxies().add(getProxyUri());
+        // account configs
+        accountConfig.setIdUri(getIdUri());
+
+        // account registration stuff configs
+        if (callId != null && !callId.isEmpty()) {
+            accountConfig.getRegConfig().setCallID(callId);
+        }
+        accountConfig.getRegConfig().setRegistrarUri(getRegistrarUri());
         accountConfig.getRegConfig().setTimeoutSec(regExpirationTimeout);
-        accountConfig.getSipConfig().setContactUriParams(getContactUriParams());
+
+        // account sip stuff configs
+        accountConfig.getSipConfig().getAuthCreds().add(getAuthCredInfo());
+        accountConfig.getSipConfig().getProxies().add(getProxyUri());
+        accountConfig.getSipConfig().setContactUriParams(contactUriParams);
+
+        // account media  stuff configs
+        accountConfig.getMediaConfig().getTransportConfig().setQosType(pj_qos_type.PJ_QOS_TYPE_VOICE);
         setVideoConfig(accountConfig);
+
         return accountConfig;
     }
 
-    protected AccountConfig getGuestAccountConfig() {
+    AccountConfig getGuestAccountConfig() {
         AccountConfig accountConfig = new AccountConfig();
         accountConfig.getMediaConfig().getTransportConfig().setQosType(pj_qos_type.PJ_QOS_TYPE_VIDEO);
         String idUri = getGuestDisplayName().isEmpty()
@@ -207,32 +255,15 @@ public class SipAccountData implements Parcelable {
         return accountConfig;
     }
 
-    protected SipAccountData setGuestDisplayName(String guestDisplayName) {
-        this.guestDisplayName = guestDisplayName;
-        return this;
-    }
-
-    protected String getGuestDisplayName() {
-        return this.guestDisplayName;
-    }
-
     private void setVideoConfig(AccountConfig accountConfig) {
         accountConfig.getVideoConfig().setAutoTransmitOutgoing(false);
         accountConfig.getVideoConfig().setAutoShowIncoming(true);
         accountConfig.getVideoConfig().setDefaultCaptureDevice(SipServiceConstants.FRONT_CAMERA_CAPTURE_DEVICE);
         accountConfig.getVideoConfig().setDefaultRenderDevice(SipServiceConstants.DEFAULT_RENDER_DEVICE);
     }
+    /*          Utilities end           */
 
-    public String getAuthenticationType() {
-        return authenticationType;
-    }
-
-    public SipAccountData setAuthenticationType(String authenticationType) {
-        this.authenticationType = authenticationType;
-        return this;
-    }
-
-
+    /*****          Object overrides        ******/
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -263,5 +294,5 @@ public class SipAccountData implements Parcelable {
         result = 31 * result + (tcpTransport ? 1 : 0);
         return result;
     }
+    /*          Object overrides end        */
 }
-

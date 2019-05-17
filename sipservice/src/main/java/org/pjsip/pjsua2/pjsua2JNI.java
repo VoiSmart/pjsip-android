@@ -1252,6 +1252,8 @@ public class pjsua2JNI {
   public final static native long AccountRegConfig_unregWaitMsec_get(long jarg1, AccountRegConfig jarg1_);
   public final static native void AccountRegConfig_proxyUse_set(long jarg1, AccountRegConfig jarg1_, long jarg2);
   public final static native long AccountRegConfig_proxyUse_get(long jarg1, AccountRegConfig jarg1_);
+  public final static native void AccountRegConfig_callID_set(long jarg1, AccountRegConfig jarg1_, String jarg2);
+  public final static native String AccountRegConfig_callID_get(long jarg1, AccountRegConfig jarg1_);
   public final static native void AccountRegConfig_readObject(long jarg1, AccountRegConfig jarg1_, long jarg2, ContainerNode jarg2_) throws java.lang.Exception;
   public final static native void AccountRegConfig_writeObject(long jarg1, AccountRegConfig jarg1_, long jarg2, ContainerNode jarg2_) throws java.lang.Exception;
   public final static native long new_AccountRegConfig();

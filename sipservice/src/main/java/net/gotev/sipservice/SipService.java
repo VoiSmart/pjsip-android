@@ -504,7 +504,7 @@ public class SipService extends BackgroundService implements SipServiceConstants
                     Logger.debug(TAG, String.valueOf(regExpTimeout));
                     refresh = false;
                 }
-                if (regContactParams != null && !(String.valueOf(regContactParams).equals(sipAccount.getData().getContactUriParams()))) {
+                if (regContactParams != null && !(regContactParams.equals(sipAccount.getData().getContactUriParams()))) {
                     Logger.debug(TAG, regContactParams);
                     sipAccount.getData().setContactUriParams(regContactParams);
                     refresh = false;

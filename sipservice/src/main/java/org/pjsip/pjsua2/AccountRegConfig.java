@@ -132,6 +132,14 @@ public class AccountRegConfig extends PersistentObject {
     return pjsua2JNI.AccountRegConfig_proxyUse_get(swigCPtr, this);
   }
 
+  public void setCallID(String value) {
+    pjsua2JNI.AccountRegConfig_callID_set(swigCPtr, this, value);
+  }
+
+  public String getCallID() {
+    return pjsua2JNI.AccountRegConfig_callID_get(swigCPtr, this);
+  }
+
   public void readObject(ContainerNode node) throws java.lang.Exception {
     pjsua2JNI.AccountRegConfig_readObject(swigCPtr, this, ContainerNode.getCPtr(node), node);
   }
