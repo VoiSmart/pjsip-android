@@ -1,6 +1,12 @@
 Change Log
 ==========
 
+### Version 2.2.1
+
+_2019-05-24_
+
+ * Fixed some error with missing default values
+
 ### Version 2.2.0
 
 _2019-05-17_

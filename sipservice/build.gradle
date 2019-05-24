@@ -12,7 +12,7 @@ def projectName = "pjsip-android"
 def projectDesc = "SIP Service for Android based on PJSIP."
 def projectGroup = "net.gotev"
 group = projectGroup
-version = "2.2.0"
+version = "2.2.1"
 
 android {
     compileSdkVersion 27
