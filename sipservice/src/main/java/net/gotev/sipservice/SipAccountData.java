@@ -24,9 +24,9 @@ public class SipAccountData implements Parcelable {
     private long port = 5060;
     private boolean tcpTransport = false;
     private String authenticationType = AUTH_TYPE_DIGEST;
-    private String contactUriParams;
+    private String contactUriParams = "";
     private int regExpirationTimeout = 300;     // 300s
-    private String guestDisplayName;
+    private String guestDisplayName = "";
     private String callId;
 
     public SipAccountData() { }
