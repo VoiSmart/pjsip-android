@@ -7,6 +7,8 @@ import org.pjsip.pjsua2.AccountConfig;
 import org.pjsip.pjsua2.AuthCredInfo;
 import org.pjsip.pjsua2.pj_qos_type;
 
+import java.util.Objects;
+
 /**
  * Contains the account's configuration data.
  * @author gotev (Aleksandar Gotev)
@@ -27,7 +29,7 @@ public class SipAccountData implements Parcelable {
     private String contactUriParams = "";
     private int regExpirationTimeout = 300;     // 300s
     private String guestDisplayName = "";
-    private String callId;
+    private String callId = "";
 
     public SipAccountData() { }
 
@@ -271,14 +273,15 @@ public class SipAccountData implements Parcelable {
 
         SipAccountData that = (SipAccountData) o;
 
-        if (username != null ? !username.equals(that.getUsername()) : that.getUsername() != null) return false;
-        if (password != null ? !password.equals(that.getPassword()) : that.getPassword() != null) return false;
-        if (realm != null ? !realm.equals(that.getRealm()) : that.getRealm() != null) return false;
-        if (host != null ? !host.equals(that.getHost()) : that.getHost() != null) return false;
-        if (port != that.getPort()) return false;
-        if (tcpTransport != that.isTcpTransport()) return false;
-        if (contactUriParams != null ? !contactUriParams.equals(that.getContactUriParams()) : that.getContactUriParams() != null) return false;
-        if (regExpirationTimeout != that.getRegExpirationTimeout()) return false;
+        if (!Objects.equals(username, that.username)) return false;
+        if (!Objects.equals(password, that.password)) return false;
+        if (!Objects.equals(realm, that.realm)) return false;
+        if (!Objects.equals(host, that.host)) return false;
+        if (port != that.port) return false;
+        if (tcpTransport != that.tcpTransport) return false;
+        if (!Objects.equals(contactUriParams, that.contactUriParams)) return false;
+        if (regExpirationTimeout != that.regExpirationTimeout) return false;
+        if (!Objects.equals(callId, that.callId)) return false;
 
         return getIdUri().equals(that.getIdUri());
 
@@ -292,6 +295,9 @@ public class SipAccountData implements Parcelable {
         result = 31 * result + host.hashCode();
         result = 31 * result + (int) (port ^ (port >>> 32));
         result = 31 * result + (tcpTransport ? 1 : 0);
+        result = 31 * result + contactUriParams.hashCode();
+        result = 31 * result + regExpirationTimeout;
+        result = 31 * result + callId.hashCode();
         return result;
     }
     /*          Object overrides end        */
