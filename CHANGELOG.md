@@ -1,6 +1,13 @@
 Change Log
 ==========
 
+### Version 2.2.2
+
+_2019-05-29_
+
+ * **MinSdk increased** - Minimum SDK is not increased to 19
+ * Improved SipAccountData class overrides
+
 ### Version 2.2.1
 
 _2019-05-24_
