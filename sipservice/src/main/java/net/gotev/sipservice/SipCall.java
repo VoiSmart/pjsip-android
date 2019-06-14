@@ -114,14 +114,16 @@ public class SipCall extends Call {
                 stopVideoFeeds();
                 stopSendingKeyFrame();
                 account.removeCall(callID);
-                try {
-                    sendCallStats(
-                            info.getTotalDuration().getSec(),
-                            callStatus != null ? callStatus.swigValue() : -1,
-                            getStreamInfo(0),
-                            getStreamStat(0));
-                } catch (Exception ex) {
-                    Crashlytics.logException(ex);
+                if (connectTimestamp > 0) {
+                    try {
+                        sendCallStats(
+                                info.getTotalDuration().getSec(),
+                                callStatus != null ? callStatus.swigValue() : -1,
+                                getStreamInfo(0),
+                                getStreamStat(0));
+                    } catch (Exception ex) {
+                        Crashlytics.logException(ex);
+                    }
                 }
             } else if (callState == pjsip_inv_state.PJSIP_INV_STATE_CONFIRMED) {
                 checkAndStopLocalRingBackTone();
