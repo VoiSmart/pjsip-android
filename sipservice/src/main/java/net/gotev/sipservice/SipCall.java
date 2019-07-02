@@ -117,7 +117,7 @@ public class SipCall extends Call {
                 if (connectTimestamp > 0) {
                     try {
                         sendCallStats(
-                                info.getTotalDuration().getSec(),
+                                info.getConnectDuration().getSec(),
                                 callStatus != null ? callStatus.swigValue() : -1,
                                 getStreamInfo(0),
                                 getStreamStat(0));
