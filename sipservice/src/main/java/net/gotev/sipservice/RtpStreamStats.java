@@ -9,7 +9,7 @@ import android.os.Parcelable;
  * Created by aenonGit on 19/04/19.
  * Copyright © 2019 VoiSmart S.r.l. All rights reserved.
  */
-
+@SuppressWarnings("unused")
 public class RtpStreamStats implements Parcelable {
 
     private int pkt;

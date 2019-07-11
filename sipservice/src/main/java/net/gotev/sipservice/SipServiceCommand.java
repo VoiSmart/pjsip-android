@@ -15,6 +15,7 @@ import java.util.ArrayList;
  * Triggers sip service commands.
  * @author gotev (Aleksandar Gotev)
  */
+@SuppressWarnings("unused")
 public class SipServiceCommand implements SipServiceConstants {
 
     public static String AGENT_NAME = "AndroidSipService/" + BuildConfig.VERSION_CODE;
@@ -286,7 +287,7 @@ public class SipServiceCommand implements SipServiceConstants {
      * @param context application context
      * @param accountID account ID
      * @param callID call ID
-     * @param number number to which to trasnfer the call
+     * @param number number to which to transfer the call
      */
     public static void transferCall(Context context, String accountID, int callID, String number) {
         checkAccount(accountID);

@@ -39,6 +39,7 @@ import org.pjsip.pjsua2.pjsua_call_vid_strm_op;
  * Wrapper around PJSUA2 Call object.
  * @author gotev (Aleksandar Gotev)
  */
+@SuppressWarnings("unused")
 public class SipCall extends Call {
 
     private static final String LOG_TAG = SipCall.class.getSimpleName();

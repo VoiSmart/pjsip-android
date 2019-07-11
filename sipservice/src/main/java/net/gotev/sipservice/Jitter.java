@@ -9,6 +9,7 @@ import android.os.Parcelable;
  * Created by aenonGit on 23/04/19.
  * Copyright © 2019 VoiSmart S.r.l. All rights reserved.
  */
+@SuppressWarnings("unused")
 public class Jitter implements Parcelable {
     private int max;
     private int mean;

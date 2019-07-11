@@ -7,6 +7,7 @@ package net.gotev.sipservice;
  * The default logger implementation logs in Android's LogCat.
  * @author gotev (Aleksandar Gotev)
  */
+@SuppressWarnings("unused")
 public class Logger {
 
     public enum LogLevel {
