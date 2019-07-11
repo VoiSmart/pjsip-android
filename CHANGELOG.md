@@ -1,6 +1,14 @@
 Change Log
 ==========
 
+### Version 2.2.3
+
+_2019-07-11_
+
+ * **Issues fixed**:
+   + #78
+   + #76
+
 ### Version 2.2.2
 
 _2019-05-29_
@@ -19,6 +27,9 @@ _2019-05-24_
 _2019-05-17_
 
  * **Use AccountRegConfig#setCallID** - Registration Call-ID can now be set from java code
+ 
+ * **Issues fixed**:
+   + #72
 
 ### Version 2.1.0
 
