@@ -46,7 +46,6 @@ import static net.gotev.sipservice.SipServiceCommand.AGENT_NAME;
 public class SipService extends BackgroundService implements SipServiceConstants {
 
     private static final String TAG = SipService.class.getSimpleName();
-    private static final long[] VIBRATOR_PATTERN = {0, 1000, 1000};
 
     private static final String PREFS_NAME = TAG + "prefs";
     private static final String PREFS_KEY_ACCOUNTS = "accounts";
@@ -842,6 +841,7 @@ public class SipService extends BackgroundService implements SipServiceConstants
         }
     }
 
+    @SuppressWarnings("unused")
     private void removeAllActiveAccounts() {
         if (!mActiveSipAccounts.isEmpty()) {
             for (String accountID : mActiveSipAccounts.keySet()) {
@@ -1129,12 +1129,9 @@ public class SipService extends BackgroundService implements SipServiceConstants
             pjSipAndroidAccount.createGuest();
             mConfiguredGuestAccount = pjSipAndroidAccount.getData();
 
-            /* do not add account if already present
-                [guest account are not added to the configured accounts]
-             */
-            if (mActiveSipAccounts.get(accountID) == null) {
-                mActiveSipAccounts.put(accountID, pjSipAndroidAccount);
-            }
+            // Overwrite the old value if present
+            mActiveSipAccounts.put(accountID, pjSipAndroidAccount);
+
             SipCall call = mActiveSipAccounts.get(accountID).addOutgoingCall(sipUri, isVideo, isVideoConference);
             if (call != null) {
                 call.setVideoParams(isVideo, isVideoConference);
