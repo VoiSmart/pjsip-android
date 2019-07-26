@@ -596,9 +596,9 @@ public class SipCall extends Call {
                 rxStat.getJitterUsec().getMin());
 
         Jitter txJitter = new Jitter(
-                rxStat.getJitterUsec().getMax(),
-                rxStat.getJitterUsec().getMean(),
-                rxStat.getJitterUsec().getMin());
+                txStat.getJitterUsec().getMax(),
+                txStat.getJitterUsec().getMean(),
+                txStat.getJitterUsec().getMin());
 
         RtpStreamStats rx = new RtpStreamStats(
                 (int)rxStat.getPkt(),
