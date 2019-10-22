@@ -60,7 +60,7 @@ public class CodecPriority implements Parcelable, Comparable<CodecPriority> {
         return 0;
     }
 
-    String getCodecId() {
+    public String getCodecId() {
         return mCodecId;
     }
 
