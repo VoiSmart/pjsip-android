@@ -70,6 +70,15 @@ public class SipServiceCommand implements SipServiceConstants {
     }
 
     /**
+     * Enables the data encryption
+     *
+     * @param alias AndroidKeyStore keys alias
+     */
+    public static void setEncryption(Context context, boolean enableEncryption, String alias) {
+        SharedPreferencesHelper.getInstance(context).setEncryption(context, enableEncryption, alias);
+    }
+
+    /**
      * Remove a SIP account.
      * @param context application context
      * @param accountID account ID uri

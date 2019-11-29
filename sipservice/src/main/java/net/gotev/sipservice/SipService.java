@@ -67,8 +67,8 @@ public class SipService extends BackgroundService implements SipServiceConstants
                 Logger.debug(TAG, "Creating SipService with priority: " + Thread.currentThread().getPriority());
 
                 loadNativeLibraries();
-
-                mSharedPreferencesHelper = new SharedPreferencesHelper(SipService.this);
+                mSharedPreferencesHelper = SharedPreferencesHelper.getInstance(SipService.this)
+                        .init(SipService.this);
                 mBroadcastEmitter = new BroadcastEventEmitter(SipService.this);
                 loadConfiguredAccounts();
                 addAllConfiguredAccounts();

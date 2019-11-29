@@ -3,8 +3,11 @@ package net.gotev.sipservice;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.crashlytics.android.Crashlytics;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.voismart.crypto.Crypto;
+import com.voismart.crypto.EncryptionHelper;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -21,28 +24,39 @@ public class SharedPreferencesHelper {
     private final String PREFS_KEY_ACCOUNTS = "accounts";
     private final String PREFS_KEY_CODEC_PRIORITIES = "codec_priorities";
     private final String PREFS_KEY_DND = "dnd_pref";
+    private final String PREFS_KEY_ENCRYPTION_ENABLED = "encryption_enabled";
+    private final String PREFS_KEY_KEYSTORE_ALIAS = "keystore_alias";
 
     private SharedPreferences sharedPreferences;
     private Gson gson;
+    private EncryptionHelper encryptionHelper = null;
 
-    SharedPreferencesHelper(Context context) {
+    private static SharedPreferencesHelper INSTANCE = null;
+
+    private SharedPreferencesHelper(Context context) {
         sharedPreferences = context.getSharedPreferences("sipservice_prefs", Context.MODE_PRIVATE);
         gson = new Gson();
     }
 
-    List<SipAccountData> retrieveConfiguredAccounts() {
-        String accounts = sharedPreferences.getString(PREFS_KEY_ACCOUNTS, "");
+    SharedPreferencesHelper init(Context context) {
+        initCrypto(context, getAlias());
+        return INSTANCE;
+    }
 
-        if (accounts.isEmpty()) {
-            return new ArrayList<>();
+    List<SipAccountData> retrieveConfiguredAccounts() {
+        if (isEncryptionEnabled()) {
+            return getDecryptedConfiguredAccounts();
         } else {
-            Type listType = new TypeToken<ArrayList<SipAccountData>>(){}.getType();
-            return gson.fromJson(accounts, listType);
+            return getConfiguredAccounts();
         }
     }
 
     void persistConfiguredAccounts(List<SipAccountData> configuredAccounts) {
-        sharedPreferences.edit().putString(PREFS_KEY_ACCOUNTS, gson.toJson(configuredAccounts)).apply();
+        if (isEncryptionEnabled()) {
+            setEncryptedConfiguredAccounts(configuredAccounts);
+        } else {
+            setConfiguredAccounts(configuredAccounts);
+        }
     }
 
     ArrayList<CodecPriority> retrieveConfiguredCodecPriorities() {
@@ -57,11 +71,124 @@ public class SharedPreferencesHelper {
         sharedPreferences.edit().putString(PREFS_KEY_CODEC_PRIORITIES, gson.toJson(codecPriorities)).apply();
     }
 
+    boolean isDND() {
+        return sharedPreferences.getBoolean(PREFS_KEY_DND, false);
+    }
+
     void setDND(boolean dnd) {
         sharedPreferences.edit().putBoolean(PREFS_KEY_DND, dnd).apply();
     }
 
-    boolean isDND() {
-        return sharedPreferences.getBoolean(PREFS_KEY_DND, false);
+    void setEncryption(Context context, boolean enableEncryption, String alias) {
+        setAlias(alias);
+        initCrypto(context, alias);
+        boolean wasEncryptionEnabled = isEncryptionEnabled();
+        if (enableEncryption != wasEncryptionEnabled) {
+            handleMigration(wasEncryptionEnabled);
+        }
+        sharedPreferences.edit().putBoolean(PREFS_KEY_ENCRYPTION_ENABLED, enableEncryption).apply();
+    }
+
+    /**
+     * Helpers to decrypt retrieved encrypted data
+     * @return decrypted accounts
+     */
+    private synchronized List<SipAccountData> getDecryptedConfiguredAccounts() {
+        List<SipAccountData> accounts = getConfiguredAccounts();
+        for (int i = 0; i < accounts.size(); i++) {
+            accounts.get(i).setUsername(decrypt(accounts.get(i).getUsername()));
+            accounts.get(i).setPassword(decrypt(accounts.get(i).getPassword()));
+        }
+        return accounts;
+    }
+
+    /**
+     * Helpers to retrieve data
+     * @return accounts
+     */
+    private synchronized List<SipAccountData> getConfiguredAccounts() {
+        String accounts = sharedPreferences.getString(PREFS_KEY_ACCOUNTS, "");
+        if (accounts.isEmpty()) {
+            return new ArrayList<>();
+        } else {
+            Type listType = new TypeToken<ArrayList<SipAccountData>>(){}.getType();
+            return gson.fromJson(accounts, listType);
+        }
+    }
+
+    /**
+     * Helpers to encrypt and persist data
+     */
+    private synchronized void setEncryptedConfiguredAccounts(List<SipAccountData> accounts) {
+        for (int i = 0; i < accounts.size(); i++) {
+            accounts.get(i).setUsername(encrypt(accounts.get(i).getUsername()));
+            accounts.get(i).setPassword(encrypt(accounts.get(i).getPassword()));
+        }
+        setConfiguredAccounts(accounts);
+    }
+
+    /**
+     * Helpers to persist data
+     */
+    private synchronized void setConfiguredAccounts(List<SipAccountData> accounts) {
+        sharedPreferences.edit().putString(PREFS_KEY_ACCOUNTS, gson.toJson(accounts)).apply();
+    }
+
+    private synchronized boolean isEncryptionEnabled() {
+        return sharedPreferences.getBoolean(PREFS_KEY_ENCRYPTION_ENABLED, false);
+    }
+
+    private void setAlias(String alias) {
+        sharedPreferences.edit().putString(PREFS_KEY_KEYSTORE_ALIAS, alias).apply();
+    }
+
+    private String getAlias() {
+        return sharedPreferences.getString(PREFS_KEY_KEYSTORE_ALIAS, "");
+    }
+
+    private void initCrypto(Context context, String alias) {
+        Crypto.init(context, alias, false);
+        encryptionHelper = EncryptionHelper.Companion.getInstance();
+    }
+
+    private String encrypt(String data) {
+        try {
+            return encryptionHelper.encrypt(data);
+        } catch (Exception e) {
+            Crashlytics.logException(e);
+            return null;
+        }
+    }
+
+    private String decrypt(String data) {
+        try {
+            return encryptionHelper.decrypt(data);
+        } catch (Exception e) {
+            Crashlytics.logException(e);
+            return null;
+        }
+    }
+
+    private void handleMigration(boolean wasEncrypted) {
+        if (wasEncrypted) {
+            migrateToPlainText();
+        } else {
+            migrateToEncryption();
+        }
+    }
+
+    private void migrateToEncryption() {
+        setEncryptedConfiguredAccounts(getConfiguredAccounts());
+    }
+
+    private void migrateToPlainText() {
+        setConfiguredAccounts(getDecryptedConfiguredAccounts());
+    }
+
+    public static SharedPreferencesHelper getInstance(Context context) {
+        if (INSTANCE == null) {
+            INSTANCE = new SharedPreferencesHelper(context);
+        }
+        return INSTANCE;
     }
 }
