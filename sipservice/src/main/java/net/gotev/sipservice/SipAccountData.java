@@ -300,5 +300,14 @@ public class SipAccountData implements Parcelable {
         result = 31 * result + callId.hashCode();
         return result;
     }
+
+    SipAccountData getDeepCopy() {
+        Parcel parcel = Parcel.obtain();
+        this.writeToParcel(parcel, 0);
+        parcel.setDataPosition(0);
+        SipAccountData temp = SipAccountData.CREATOR.createFromParcel(parcel);
+        parcel.recycle();
+        return temp;
+    }
     /*          Object overrides end        */
 }

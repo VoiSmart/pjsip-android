@@ -108,7 +108,7 @@ public class SharedPreferencesHelper {
      */
     private synchronized List<SipAccountData> getConfiguredAccounts() {
         String accounts = sharedPreferences.getString(PREFS_KEY_ACCOUNTS, "");
-        if (accounts.isEmpty()) {
+        if (accounts.isEmpty() || accounts.equals("[]")) {
             return new ArrayList<>();
         } else {
             Type listType = new TypeToken<ArrayList<SipAccountData>>(){}.getType();
@@ -120,11 +120,14 @@ public class SharedPreferencesHelper {
      * Helpers to encrypt and persist data
      */
     private synchronized void setEncryptedConfiguredAccounts(List<SipAccountData> accounts) {
+        List<SipAccountData> temp = new ArrayList<>();
         for (int i = 0; i < accounts.size(); i++) {
-            accounts.get(i).setUsername(encrypt(accounts.get(i).getUsername()));
-            accounts.get(i).setPassword(encrypt(accounts.get(i).getPassword()));
+            SipAccountData d = accounts.get(i).getDeepCopy();
+            d.setUsername(encrypt(d.getUsername()));
+            d.setPassword(encrypt(d.getPassword()));
+            temp.add(d);
         }
-        setConfiguredAccounts(accounts);
+        setConfiguredAccounts(temp);
     }
 
     /**
