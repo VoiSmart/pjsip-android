@@ -1,6 +1,15 @@
 Change Log
 ==========
 
+### Version 2.3.0
+
+_2019-12-18_
+
+ * **Data encryption** - It is now possible to enable encryption for stored credentials in SipAccountData
+ * **OpenH264** 1.7.0
+ * **Issues fixed**:
+   + #87
+
 ### Version 2.2.3
 
 _2019-07-11_

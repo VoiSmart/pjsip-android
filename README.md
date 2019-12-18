@@ -36,6 +36,7 @@ Native PJSIP library for Android is compiled using [PJSIP Android Builder](https
   - video preview
 - Use of a fixed SIP `Call-ID Header`. Refer to [this](https://github.com/VoiSmart/pjsip-android-builder/tree/master/patches/fixed_callid) for more details
 - Get Call Statistics on call disconnected
+- Sip Credential encryption on device. Refer to VoiSmart [Crypto](https://github.com/VoiSmart/crypto) library for more details
 
 ## What is missing (contributions are welcome):
 - Multiple calls support
