@@ -39,7 +39,9 @@ public class SharedPreferencesHelper {
     }
 
     SharedPreferencesHelper init(Context context) {
-        initCrypto(context, getAlias());
+        if (isEncryptionEnabled()) {
+            initCrypto(context, getAlias());
+        }
         return INSTANCE;
     }
 
@@ -80,8 +82,10 @@ public class SharedPreferencesHelper {
     }
 
     void setEncryption(Context context, boolean enableEncryption, String alias) {
-        setAlias(alias);
-        initCrypto(context, alias);
+        if (enableEncryption) {
+            setAlias(alias);
+            initCrypto(context, alias);
+        }
         boolean wasEncryptionEnabled = isEncryptionEnabled();
         if (enableEncryption != wasEncryptionEnabled) {
             handleMigration(wasEncryptionEnabled);
