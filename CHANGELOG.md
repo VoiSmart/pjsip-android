@@ -3,6 +3,13 @@ Change Log
 
 ### Version 2.3.0
 
+_2020-03-11_
+ * Fix Crash if starting SipService without enabling encryption"
+ * **Issues fixed**:
+   + #91
+
+### Version 2.3.0
+
 _2019-12-18_
 
  * **Data encryption** - It is now possible to enable encryption for stored credentials in SipAccountData
