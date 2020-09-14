@@ -1,6 +1,12 @@
 Change Log
 ==========
 
+### Version 2.4.1
+
+_2020-09-14_
+ * Fix travis file
+ * Bump gradle plugin, wrapper, targetSdk
+
 ### Version 2.4.0
 
 _2020-09-14_
