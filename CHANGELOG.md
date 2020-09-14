@@ -6,7 +6,7 @@ Change Log
 _2020-09-14_
  * Fix some small warnings
  * **Issues fixed**:
-  + \#115: Crashlytics has been removed and default logging level is now always debug. The logging level has been delegated to the loggerdelegate if set. See [Readme](README.md) for more info.
+   + #115: Crashlytics has been removed and default logging level is now always debug. The logging level has been delegated to the loggerdelegate if set. See [Readme](README.md) for more info.
 
 ### Version 2.3.1
 
