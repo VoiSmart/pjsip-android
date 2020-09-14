@@ -1,4 +1,6 @@
 language: android
+jdk: oraclejdk8
+
 android:
   components:
     # Uncomment the lines below if you want to
@@ -10,12 +12,17 @@ android:
     - build-tools-29.0.3
 
     # The SDK version used to compile your project
-    - android-27
-
-    # Additional components
-    - extra-google-m2repository
-    - extra-android-m2repository
+    - android-28
 
     # Specify at least one system image,
     # if you need to run emulator(s) during your tests
-    - sys-img-armeabi-v7a-android-27
+    - sys-img-armeabi-v7a-android-28
+
+  licenses:
+    - 'android-sdk-license-.+'
+
+before_install:
+  - touch $HOME/.android/repositories.cfg
+  # 29 is required to be accepted on both platform and tools despite the actual versions being used
+  - yes | sdkmanager "platforms;android-29"
+  - yes | sdkmanager "build-tools;29.0.3"
