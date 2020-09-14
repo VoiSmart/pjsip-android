@@ -3,7 +3,6 @@ package net.gotev.sipservice;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.crashlytics.android.Crashlytics;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.voismart.crypto.Crypto;
@@ -32,6 +31,7 @@ public class SharedPreferencesHelper {
     private EncryptionHelper encryptionHelper = null;
 
     private static SharedPreferencesHelper INSTANCE = null;
+    private static final String TAG = SharedPreferencesHelper.class.getSimpleName();
 
     private SharedPreferencesHelper(Context context) {
         sharedPreferences = context.getSharedPreferences("sipservice_prefs", Context.MODE_PRIVATE);
@@ -162,7 +162,7 @@ public class SharedPreferencesHelper {
         try {
             return encryptionHelper.encrypt(data);
         } catch (Exception e) {
-            Crashlytics.logException(e);
+            Logger.error(TAG, "Error while encrypting the string", e);
             return null;
         }
     }
@@ -171,7 +171,7 @@ public class SharedPreferencesHelper {
         try {
             return encryptionHelper.decrypt(data);
         } catch (Exception e) {
-            Crashlytics.logException(e);
+            Logger.error(TAG, "Error while deciphering the string", e);
             return null;
         }
     }

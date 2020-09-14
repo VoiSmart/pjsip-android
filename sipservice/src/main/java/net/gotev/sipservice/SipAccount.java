@@ -1,7 +1,5 @@
 package net.gotev.sipservice;
 
-import com.crashlytics.android.Crashlytics;
-
 import org.pjsip.pjsua2.Account;
 import org.pjsip.pjsua2.CallInfo;
 import org.pjsip.pjsua2.CallOpParam;
@@ -184,7 +182,7 @@ public class SipAccount extends Account {
                 remoteUri = contactInfo.getRemoteUri();
             } catch (Exception ex) {
                 Logger.error(LOG_TAG, "Error while getting caller info", ex);
-                Crashlytics.logException(ex);
+                throw ex;
             }
 
             // check for video in remote SDP
@@ -196,7 +194,6 @@ public class SipAccount extends Account {
 
         } catch (Exception ex) {
             Logger.error(LOG_TAG, "Error while getting caller info", ex);
-            Crashlytics.logException(ex);
         }
     }
 }

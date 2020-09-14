@@ -24,7 +24,11 @@ public class Logger {
         void info(String tag, String message);
     }
 
-    private LogLevel mLogLevel = BuildConfig.DEBUG ? LogLevel.DEBUG : LogLevel.OFF;
+    /**
+     * Log everything unless otherwise specified by either setLogLevel
+     * or by the delegate specified in setLoggerDelegate
+     */
+    private LogLevel mLogLevel = LogLevel.DEBUG;
 
     private LoggerDelegate mDelegate = new DefaultLoggerDelegate();
 

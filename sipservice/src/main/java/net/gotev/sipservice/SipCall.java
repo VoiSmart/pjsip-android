@@ -4,8 +4,6 @@ import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.view.Surface;
 
-import com.crashlytics.android.Crashlytics;
-
 import org.pjsip.pjsua2.AudDevManager;
 import org.pjsip.pjsua2.AudioMedia;
 import org.pjsip.pjsua2.Call;
@@ -108,7 +106,9 @@ public class SipCall extends Call {
             try {
                 callStatus = info.getLastStatusCode();
                 account.getService().setLastCallStatus(callStatus.swigValue());
-            } catch(Exception ex) {}
+            } catch(Exception ex) {
+                Logger.error(LOG_TAG, "Error while getting call status", ex);
+            }
 
             if (callState == pjsip_inv_state.PJSIP_INV_STATE_DISCONNECTED) {
                 checkAndStopLocalRingBackTone();
@@ -123,7 +123,8 @@ public class SipCall extends Call {
                                 getStreamInfo(0),
                                 getStreamStat(0));
                     } catch (Exception ex) {
-                        Crashlytics.logException(ex);
+                        Logger.error(LOG_TAG, "Error while sending call stats", ex);
+                        throw ex;
                     }
                 }
             } else if (callState == pjsip_inv_state.PJSIP_INV_STATE_CONFIRMED) {
@@ -203,7 +204,6 @@ public class SipCall extends Call {
                         (int) mVideoWindow.getInfo().getSize().getH());
             } catch (Exception ex) {
                 Logger.error(LOG_TAG, "Unable to get video dimensions", ex);
-                Crashlytics.logException(ex);
             }
         }
         super.onCallMediaEvent(prm);
@@ -478,7 +478,6 @@ public class SipCall extends Call {
                 setVideoMute(localVideoMute);
             } catch (Exception ex) {
                 Logger.error(LOG_TAG, "Unable to setup Incoming Video Feed", ex);
-                Crashlytics.logException(ex);
             }
         }
     }
@@ -547,7 +546,6 @@ public class SipCall extends Call {
             localVideoMute = videoMute;
         } catch(Exception ex) {
             Logger.error(LOG_TAG, "Error while toggling video transmission", ex);
-            Crashlytics.logException(ex);
         }
     }
 
@@ -571,7 +569,6 @@ public class SipCall extends Call {
                 startSendingKeyFrame();
             } catch (Exception ex) {
                 Logger.error(LOG_TAG, "error while sending periodic keyframe");
-                Crashlytics.logException(ex);
             }
         }
     };

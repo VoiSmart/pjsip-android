@@ -6,8 +6,6 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.view.Surface;
 
-import com.crashlytics.android.Crashlytics;
-
 import org.pjsip.pjsua2.AudDevManager;
 import org.pjsip.pjsua2.CallVidSetStreamParam;
 import org.pjsip.pjsua2.CodecFmtpVector;
@@ -1066,7 +1064,6 @@ public class SipService extends BackgroundService implements SipServiceConstants
             sipCall.vidSetStream(pjsua_call_vid_strm_op.PJSUA_CALL_VID_STRM_CHANGE_CAP_DEV, callVidSetStreamParam);
         } catch (Exception ex) {
             Logger.error(TAG, "Error while switching capture device", ex);
-            Crashlytics.logException(ex);
         }
     }
 
@@ -1115,7 +1112,6 @@ public class SipService extends BackgroundService implements SipServiceConstants
         } catch (Exception ex) {
             Logger.error(TAG, "Error while making a direct call as Guest", ex);
             mBroadcastEmitter.outgoingCall(accountID, -1, uri.getUserInfo(), false, false);
-            Crashlytics.logException(ex);
         }
     }
 
