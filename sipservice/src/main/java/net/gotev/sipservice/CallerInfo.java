@@ -10,8 +10,6 @@ import java.util.regex.Pattern;
  * @author gotev (Aleksandar Gotev)
  */
 public class CallerInfo {
-    private final Pattern displayNameAndRemoteUriPattern = Pattern.compile("^\"([^\"]+).*?sip:(.*?)>$");
-    private final Pattern remoteUriPattern = Pattern.compile("^.*?sip:(.*?)>$");
 
     private static final String UNKNOWN = "Unknown";
 
@@ -26,12 +24,14 @@ public class CallerInfo {
             return;
         }
 
+        Pattern displayNameAndRemoteUriPattern = Pattern.compile("^\"([^\"]+).*?sip:(.*?)>$");
         Matcher completeInfo = displayNameAndRemoteUriPattern.matcher(temp);
         if (completeInfo.matches()) {
             displayName = completeInfo.group(1);
             remoteUri = completeInfo.group(2);
 
         } else {
+            Pattern remoteUriPattern = Pattern.compile("^.*?sip:(.*?)>$");
             Matcher remoteUriInfo = remoteUriPattern.matcher(temp);
             if (remoteUriInfo.matches()) {
                 displayName = remoteUri = remoteUriInfo.group(1);
