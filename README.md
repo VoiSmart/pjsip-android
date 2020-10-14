@@ -49,6 +49,12 @@ Native PJSIP library for Android is compiled using [PJSIP Android Builder](https
 - Support for In-Call RTCP signaling to get call statistics
 - Other things which I'm not aware at the moment...
 
+## Used Libraries versions
+- PJSIP: 2.6
+- OpenSSL: 1.0.2g
+- OpenH264: 1.7.0
+- Opus: 1.2.1
+
 ## Logging
 This library ships with a default logger which logs with the default Android `Log` class and a default `DEBUG` loglevel.
 You can customize such behaviour by either:
