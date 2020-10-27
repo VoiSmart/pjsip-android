@@ -2,10 +2,6 @@ apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.jfrog.bintray'
 
-repositories {
-    maven { url 'https://maven.fabric.io/public' }
-}
-
 def siteUrl = 'https://github.com/gotev/pjsip-android'
 def gitUrl = 'https://github.com/gotev/pjsip-android.git'
 def projectName = "pjsip-android"
