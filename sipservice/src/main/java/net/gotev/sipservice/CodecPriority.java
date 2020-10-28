@@ -9,9 +9,9 @@ import android.os.Parcelable;
  */
 public class CodecPriority implements Parcelable, Comparable<CodecPriority> {
 
-    public static int PRIORITY_MAX = 254;
-    public static int PRIORITY_MIN = 1;
-    public static int PRIORITY_DISABLED = 0;
+    public static final int PRIORITY_MAX = 254;
+    public static final int PRIORITY_MIN = 1;
+    public static final int PRIORITY_DISABLED = 0;
 
     private static final String G729_LABEL = "G.729";
     private static final String PCMU_LABEL = "PCMU";
@@ -21,7 +21,7 @@ public class CodecPriority implements Parcelable, Comparable<CodecPriority> {
     private static final String G7221_LABEL = "G.722.1";
     private static final String OPUS_LABEL = "Opus";
 
-    private String mCodecId;
+    private final String mCodecId;
     private int mPriority;
 
     CodecPriority(String codecId, short priority) {
@@ -71,11 +71,7 @@ public class CodecPriority implements Parcelable, Comparable<CodecPriority> {
     public void setPriority(int mPriority) {
         if (mPriority > PRIORITY_MAX) {
             this.mPriority = PRIORITY_MAX;
-        } else if (mPriority < PRIORITY_DISABLED) {
-            this.mPriority = PRIORITY_DISABLED;
-        } else {
-            this.mPriority = mPriority;
-        }
+        } else this.mPriority = Math.max(mPriority, PRIORITY_DISABLED);
     }
 
     public String getCodecName() {

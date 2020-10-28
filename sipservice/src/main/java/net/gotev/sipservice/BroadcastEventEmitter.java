@@ -17,7 +17,7 @@ public class BroadcastEventEmitter implements SipServiceConstants {
 
     public static String NAMESPACE = "net.gotev";
 
-    private Context mContext;
+    private final Context mContext;
 
     /**
      * Enumeration of the broadcast actions

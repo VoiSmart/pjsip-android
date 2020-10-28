@@ -13,8 +13,8 @@ public class CallerInfo {
 
     private static final String UNKNOWN = "Unknown";
 
-    private String displayName;
-    private String remoteUri;
+    private final String displayName;
+    private final String remoteUri;
 
     public CallerInfo(final CallInfo callInfo) {
         String temp = callInfo.getRemoteUri();

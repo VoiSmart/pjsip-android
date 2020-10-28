@@ -26,8 +26,8 @@ public class SharedPreferencesHelper {
     private final String PREFS_KEY_ENCRYPTION_ENABLED = "encryption_enabled";
     private final String PREFS_KEY_KEYSTORE_ALIAS = "keystore_alias";
 
-    private SharedPreferences sharedPreferences;
-    private Gson gson;
+    private final SharedPreferences sharedPreferences;
+    private final Gson gson;
     private EncryptionHelper encryptionHelper = null;
 
     private static SharedPreferencesHelper INSTANCE = null;

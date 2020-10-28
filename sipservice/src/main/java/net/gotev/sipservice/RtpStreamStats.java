@@ -12,12 +12,12 @@ import android.os.Parcelable;
 @SuppressWarnings("unused")
 public class RtpStreamStats implements Parcelable {
 
-    private int pkt;
-    private int discard;
-    private int loss;
-    private int reorder;
-    private int dup;
-    private Jitter jitter;
+    private final int pkt;
+    private final int discard;
+    private final int loss;
+    private final int reorder;
+    private final int dup;
+    private final Jitter jitter;
 
     RtpStreamStats(int pkts, int discard, int loss, int reorder, int dup, Jitter jitter) {
         this.pkt = pkts;

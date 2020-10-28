@@ -11,9 +11,9 @@ import android.os.Parcelable;
  */
 @SuppressWarnings("unused")
 public class Jitter implements Parcelable {
-    private int max;
-    private int mean;
-    private int min;
+    private final int max;
+    private final int mean;
+    private final int min;
 
     Jitter(int max, int mean, int min) {
         this.max = max;

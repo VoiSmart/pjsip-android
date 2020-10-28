@@ -42,7 +42,7 @@ public class SipCall extends Call {
 
     private static final String LOG_TAG = SipCall.class.getSimpleName();
 
-    private SipAccount account;
+    private final SipAccount account;
     private boolean localHold = false;
     private boolean localMute = false;
     private boolean localVideoMute = false;
@@ -561,7 +561,7 @@ public class SipCall extends Call {
         this.frontCamera = frontCamera;
     }
 
-    private Runnable sendKeyFrameRunnable = new Runnable() {
+    private final Runnable sendKeyFrameRunnable = new Runnable() {
         @Override
         public void run() {
             try {
