@@ -18,7 +18,11 @@ import java.util.ArrayList;
 @SuppressWarnings("unused")
 public class SipServiceCommand implements SipServiceConstants {
 
-    public static String AGENT_NAME = "AndroidSipService/" + BuildConfig.VERSION_CODE;
+    /**
+     * This should be changed on the app side
+     * to reflect app version/name/... or whatever might be useful for debugging
+     */
+    public static String AGENT_NAME = "AndroidSipService";
 
     /**
      * Adds a new SIP account.
