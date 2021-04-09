@@ -1,12 +1,12 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 29
-    buildToolsVersion "29.0.3"
+    compileSdkVersion 30
+    buildToolsVersion "30.0.3"
 
     defaultConfig {
         minSdkVersion 19
-        targetSdkVersion 28
+        targetSdkVersion 29
         versionCode 18
         versionName "2.4.1"
     }
@@ -23,4 +23,3 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.6'
     implementation "com.github.voismart:crypto:0.1.0"
 }
-
