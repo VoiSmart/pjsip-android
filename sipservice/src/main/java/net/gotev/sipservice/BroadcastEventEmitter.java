@@ -15,7 +15,7 @@ import java.util.List;
  */
 public class BroadcastEventEmitter implements SipServiceConstants {
 
-    public static String NAMESPACE = "net.gotev";
+    public static String NAMESPACE = "com.voismart";
 
     private final Context mContext;
 
