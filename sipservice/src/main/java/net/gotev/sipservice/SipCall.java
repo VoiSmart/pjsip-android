@@ -16,6 +16,7 @@ import org.pjsip.pjsua2.Media;
 import org.pjsip.pjsua2.OnCallMediaEventParam;
 import org.pjsip.pjsua2.OnCallMediaStateParam;
 import org.pjsip.pjsua2.OnCallStateParam;
+import org.pjsip.pjsua2.OnStreamDestroyedParam;
 import org.pjsip.pjsua2.RtcpStreamStat;
 import org.pjsip.pjsua2.StreamInfo;
 import org.pjsip.pjsua2.StreamStat;
@@ -55,6 +56,9 @@ public class SipCall extends Call {
     private VideoWindow mVideoWindow;
     private VideoPreview mVideoPreview;
 
+    private StreamInfo streamInfo = null;
+    private StreamStat streamStat = null;
+
     /**
      * Incoming call constructor.
      * @param account the account which own this call
@@ -76,7 +80,7 @@ public class SipCall extends Call {
         this.account = account;
     }
 
-    public pjsip_inv_state getCurrentState() {
+    public int getCurrentState() {
         try {
             CallInfo info = getInfo();
             return info.getState();
@@ -91,8 +95,8 @@ public class SipCall extends Call {
         try {
             CallInfo info = getInfo();
             int callID = info.getId();
-            pjsip_inv_state callState = info.getState();
-            pjsip_status_code callStatus = null;
+            int callState = info.getState();
+            int callStatus = pjsip_status_code.PJSIP_SC_NULL;
 
             /*
              * From: http://www.pjsip.org/docs/book-latest/html/call.html#call-disconnection
@@ -105,7 +109,7 @@ public class SipCall extends Call {
 
             try {
                 callStatus = info.getLastStatusCode();
-                account.getService().setLastCallStatus(callStatus.swigValue());
+                account.getService().setLastCallStatus(callStatus);
             } catch(Exception ex) {
                 Logger.error(LOG_TAG, "Error while getting call status", ex);
             }
@@ -115,13 +119,9 @@ public class SipCall extends Call {
                 stopVideoFeeds();
                 stopSendingKeyFrame();
                 account.removeCall(callID);
-                if (connectTimestamp > 0) {
+                if (connectTimestamp > 0 && streamInfo != null && streamStat != null) {
                     try {
-                        sendCallStats(
-                                info.getConnectDuration().getSec(),
-                                callStatus != null ? callStatus.swigValue() : -1,
-                                getStreamInfo(0),
-                                getStreamStat(0));
+                        sendCallStats(info.getConnectDuration().getSec(), callStatus);
                     } catch (Exception ex) {
                         Logger.error(LOG_TAG, "Error while sending call stats", ex);
                         throw ex;
@@ -137,7 +137,7 @@ public class SipCall extends Call {
 
                 // check whether the 183 has arrived or not
             } else if (callState == pjsip_inv_state.PJSIP_INV_STATE_EARLY){
-                pjsip_status_code statusCode = info.getLastStatusCode();
+                int statusCode = info.getLastStatusCode();
                 // check if 180 && call is outgoing (ROLE UAC)
                 if (statusCode == pjsip_status_code.PJSIP_SC_RINGING && info.getRole() == pjsip_role_e.PJSIP_ROLE_UAC){
                     checkAndStopLocalRingBackTone();
@@ -150,7 +150,7 @@ public class SipCall extends Call {
             }
 
             account.getService().getBroadcastEmitter()
-                    .callState(account.getData().getIdUri(), callID, callState.swigValue(), callStatus != null ? callStatus.swigValue() : -1,
+                    .callState(account.getData().getIdUri(), callID, callState, callStatus,
                                connectTimestamp, localHold, localMute, localVideoMute);
 
             if (callState == pjsip_inv_state.PJSIP_INV_STATE_DISCONNECTED) {
@@ -209,6 +209,17 @@ public class SipCall extends Call {
         super.onCallMediaEvent(prm);
     }
 
+    @Override
+    public void onStreamDestroyed(OnStreamDestroyedParam prm) {
+        try {
+            streamInfo = getStreamInfo(0);
+            streamStat = getStreamStat(0);
+        } catch (Exception ex) {
+            Logger.error(LOG_TAG, "onStreamDestroyed: error while getting call stats", ex);
+        }
+        super.onStreamDestroyed(prm);
+    }
+
     /**
      * Get the total duration of the call.
      * @return the duration in milliseconds or 0 if the call is not connected.
@@ -223,7 +234,7 @@ public class SipCall extends Call {
         setMediaParams(param);
         if (!videoCall) {
             CallSetting callSetting = param.getOpt();
-            callSetting.setFlag(pjsua_call_flag.PJSUA_CALL_INCLUDE_DISABLED_MEDIA.swigValue());
+            callSetting.setFlag(pjsua_call_flag.PJSUA_CALL_INCLUDE_DISABLED_MEDIA);
         }
         try {
             answer(param);
@@ -364,7 +375,7 @@ public class SipCall extends Call {
                 Logger.debug(LOG_TAG, "un-holding call with ID " + getId());
                 setMediaParams(param);
                 CallSetting opt = param.getOpt();
-                opt.setFlag(pjsua_call_flag.PJSUA_CALL_UNHOLD.swigValue());
+                opt.setFlag(pjsua_call_flag.PJSUA_CALL_UNHOLD);
                 reinvite(param);
                 localHold = false;
             }
@@ -403,7 +414,7 @@ public class SipCall extends Call {
         setMediaParams(prm);
         if (!videoCall) {
             CallSetting callSetting = prm.getOpt();
-            callSetting.setFlag(pjsua_call_flag.PJSUA_CALL_INCLUDE_DISABLED_MEDIA.swigValue());
+            callSetting.setFlag(pjsua_call_flag.PJSUA_CALL_INCLUDE_DISABLED_MEDIA);
         }
         super.makeCall(dst_uri, prm);
     }
@@ -438,7 +449,10 @@ public class SipCall extends Call {
             mVideoPreview.delete();
         }
         if (!videoConference) {
-            mVideoPreview = new VideoPreview(mediaInfo.getVideoCapDev());
+            // Since 2.9 pjsip will not start capture device if autoTransmit is false
+            // thus mediaInfo.getVideoCapDev() always returns -3 -> NULL
+            // mVideoPreview = new VideoPreview(mediaInfo.getVideoCapDev());
+            mVideoPreview = new VideoPreview(SipServiceConstants.FRONT_CAMERA_CAPTURE_DEVICE);
         }
         mVideoWindow = new VideoWindow(mediaInfo.getVideoIncomingWindowId());
     }
@@ -581,7 +595,7 @@ public class SipCall extends Call {
         account.getService().dequeueJob(sendKeyFrameRunnable);
     }
 
-    private void sendCallStats(int duration, int callStatus, StreamInfo streamInfo, StreamStat streamStat) {
+    private void sendCallStats(int duration, int callStatus) {
         String audioCodec = streamInfo.getCodecName().toLowerCase()+"_"+streamInfo.getCodecClockRate();
 
         RtcpStreamStat rxStat = streamStat.getRtcp().getRxStat();
@@ -616,5 +630,7 @@ public class SipCall extends Call {
         );
 
         account.getService().getBroadcastEmitter().callStats(duration, audioCodec, callStatus, rx, tx);
+        streamInfo = null;
+        streamStat = null;
     }
 }

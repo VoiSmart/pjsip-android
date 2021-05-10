@@ -128,8 +128,7 @@ public class SipAccount extends Account {
 
     @Override
     public void onRegState(OnRegStateParam prm) {
-        service.getBroadcastEmitter()
-               .registrationState(data.getIdUri(), prm.getCode().swigValue());
+        service.getBroadcastEmitter().registrationState(data.getIdUri(), prm.getCode());
     }
 
     @Override

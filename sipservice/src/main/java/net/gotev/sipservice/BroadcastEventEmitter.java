@@ -91,7 +91,7 @@ public class BroadcastEventEmitter implements SipServiceConstants {
      * @param isLocalMute true if the call is muted locally
      * @param isLocalVideoMute true if the video is muted locally
      */
-    public synchronized  void callState(String accountID, int callID, int callStateCode, int callStateStatus,
+    public synchronized void callState(String accountID, int callID, int callStateCode, int callStateStatus,
                           long connectTimestamp, boolean isLocalHold, boolean isLocalMute, boolean isLocalVideoMute) {
         final Intent intent = new Intent();
 
