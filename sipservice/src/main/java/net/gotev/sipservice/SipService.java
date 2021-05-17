@@ -13,6 +13,7 @@ import org.pjsip.pjsua2.CodecInfo;
 import org.pjsip.pjsua2.CodecInfoVector2;
 import org.pjsip.pjsua2.Endpoint;
 import org.pjsip.pjsua2.EpConfig;
+import org.pjsip.pjsua2.IpChangeParam;
 import org.pjsip.pjsua2.MediaFormatVideo;
 import org.pjsip.pjsua2.TransportConfig;
 import org.pjsip.pjsua2.VidCodecParam;
@@ -171,6 +172,9 @@ public class SipService extends BackgroundService implements SipServiceConstants
                         break;
                     case ACTION_MAKE_DIRECT_CALL:
                         handleMakeDirectCall(intent);
+                        break;
+                    case ACTION_RECONNECT_CALL:
+                        handleReconnectCall();
                         break;
                     default: break;
                 }
@@ -632,7 +636,7 @@ public class SipService extends BackgroundService implements SipServiceConstants
 
         try {
             Logger.debug(TAG, "Starting PJSIP");
-            mEndpoint = new Endpoint();
+            mEndpoint = new SipEndpoint(this);
             mEndpoint.libCreate();
 
             EpConfig epConfig = new EpConfig();
@@ -1118,6 +1122,16 @@ public class SipService extends BackgroundService implements SipServiceConstants
         } catch (Exception ex) {
             Logger.error(TAG, "Error while making a direct call as Guest", ex);
             mBroadcastEmitter.outgoingCall(accountID, -1, uri.getUserInfo(), false, false);
+        }
+    }
+
+    private void handleReconnectCall() {
+        try {
+            getBroadcastEmitter().callReconnectionState(CallReconnectionState.PROGRESS);
+            mEndpoint.handleIpChange(new IpChangeParam());
+            Logger.info(TAG, "Call reconnection started");
+        } catch (Exception exc) {
+            Logger.error(TAG, "Error while reconnecting the call", exc);
         }
     }
 

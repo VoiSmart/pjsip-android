@@ -562,4 +562,22 @@ public class SipServiceCommand implements SipServiceConstants {
         intent.putExtra(PARAM_CALL_ID, callID);
         context.startService(intent);
     }
+
+    /**
+     * Depending on the configuration (accountConfig.setIpChangeConfig) the reconnection process may differ
+     * By default it will try to recover an existing call if present by
+     *      restarting the transport
+     *      registering
+     *      updating via & contact
+     *
+     * Before calling this you should listen to network connection/disconnection events.
+     * As soon as the connection comes back after a disconnection event you can call this
+     * to try to reconnect the ongoing call
+     * @param context the context
+     */
+    public static void reconnectCall(Context context) {
+        Intent intent = new Intent(context, SipService.class);
+        intent.setAction(ACTION_RECONNECT_CALL);
+        context.startService(intent);
+    }
 }

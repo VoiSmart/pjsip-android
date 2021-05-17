@@ -79,6 +79,8 @@ public class BroadcastEventReceiver extends BroadcastReceiver implements SipServ
                 intent.getStringExtra(PARAM_CALL_STATS_AUDIO_CODEC), callStatus,
                 (RtpStreamStats) intent.getParcelableExtra(PARAM_CALL_STATS_RX_STREAM),
                 (RtpStreamStats) intent.getParcelableExtra(PARAM_CALL_STATS_TX_STREAM));
+        } else if (BroadcastEventEmitter.getAction(BroadcastEventEmitter.BroadcastAction.CALL_RECONNECTION_STATE).equals(action)) {
+            onCallReconnectionState((CallReconnectionState) intent.getSerializableExtra(PARAM_CALL_RECONNECTION_STATE));
         }
     }
 
@@ -115,6 +117,8 @@ public class BroadcastEventReceiver extends BroadcastReceiver implements SipServ
                 BroadcastEventEmitter.BroadcastAction.VIDEO_SIZE));
         intentFilter.addAction(BroadcastEventEmitter.getAction(
                 BroadcastEventEmitter.BroadcastAction.CALL_STATS));
+        intentFilter.addAction(BroadcastEventEmitter.getAction(
+                BroadcastEventEmitter.BroadcastAction.CALL_RECONNECTION_STATE));
         context.registerReceiver(this, intentFilter);
     }
 
@@ -183,5 +187,9 @@ public class BroadcastEventReceiver extends BroadcastReceiver implements SipServ
 
     protected void onCallStats(int duration, String audioCodec, int callStatusCode, RtpStreamStats rx, RtpStreamStats tx) {
         Logger.debug(LOG_TAG, "Call Stats sent "+duration+" "+audioCodec);
+    }
+
+    protected void onCallReconnectionState(CallReconnectionState state) {
+        Logger.debug(LOG_TAG, "Call reconnection state " + state.name());
     }
 }

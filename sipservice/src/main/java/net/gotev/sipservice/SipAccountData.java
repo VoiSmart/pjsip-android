@@ -5,6 +5,7 @@ import android.os.Parcelable;
 
 import org.pjsip.pjsua2.AccountConfig;
 import org.pjsip.pjsua2.AuthCredInfo;
+import org.pjsip.pjsua2.pj_constants_;
 import org.pjsip.pjsua2.pj_qos_type;
 
 import java.util.Objects;
@@ -236,6 +237,10 @@ public class SipAccountData implements Parcelable {
         accountConfig.getSipConfig().getAuthCreds().add(getAuthCredInfo());
         accountConfig.getSipConfig().getProxies().add(getProxyUri());
         accountConfig.getSipConfig().setContactUriParams(contactUriParams);
+
+        // nat configs to allow call reconnection across networks
+        accountConfig.getNatConfig().setSdpNatRewriteUse(pj_constants_.PJ_TRUE);
+        accountConfig.getNatConfig().setViaRewriteUse(pj_constants_.PJ_TRUE);
 
         // account media  stuff configs
         accountConfig.getMediaConfig().getTransportConfig().setQosType(pj_qos_type.PJ_QOS_TYPE_VOICE);
