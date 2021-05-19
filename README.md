@@ -37,6 +37,7 @@ Native PJSIP library for Android is compiled using [PJSIP Android Builder](https
 - Use of a fixed SIP `Call-ID Header`. Refer to [this](https://github.com/VoiSmart/pjsip-android-builder/tree/master/patches/fixed_callid) for more details
 - Get Call Statistics on call disconnected
 - Sip Credential encryption on device. Refer to VoiSmart [Crypto](https://github.com/VoiSmart/crypto) library for more details
+- Call Reconnection: useful after a network disconnection, it will try to reconnect the call with new ip/port
 
 ## What is missing (contributions are welcome):
 - Multiple calls support
@@ -50,10 +51,11 @@ Native PJSIP library for Android is compiled using [PJSIP Android Builder](https
 - Other things which I'm not aware at the moment...
 
 ## Used Libraries versions
-- PJSIP: 2.6
-- OpenSSL: 1.0.2g
-- OpenH264: 1.7.0
-- Opus: 1.2.1
+- PJSIP: 2.11
+- OpenSSL: 1.1.1k
+- OpenH264: 2.1.0
+- Opus: 1.3.1
+- bcg729: 1.1.1
 
 ## Logging
 This library ships with a default logger which logs with the default Android `Log` class and a default `DEBUG` loglevel.

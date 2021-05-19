@@ -1,6 +1,22 @@
 Change Log
 ==========
 
+### Version 2.5.0
+
+_2021-05-19_
+ * **MinSdk increased** - Minimum SDK is now increased to api 21
+ * **TargetSdk increased** - Minimum SDK is now increased to api 28
+ * Bump BuildTools and CompileSdk to 30 and 30.0.3
+ * Update libs:
+    - PJSIP: 2.6 -> 2.11
+    - OpenSSL: 1.0.2g -> 1.1.1k
+    - OpenH264: 1.7.0 -> 2.1.0
+    - Opus: 1.2.1 -> 1.3.1
+    - bcg729: none -> 1.1.1 (previously it used a custom implementation)
+ * Add call reconnection method: useful after a network disconnection, it will try to reconnect the call with new ip/port
+ * Change default BroadcastEventEmitter NAMESPACE
+ * Bump gradle versions
+
 ### Version 2.4.1
 
 _2020-09-14_
