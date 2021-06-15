@@ -89,12 +89,8 @@ public class BroadcastEventEmitter implements SipServiceConstants {
      * @param callStateCode SIP call state code
      * @param callStateStatus SIP call state status
      * @param connectTimestamp call start timestamp
-     * @param isLocalHold true if the call is held locally
-     * @param isLocalMute true if the call is muted locally
-     * @param isLocalVideoMute true if the video is muted locally
      */
-    public synchronized void callState(String accountID, int callID, int callStateCode, int callStateStatus,
-                          long connectTimestamp, boolean isLocalHold, boolean isLocalMute, boolean isLocalVideoMute) {
+    public synchronized void callState(String accountID, int callID, int callStateCode, int callStateStatus, long connectTimestamp) {
         final Intent intent = new Intent();
 
         intent.setAction(getAction(BroadcastAction.CALL_STATE));
@@ -103,9 +99,6 @@ public class BroadcastEventEmitter implements SipServiceConstants {
         intent.putExtra(PARAM_CALL_STATE, callStateCode);
         intent.putExtra(PARAM_CALL_STATUS, callStateStatus);
         intent.putExtra(PARAM_CONNECT_TIMESTAMP, connectTimestamp);
-        intent.putExtra(PARAM_LOCAL_HOLD, isLocalHold);
-        intent.putExtra(PARAM_LOCAL_MUTE, isLocalMute);
-        intent.putExtra(PARAM_LOCAL_VIDEO_MUTE, isLocalVideoMute);
 
         mContext.sendBroadcast(intent);
     }

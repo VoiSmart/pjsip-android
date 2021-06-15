@@ -165,7 +165,7 @@ public class SipServiceCommand implements SipServiceConstants {
 
     /**
      * Checks the status of a call. You will receive the result in
-     * {@link BroadcastEventReceiver#onCallState(String, int, int, int, long, boolean, boolean, boolean)}
+     * {@link BroadcastEventReceiver#onCallState(String, int, int, int, long)}
      * @param context application context
      * @param accountID account ID used to make the call
      * @param callID call ID
@@ -183,7 +183,7 @@ public class SipServiceCommand implements SipServiceConstants {
     /**
      * Hangs up an active call. If the call does not exist or has been terminated, a disconnected
      * state will be sent to
-     * {@link BroadcastEventReceiver#onCallState(String, int, int, int, long, boolean, boolean, boolean)}
+     * {@link BroadcastEventReceiver#onCallState(String, int, int, int, long)}
      * @param context application context
      * @param accountID account ID
      * @param callID call ID to hang up
@@ -229,7 +229,7 @@ public class SipServiceCommand implements SipServiceConstants {
     /**
      * Send DTMF. If the call does not exist or has been terminated, a disconnected
      * state will be sent to
-     * {@link BroadcastEventReceiver#onCallState(String, int, int, int, long, boolean, boolean, boolean)}
+     * {@link BroadcastEventReceiver#onCallState(String, int, int, int, long)}
      * @param context application context
      * @param accountID account ID
      * @param callID call ID to hang up
@@ -250,7 +250,7 @@ public class SipServiceCommand implements SipServiceConstants {
     /**
      * Accept an incoming call. If the call does not exist or has been terminated, a disconnected
      * state will be sent to
-     * {@link BroadcastEventReceiver#onCallState(String, int, int, int, long, boolean, boolean, boolean)}
+     * {@link BroadcastEventReceiver#onCallState(String, int, int, int, long)}
      * @param context application context
      * @param accountID account ID
      * @param callID call ID to hang up
@@ -274,7 +274,7 @@ public class SipServiceCommand implements SipServiceConstants {
     /**
      * Decline an incoming call. If the call does not exist or has been terminated, a disconnected
      * state will be sent to
-     * {@link BroadcastEventReceiver#onCallState(String, int, int, int, long, boolean, boolean, boolean)}
+     * {@link BroadcastEventReceiver#onCallState(String, int, int, int, long)}
      * @param context application context
      * @param accountID account ID
      * @param callID call ID to hang up
@@ -292,7 +292,7 @@ public class SipServiceCommand implements SipServiceConstants {
     /**
      * Blind call transfer. If the call does not exist or has been terminated, a disconnected
      * state will be sent to
-     * {@link BroadcastEventReceiver#onCallState(String, int, int, int, long, boolean, boolean, boolean)}
+     * {@link BroadcastEventReceiver#onCallState(String, int, int, int, long)}
      * @param context application context
      * @param accountID account ID
      * @param callID call ID
@@ -312,7 +312,7 @@ public class SipServiceCommand implements SipServiceConstants {
     /**
      * Sets hold status for a call. If the call does not exist or has been terminated, a disconnected
      * state will be sent to
-     * {@link BroadcastEventReceiver#onCallState(String, int, int, int, long, boolean, boolean, boolean)}
+     * {@link BroadcastEventReceiver#onCallState(String, int, int, int, long)}
      * @param context application context
      * @param accountID account ID
      * @param callID call ID
@@ -332,7 +332,7 @@ public class SipServiceCommand implements SipServiceConstants {
     /**
      * Toggle hold status for a call. If the call does not exist or has been terminated, a disconnected
      * state will be sent to
-     * {@link BroadcastEventReceiver#onCallState(String, int, int, int, long, boolean, boolean, boolean)}
+     * {@link BroadcastEventReceiver#onCallState(String, int, int, int, long)}
      * @param context application context
      * @param accountID account ID
      * @param callID call ID
@@ -350,7 +350,7 @@ public class SipServiceCommand implements SipServiceConstants {
     /**
      * Sets mute status for a call. If the call does not exist or has been terminated, a disconnected
      * state will be sent to
-     * {@link BroadcastEventReceiver#onCallState(String, int, int, int, long, boolean, boolean, boolean)}
+     * {@link BroadcastEventReceiver#onCallState(String, int, int, int, long)}
      * @param context application context
      * @param accountID account ID
      * @param callID call ID
@@ -370,7 +370,7 @@ public class SipServiceCommand implements SipServiceConstants {
     /**
      * Toggle mute status for a call. If the call does not exist or has been terminated, a disconnected
      * state will be sent to
-     * {@link BroadcastEventReceiver#onCallState(String, int, int, int, long, boolean, boolean, boolean)}
+     * {@link BroadcastEventReceiver#onCallState(String, int, int, int, long)}
      * @param context application context
      * @param accountID account ID
      * @param callID call ID
@@ -450,7 +450,7 @@ public class SipServiceCommand implements SipServiceConstants {
     /**
      * Sets up the incoming video feed. If the call does not exist or has been terminated, a disconnected
      * state will be sent to
-     * {@link BroadcastEventReceiver#onCallState(String, int, int, int, long, boolean, boolean, boolean)}
+     * {@link BroadcastEventReceiver#onCallState(String, int, int, int, long)}
      * @param context application context
      * @param accountID account ID
      * @param callID call ID
@@ -470,7 +470,7 @@ public class SipServiceCommand implements SipServiceConstants {
     /**
      * Mutes and Un-Mutes video for a call. If the call does not exist or has been terminated, a disconnected
      * state will be sent to
-     * {@link BroadcastEventReceiver#onCallState(String, int, int, int, long, boolean, boolean, boolean)}
+     * {@link BroadcastEventReceiver#onCallState(String, int, int, int, long)}
      * @param context application context
      * @param accountID account ID
      * @param callID call ID
@@ -490,7 +490,7 @@ public class SipServiceCommand implements SipServiceConstants {
     /**
      * Starts the preview for a call. If the call does not exist or has been terminated, a disconnected
      * state will be sent to
-     * {@link BroadcastEventReceiver#onCallState(String, int, int, int, long, boolean, boolean, boolean)}
+     * {@link BroadcastEventReceiver#onCallState(String, int, int, int, long)}
      * @param context application context
      * @param accountID account ID
      * @param callID call ID
@@ -510,7 +510,7 @@ public class SipServiceCommand implements SipServiceConstants {
     /**
      * Rotates the transmitting video (heads up always), according to the device orientation.
      * If the call does not exist or has been terminated, a disconnected state will be sent to
-     * {@link BroadcastEventReceiver#onCallState(String, int, int, int, long, boolean, boolean, boolean)}
+     * {@link BroadcastEventReceiver#onCallState(String, int, int, int, long)}
      * @param context application context
      * @param accountID account ID
      * @param callID call ID
@@ -530,7 +530,7 @@ public class SipServiceCommand implements SipServiceConstants {
     /**
      * Stops the preview for a call. If the call does not exist or has been terminated, a disconnected
      * state will be sent to
-     * {@link BroadcastEventReceiver#onCallState(String, int, int, int, long, boolean, boolean, boolean)}
+     * {@link BroadcastEventReceiver#onCallState(String, int, int, int, long)}
      * @param context application context
      * @param accountID account ID
      * @param callID call ID
@@ -548,7 +548,7 @@ public class SipServiceCommand implements SipServiceConstants {
     /**
      * Switches between front and back camera. If the call does not exist or has been terminated, a disconnected
      * state will be sent to
-     * {@link BroadcastEventReceiver#onCallState(String, int, int, int, long, boolean, boolean, boolean)}
+     * {@link BroadcastEventReceiver#onCallState(String, int, int, int, long)}
      * @param context application context
      * @param accountID account ID
      * @param callID call ID

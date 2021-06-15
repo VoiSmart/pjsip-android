@@ -150,8 +150,7 @@ public class SipCall extends Call {
             }
 
             account.getService().getBroadcastEmitter()
-                    .callState(account.getData().getIdUri(), callID, callState, callStatus,
-                               connectTimestamp, localHold, localMute, localVideoMute);
+                    .callState(account.getData().getIdUri(), callID, callState, callStatus, connectTimestamp);
 
             if (callState == pjsip_inv_state.PJSIP_INV_STATE_DISCONNECTED) {
                 account.getService().setLastCallStatus(0);

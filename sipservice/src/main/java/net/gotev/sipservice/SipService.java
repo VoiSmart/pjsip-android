@@ -212,8 +212,7 @@ public class SipService extends BackgroundService implements SipServiceConstants
     private void notifyCallDisconnected(String accountID, int callID) {
         mBroadcastEmitter.callState(accountID, callID,
                 pjsip_inv_state.PJSIP_INV_STATE_DISCONNECTED,
-                callStatus, 0,
-                false, false, false);
+                callStatus, 0);
     }
 
     private void handleGetCallStatus(Intent intent) {
@@ -229,9 +228,7 @@ public class SipService extends BackgroundService implements SipServiceConstants
                 ex.printStackTrace();
             }
 
-            mBroadcastEmitter.callState(accountID, callID, sipCall.getCurrentState(), callStatusCode,
-                                        sipCall.getConnectTimestamp(), sipCall.isLocalHold(),
-                                        sipCall.isLocalMute(), sipCall.isLocalVideoMute());
+            mBroadcastEmitter.callState(accountID, callID, sipCall.getCurrentState(), callStatusCode, sipCall.getConnectTimestamp());
         }
     }
 

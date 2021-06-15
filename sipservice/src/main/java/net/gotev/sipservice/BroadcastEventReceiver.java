@@ -44,10 +44,7 @@ public class BroadcastEventReceiver extends BroadcastReceiver implements SipServ
             onCallState(intent.getStringExtra(PARAM_ACCOUNT_ID),
                         intent.getIntExtra(PARAM_CALL_ID, -1),
                         callState, callStatus,
-                        intent.getLongExtra(PARAM_CONNECT_TIMESTAMP, -1),
-                        intent.getBooleanExtra(PARAM_LOCAL_HOLD, false),
-                        intent.getBooleanExtra(PARAM_LOCAL_MUTE, false),
-                        intent.getBooleanExtra(PARAM_LOCAL_VIDEO_MUTE, false));
+                        intent.getLongExtra(PARAM_CONNECT_TIMESTAMP, -1));
 
         } else if (BroadcastEventEmitter.getAction(BroadcastEventEmitter.BroadcastAction.CALL_MEDIA_STATE).equals(action)) {
             onCallMediaState(intent.getStringExtra(PARAM_ACCOUNT_ID),
@@ -152,16 +149,12 @@ public class BroadcastEventReceiver extends BroadcastReceiver implements SipServ
                 ", remoteUri: " + remoteUri);
     }
 
-    public void onCallState(String accountID, int callID, int callStateCode, int callStatusCode,
-                            long connectTimestamp, boolean isLocalHold, boolean isLocalMute, boolean isLocalVideoMute) {
+    public void onCallState(String accountID, int callID, int callStateCode, int callStatusCode, long connectTimestamp) {
         Logger.debug(LOG_TAG, "onCallState - accountID: " + accountID +
                 ", callID: " + callID +
                 ", callStateCode: " + callStateCode +
                 ", callStatusCode: " + callStatusCode +
-                ", connectTimestamp: " + connectTimestamp +
-                ", isLocalHold: " + isLocalHold +
-                ", isLocalMute: " + isLocalMute +
-                ", isLocalVideoMute: " + isLocalVideoMute);
+                ", connectTimestamp: " + connectTimestamp);
     }
 
     public void onCallMediaState(String accountID, int callID, MediaState stateType, boolean stateValue) {
