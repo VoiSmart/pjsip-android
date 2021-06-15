@@ -51,6 +51,8 @@ public class SipService extends BackgroundService implements SipServiceConstants
     private volatile boolean mStarted;
     private int callStatus;
 
+    /***   Service Lifecycle Callbacks    ***/
+
     @Override
     public IBinder onBind(Intent intent) {
         return null;
@@ -60,129 +62,123 @@ public class SipService extends BackgroundService implements SipServiceConstants
     public void onCreate() {
         super.onCreate();
 
-        enqueueJob(new Runnable() {
-            @Override
-            public void run() {
-                Logger.debug(TAG, "Creating SipService with priority: " + Thread.currentThread().getPriority());
+        enqueueJob(() -> {
+            Logger.debug(TAG, "Creating SipService with priority: " + Thread.currentThread().getPriority());
 
-                loadNativeLibraries();
-                mSharedPreferencesHelper = SharedPreferencesHelper.getInstance(SipService.this)
-                        .init(SipService.this);
-                mBroadcastEmitter = new BroadcastEventEmitter(SipService.this);
-                loadConfiguredAccounts();
-                addAllConfiguredAccounts();
+            loadNativeLibraries();
+            mSharedPreferencesHelper = SharedPreferencesHelper.getInstance(SipService.this)
+                    .init(SipService.this);
+            mBroadcastEmitter = new BroadcastEventEmitter(SipService.this);
+            loadConfiguredAccounts();
+            addAllConfiguredAccounts();
 
-                Logger.debug(TAG, "SipService created!");
-            }
+            Logger.debug(TAG, "SipService created!");
         });
     }
 
     @Override
     public int onStartCommand(final Intent intent, int flags, int startId) {
-        enqueueJob(new Runnable() {
-            @Override
-            public void run() {
-                if (intent == null) return;
+        enqueueJob(() -> {
+            if (intent == null) return;
 
-                String action = intent.getAction();
+            String action = intent.getAction();
 
-                if (action == null) return;
+            if (action == null) return;
 
-                switch(action) {
-                    case ACTION_SET_ACCOUNT:
-                        handleSetAccount(intent);
-                        break;
-                    case ACTION_REMOVE_ACCOUNT:
-                        handleRemoveAccount(intent);
-                        break;
-                    case ACTION_RESTART_SIP_STACK:
-                        handleRestartSipStack();
-                        break;
-                    case ACTION_MAKE_CALL:
-                        handleMakeCall(intent);
-                        break;
-                    case ACTION_HANG_UP_CALL:
-                        handleHangUpCall(intent);
-                        break;
-                    case ACTION_HANG_UP_CALLS:
-                        handleHangUpActiveCalls(intent);
-                        break;
-                    case ACTION_HOLD_CALLS:
-                        handleHoldActiveCalls(intent);
-                        break;
-                    case ACTION_GET_CALL_STATUS:
-                        handleGetCallStatus(intent);
-                        break;
-                    case ACTION_SEND_DTMF:
-                        handleSendDTMF(intent);
-                        break;
-                    case ACTION_ACCEPT_INCOMING_CALL:
-                        handleAcceptIncomingCall(intent);
-                        break;
-                    case ACTION_DECLINE_INCOMING_CALL:
-                        handleDeclineIncomingCall(intent);
-                        break;
-                    case ACTION_SET_HOLD:
-                        handleSetCallHold(intent);
-                        break;
-                    case ACTION_TOGGLE_HOLD:
-                        handleToggleCallHold(intent);
-                        break;
-                    case ACTION_SET_MUTE:
-                        handleSetCallMute(intent);
-                        break;
-                    case ACTION_TOGGLE_MUTE:
-                        handleToggleCallMute(intent);
-                        break;
-                    case ACTION_TRANSFER_CALL:
-                        handleTransferCall(intent);
-                        break;
-                    case ACTION_GET_CODEC_PRIORITIES:
-                        handleGetCodecPriorities();
-                        break;
-                    case ACTION_SET_CODEC_PRIORITIES:
-                        handleSetCodecPriorities(intent);
-                        break;
-                    case ACTION_GET_REGISTRATION_STATUS:
-                        handleGetRegistrationStatus(intent);
-                        break;
-                    case ACTION_REFRESH_REGISTRATION:
-                        handleRefreshRegistration(intent);
-                        break;
-                    case ACTION_SET_DND:
-                        handleSetDND(intent);
-                        break;
-                    case ACTION_SET_INCOMING_VIDEO:
-                        handleSetIncomingVideoFeed(intent);
-                        break;
-                    case ACTION_SET_SELF_VIDEO_ORIENTATION:
-                        handleSetSelfVideoOrientation(intent);
-                        break;
-                    case ACTION_SET_VIDEO_MUTE:
-                        handleSetVideoMute(intent);
-                        break;
-                    case ACTION_START_VIDEO_PREVIEW:
-                        handleStartVideoPreview(intent);
-                        break;
-                    case ACTION_STOP_VIDEO_PREVIEW:
-                        handleStopVideoPreview(intent);
-                        break;
-                    case ACTION_SWITCH_VIDEO_CAPTURE_DEVICE:
-                        handleSwitchVideoCaptureDevice(intent);
-                        break;
-                    case ACTION_MAKE_DIRECT_CALL:
-                        handleMakeDirectCall(intent);
-                        break;
-                    case ACTION_RECONNECT_CALL:
-                        handleReconnectCall();
-                        break;
-                    default: break;
-                }
+            switch(action) {
+                case ACTION_SET_ACCOUNT:
+                    handleSetAccount(intent);
+                    break;
+                case ACTION_REMOVE_ACCOUNT:
+                    handleRemoveAccount(intent);
+                    break;
+                case ACTION_RESTART_SIP_STACK:
+                    handleRestartSipStack();
+                    break;
+                case ACTION_MAKE_CALL:
+                    handleMakeCall(intent);
+                    break;
+                case ACTION_HANG_UP_CALL:
+                    handleHangUpCall(intent);
+                    break;
+                case ACTION_HANG_UP_CALLS:
+                    handleHangUpActiveCalls(intent);
+                    break;
+                case ACTION_HOLD_CALLS:
+                    handleHoldActiveCalls(intent);
+                    break;
+                case ACTION_GET_CALL_STATUS:
+                    handleGetCallStatus(intent);
+                    break;
+                case ACTION_SEND_DTMF:
+                    handleSendDTMF(intent);
+                    break;
+                case ACTION_ACCEPT_INCOMING_CALL:
+                    handleAcceptIncomingCall(intent);
+                    break;
+                case ACTION_DECLINE_INCOMING_CALL:
+                    handleDeclineIncomingCall(intent);
+                    break;
+                case ACTION_SET_HOLD:
+                    handleSetCallHold(intent);
+                    break;
+                case ACTION_TOGGLE_HOLD:
+                    handleToggleCallHold(intent);
+                    break;
+                case ACTION_SET_MUTE:
+                    handleSetCallMute(intent);
+                    break;
+                case ACTION_TOGGLE_MUTE:
+                    handleToggleCallMute(intent);
+                    break;
+                case ACTION_TRANSFER_CALL:
+                    handleTransferCall(intent);
+                    break;
+                case ACTION_GET_CODEC_PRIORITIES:
+                    handleGetCodecPriorities();
+                    break;
+                case ACTION_SET_CODEC_PRIORITIES:
+                    handleSetCodecPriorities(intent);
+                    break;
+                case ACTION_GET_REGISTRATION_STATUS:
+                    handleGetRegistrationStatus(intent);
+                    break;
+                case ACTION_REFRESH_REGISTRATION:
+                    handleRefreshRegistration(intent);
+                    break;
+                case ACTION_SET_DND:
+                    handleSetDND(intent);
+                    break;
+                case ACTION_SET_INCOMING_VIDEO:
+                    handleSetIncomingVideoFeed(intent);
+                    break;
+                case ACTION_SET_SELF_VIDEO_ORIENTATION:
+                    handleSetSelfVideoOrientation(intent);
+                    break;
+                case ACTION_SET_VIDEO_MUTE:
+                    handleSetVideoMute(intent);
+                    break;
+                case ACTION_START_VIDEO_PREVIEW:
+                    handleStartVideoPreview(intent);
+                    break;
+                case ACTION_STOP_VIDEO_PREVIEW:
+                    handleStopVideoPreview(intent);
+                    break;
+                case ACTION_SWITCH_VIDEO_CAPTURE_DEVICE:
+                    handleSwitchVideoCaptureDevice(intent);
+                    break;
+                case ACTION_MAKE_DIRECT_CALL:
+                    handleMakeDirectCall(intent);
+                    break;
+                case ACTION_RECONNECT_CALL:
+                    handleReconnectCall();
+                    break;
+                default: break;
+            }
 
-                if (mConfiguredAccounts.isEmpty() && mConfiguredGuestAccount == null) {
-                    Logger.debug(TAG, "No more configured accounts. Shutting down service");
-                    stopSelf();
-                }
+            if (mConfiguredAccounts.isEmpty() && mConfiguredGuestAccount == null) {
+                Logger.debug(TAG, "No more configured accounts. Shutting down service");
+                stopSelf();
             }
         });
 
@@ -191,25 +187,29 @@ public class SipService extends BackgroundService implements SipServiceConstants
 
     @Override
     public void onDestroy() {
-        enqueueJob(new Runnable() {
-            @Override
-            public void run() {
-                Logger.debug(TAG, "Destroying SipService");
-                stopStack();
-            }
+        enqueueJob(() -> {
+            Logger.debug(TAG, "Destroying SipService");
+            stopStack();
         });
         super.onDestroy();
     }
+
+    /***   Sip Calls Management    ***/
 
     private SipCall getCall(String accountID, int callID) {
         SipAccount account = mActiveSipAccounts.get(accountID);
 
         if (account == null) return null;
-        return account.getCall(callID);
+        SipCall sipCall = account.getCall(callID);
+        if (sipCall != null) {
+            return sipCall;
+        } else {
+            notifyCallDisconnected(accountID, callID);
+            return null;
+        }
     }
 
     private void notifyCallDisconnected(String accountID, int callID) {
-
         mBroadcastEmitter.callState(accountID, callID,
                 pjsip_inv_state.PJSIP_INV_STATE_DISCONNECTED,
                 callStatus, 0,
@@ -217,26 +217,22 @@ public class SipService extends BackgroundService implements SipServiceConstants
     }
 
     private void handleGetCallStatus(Intent intent) {
-
         String accountID = intent.getStringExtra(PARAM_ACCOUNT_ID);
         int callID = intent.getIntExtra(PARAM_CALL_ID, 0);
 
         SipCall sipCall = getCall(accountID, callID);
-        if (sipCall == null) {
-            notifyCallDisconnected(accountID, callID);
-            return;
-        }
+        if (sipCall != null) {
+            int callStatusCode = callStatus;
+            try {
+                callStatusCode = sipCall.getInfo().getLastStatusCode();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
 
-        int callStatusCode = callStatus;
-        try {
-            callStatusCode = sipCall.getInfo().getLastStatusCode();
-        } catch (Exception ex) {
-            ex.printStackTrace();
+            mBroadcastEmitter.callState(accountID, callID, sipCall.getCurrentState(), callStatusCode,
+                                        sipCall.getConnectTimestamp(), sipCall.isLocalHold(),
+                                        sipCall.isLocalMute(), sipCall.isLocalVideoMute());
         }
-
-        mBroadcastEmitter.callState(accountID, callID, sipCall.getCurrentState(), callStatusCode,
-                                    sipCall.getConnectTimestamp(), sipCall.isLocalHold(),
-                                    sipCall.isLocalMute(), sipCall.isLocalVideoMute());
     }
 
     private void handleSendDTMF(Intent intent) {
@@ -245,55 +241,46 @@ public class SipService extends BackgroundService implements SipServiceConstants
         String dtmf = intent.getStringExtra(PARAM_DTMF);
 
         SipCall sipCall = getCall(accountID, callID);
-        if (sipCall == null) {
-            notifyCallDisconnected(accountID, callID);
-            return;
-        }
-
-        try {
-            sipCall.dialDtmf(dtmf);
-        } catch (Exception exc) {
-            Logger.error(TAG, "Error while dialing dtmf: " + dtmf + ". AccountID: "
-                         + accountID + ", CallID: " + callID);
+        if (sipCall != null) {
+             try {
+                sipCall.dialDtmf(dtmf);
+            } catch (Exception exc) {
+                Logger.error(TAG, "Error while dialing dtmf: " + dtmf + ". AccountID: "
+                             + accountID + ", CallID: " + callID);
+            }
         }
     }
 
     private void handleAcceptIncomingCall(Intent intent) {
         String accountID = intent.getStringExtra(PARAM_ACCOUNT_ID);
         int callID = intent.getIntExtra(PARAM_CALL_ID, 0);
-        boolean isVideo = intent.getBooleanExtra(PARAM_IS_VIDEO, false);
 
         SipCall sipCall = getCall(accountID, callID);
-        if (sipCall == null) {
-            notifyCallDisconnected(accountID, callID);
-            return;
-        }
-
-        try {
-            sipCall.setVideoParams(isVideo, false);
-            sipCall.acceptIncomingCall();
-        } catch (Exception exc) {
-            Logger.error(TAG, "Error while accepting incoming call. AccountID: "
-                         + accountID + ", CallID: " + callID);
+        if (sipCall != null) {
+            boolean isVideo = intent.getBooleanExtra(PARAM_IS_VIDEO, false);
+            try {
+                sipCall.setVideoParams(isVideo, false);
+                sipCall.acceptIncomingCall();
+            } catch (Exception exc) {
+                Logger.error(TAG, "Error while accepting incoming call. AccountID: "
+                        + accountID + ", CallID: " + callID);
+            }
         }
     }
 
     private void handleSetCallHold(Intent intent) {
         String accountID = intent.getStringExtra(PARAM_ACCOUNT_ID);
         int callID = intent.getIntExtra(PARAM_CALL_ID, 0);
-        boolean hold = intent.getBooleanExtra(PARAM_HOLD, false);
 
         SipCall sipCall = getCall(accountID, callID);
-        if (sipCall == null) {
-            notifyCallDisconnected(accountID, callID);
-            return;
-        }
-
-        try {
-            sipCall.setHold(hold);
-        } catch (Exception exc) {
-            Logger.error(TAG, "Error while setting hold. AccountID: "
-                    + accountID + ", CallID: " + callID);
+        if (sipCall != null) {
+            boolean hold = intent.getBooleanExtra(PARAM_HOLD, false);
+            try {
+                sipCall.setHold(hold);
+            } catch (Exception exc) {
+                Logger.error(TAG, "Error while setting hold. AccountID: "
+                        + accountID + ", CallID: " + callID);
+            }
         }
     }
 
@@ -302,35 +289,29 @@ public class SipService extends BackgroundService implements SipServiceConstants
         int callID = intent.getIntExtra(PARAM_CALL_ID, 0);
 
         SipCall sipCall = getCall(accountID, callID);
-        if (sipCall == null) {
-            notifyCallDisconnected(accountID, callID);
-            return;
-        }
-
-        try {
-            sipCall.toggleHold();
-        } catch (Exception exc) {
-            Logger.error(TAG, "Error while toggling hold. AccountID: "
-                    + accountID + ", CallID: " + callID);
+        if (sipCall != null) {
+            try {
+                sipCall.toggleHold();
+            } catch (Exception exc) {
+                Logger.error(TAG, "Error while toggling hold. AccountID: "
+                        + accountID + ", CallID: " + callID);
+            }
         }
     }
 
     private void handleSetCallMute(Intent intent) {
         String accountID = intent.getStringExtra(PARAM_ACCOUNT_ID);
         int callID = intent.getIntExtra(PARAM_CALL_ID, 0);
-        boolean mute = intent.getBooleanExtra(PARAM_MUTE, false);
 
         SipCall sipCall = getCall(accountID, callID);
-        if (sipCall == null) {
-            notifyCallDisconnected(accountID, callID);
-            return;
-        }
-
-        try {
-            sipCall.setMute(mute);
-        } catch (Exception exc) {
-            Logger.error(TAG, "Error while setting mute. AccountID: "
-                         + accountID + ", CallID: " + callID);
+        if (sipCall != null) {
+            boolean mute = intent.getBooleanExtra(PARAM_MUTE, false);
+            try {
+                sipCall.setMute(mute);
+            } catch (Exception exc) {
+                Logger.error(TAG, "Error while setting mute. AccountID: "
+                        + accountID + ", CallID: " + callID);
+            }
         }
     }
 
@@ -339,16 +320,13 @@ public class SipService extends BackgroundService implements SipServiceConstants
         int callID = intent.getIntExtra(PARAM_CALL_ID, 0);
 
         SipCall sipCall = getCall(accountID, callID);
-        if (sipCall == null) {
-            notifyCallDisconnected(accountID, callID);
-            return;
-        }
-
-        try {
-            sipCall.toggleMute();
-        } catch (Exception exc) {
-            Logger.error(TAG, "Error while toggling mute. AccountID: "
-                    + accountID + ", CallID: " + callID);
+        if (sipCall != null) {
+            try {
+                sipCall.toggleMute();
+            } catch (Exception exc) {
+                Logger.error(TAG, "Error while toggling mute. AccountID: "
+                        + accountID + ", CallID: " + callID);
+            }
         }
     }
 
@@ -357,16 +335,13 @@ public class SipService extends BackgroundService implements SipServiceConstants
         int callID = intent.getIntExtra(PARAM_CALL_ID, 0);
 
         SipCall sipCall = getCall(accountID, callID);
-        if (sipCall == null) {
-            notifyCallDisconnected(accountID, callID);
-            return;
-        }
-
-        try {
-            sipCall.declineIncomingCall();
-        } catch (Exception exc) {
-            Logger.error(TAG, "Error while declining incoming call. AccountID: "
-                    + accountID + ", CallID: " + callID);
+        if (sipCall != null) {
+            try {
+                sipCall.declineIncomingCall();
+            } catch (Exception exc) {
+                Logger.error(TAG, "Error while declining incoming call. AccountID: "
+                        + accountID + ", CallID: " + callID);
+            }
         }
     }
 
@@ -375,15 +350,7 @@ public class SipService extends BackgroundService implements SipServiceConstants
         int callID = intent.getIntExtra(PARAM_CALL_ID, 0);
 
         try {
-            SipCall sipCall = getCall(accountID, callID);
-
-            if (sipCall == null) {
-                notifyCallDisconnected(accountID, callID);
-                return;
-            }
-
-            sipCall.hangUp();
-
+            hangupCall(accountID, callID);
         } catch (Exception exc) {
             Logger.error(TAG, "Error while hanging up call", exc);
             notifyCallDisconnected(accountID, callID);
@@ -402,18 +369,18 @@ public class SipService extends BackgroundService implements SipServiceConstants
 
         for (int callID : activeCallIDs) {
             try {
-                SipCall sipCall = getCall(accountID, callID);
-
-                if (sipCall == null) {
-                    notifyCallDisconnected(accountID, callID);
-                    return;
-                }
-
-                sipCall.hangUp();
+                hangupCall(accountID, callID);
             } catch (Exception exc) {
                 Logger.error(TAG, "Error while hanging up call", exc);
                 notifyCallDisconnected(accountID, callID);
             }
+        }
+    }
+
+    private void hangupCall(String accountID, int callID) {
+        SipCall sipCall = getCall(accountID, callID);
+        if (sipCall != null) {
+            sipCall.hangUp();
         }
     }
 
@@ -430,13 +397,9 @@ public class SipService extends BackgroundService implements SipServiceConstants
         for (int callID : activeCallIDs) {
             try {
                 SipCall sipCall = getCall(accountID, callID);
-
-                if (sipCall == null) {
-                    notifyCallDisconnected(accountID, callID);
-                    return;
+                if (sipCall != null) {
+                    sipCall.setHold(true);
                 }
-
-                sipCall.setHold(true);
             } catch (Exception exc) {
                 Logger.error(TAG, "Error while holding call", exc);
             }
@@ -450,17 +413,129 @@ public class SipService extends BackgroundService implements SipServiceConstants
 
         try {
             SipCall sipCall = getCall(accountID, callID);
-
-            if (sipCall == null) {
-                notifyCallDisconnected(accountID, callID);
-                return;
+            if (sipCall != null) {
+                sipCall.transferTo(number);
             }
-
-            sipCall.transferTo(number);
-
         } catch (Exception exc) {
             Logger.error(TAG, "Error while transferring call to " + number, exc);
             notifyCallDisconnected(accountID, callID);
+        }
+    }
+
+    private void handleSetIncomingVideoFeed(Intent intent) {
+        String accountID = intent.getStringExtra(PARAM_ACCOUNT_ID);
+        int callID = intent.getIntExtra(PARAM_CALL_ID, 0);
+
+        SipCall sipCall = getCall(accountID, callID);
+        if (sipCall != null) {
+            Bundle bundle = intent.getExtras();
+            if (bundle != null) {
+                Surface surface = bundle.getParcelable(PARAM_SURFACE);
+                sipCall.setIncomingVideoFeed(surface);
+            }
+        }
+    }
+
+    private void handleSetSelfVideoOrientation(Intent intent) {
+        String accountID = intent.getStringExtra(PARAM_ACCOUNT_ID);
+        int callID = intent.getIntExtra(PARAM_CALL_ID, 0);
+
+        SipAccount sipAccount = mActiveSipAccounts.get(accountID);
+        if (sipAccount != null) {
+            SipCall sipCall = getCall(accountID, callID);
+            if (sipCall != null) {
+                int orientation = intent.getIntExtra(PARAM_ORIENTATION, -1);
+                setSelfVideoOrientation(sipCall, orientation);
+            }
+        }
+    }
+
+    void setSelfVideoOrientation(SipCall sipCall, int orientation) {
+        try {
+            int pjmediaOrientation;
+
+            switch (orientation) {
+                case Surface.ROTATION_0:   // Portrait
+                    pjmediaOrientation = pjmedia_orient.PJMEDIA_ORIENT_ROTATE_270DEG;
+                    break;
+                case Surface.ROTATION_90:  // Landscape, home button on the right
+                    pjmediaOrientation = pjmedia_orient.PJMEDIA_ORIENT_NATURAL;
+                    break;
+                case Surface.ROTATION_180:
+                    pjmediaOrientation = pjmedia_orient.PJMEDIA_ORIENT_ROTATE_90DEG;
+                    break;
+                case Surface.ROTATION_270: // Landscape, home button on the left
+                    pjmediaOrientation = pjmedia_orient.PJMEDIA_ORIENT_ROTATE_180DEG;
+                    break;
+                default:
+                    pjmediaOrientation = pjmedia_orient.PJMEDIA_ORIENT_UNKNOWN;
+            }
+
+            if (pjmediaOrientation != pjmedia_orient.PJMEDIA_ORIENT_UNKNOWN)
+                // set orientation to the correct current device
+                getVidDevManager().setCaptureOrient(
+                        sipCall.isFrontCamera()
+                                ? FRONT_CAMERA_CAPTURE_DEVICE
+                                : BACK_CAMERA_CAPTURE_DEVICE,
+                        pjmediaOrientation, true);
+
+        } catch (Exception iex) {
+            Logger.error(TAG, "Error while changing video orientation");
+        }
+    }
+
+    private void handleSetVideoMute(Intent intent) {
+        String accountID = intent.getStringExtra(PARAM_ACCOUNT_ID);
+        int callID = intent.getIntExtra(PARAM_CALL_ID, 0);
+
+        SipCall sipCall = getCall(accountID, callID);
+        if (sipCall != null) {
+            boolean mute = intent.getBooleanExtra(PARAM_VIDEO_MUTE, false);
+            sipCall.setVideoMute(mute);
+        }
+    }
+
+    private void handleStartVideoPreview(Intent intent) {
+        String accountID = intent.getStringExtra(PARAM_ACCOUNT_ID);
+        int callID = intent.getIntExtra(PARAM_CALL_ID, 0);
+
+        SipCall sipCall = getCall(accountID, callID);
+        if (sipCall != null) {
+            Bundle bundle = intent.getExtras();
+            if (bundle != null) {
+                Surface surface = intent.getExtras().getParcelable(PARAM_SURFACE);
+                sipCall.startPreviewVideoFeed(surface);
+            }
+        }
+    }
+
+    private void handleStopVideoPreview(Intent intent) {
+        String accountID = intent.getStringExtra(PARAM_ACCOUNT_ID);
+        int callID = intent.getIntExtra(PARAM_CALL_ID, 0);
+
+        SipCall sipCall = getCall(accountID, callID);
+        if (sipCall != null) {
+            sipCall.stopPreviewVideoFeed();
+        }
+    }
+
+    // Switch Camera
+    private void handleSwitchVideoCaptureDevice(Intent intent) {
+        String accountID = intent.getStringExtra(PARAM_ACCOUNT_ID);
+        int callID = intent.getIntExtra(PARAM_CALL_ID, 0);
+
+        final SipCall sipCall = getCall(accountID, callID);
+        if (sipCall != null) {
+            try {
+                CallVidSetStreamParam callVidSetStreamParam = new CallVidSetStreamParam();
+                callVidSetStreamParam.setCapDev(sipCall.isFrontCamera()
+                        ? BACK_CAMERA_CAPTURE_DEVICE
+                        : FRONT_CAMERA_CAPTURE_DEVICE);
+                sipCall.setFrontCamera(!sipCall.isFrontCamera());
+                sipCall.vidSetStream(pjsua_call_vid_strm_op.PJSUA_CALL_VID_STRM_CHANGE_CAP_DEV, callVidSetStreamParam);
+            } catch (Exception ex) {
+                Logger.error(TAG, "Error while switching capture device", ex);
+            }
         }
     }
 
@@ -485,6 +560,70 @@ public class SipService extends BackgroundService implements SipServiceConstants
         }
     }
 
+    private void handleMakeDirectCall(Intent intent) {
+        Bundle bundle = intent.getExtras();
+        if (bundle == null) return;
+        Uri uri = bundle.getParcelable(PARAM_DIRECT_CALL_URI);
+        if (uri == null) return;
+        String sipServer = intent.getStringExtra(PARAM_DIRECT_CALL_SIP_SERVER);
+        String name = intent.getStringExtra(PARAM_GUEST_NAME);
+        boolean isVideo = intent.getBooleanExtra(PARAM_IS_VIDEO, false);
+        boolean isVideoConference = false;
+        if (isVideo) {
+            isVideoConference = intent.getBooleanExtra(PARAM_IS_VIDEO_CONF, false);
+        }
+
+        Logger.debug(TAG, "Making call to " + uri.getUserInfo());
+        String accountID = "sip:"+name+"@"+uri.getHost();
+        String sipUri = "sip:" + uri.getUserInfo()+"@"+uri.getHost();
+
+        try {
+            startStack();
+            SipAccountData sipAccountData = new SipAccountData()
+                    .setHost(sipServer != null ? sipServer : uri.getHost())
+                    .setUsername(name)
+                    .setPort((uri.getPort() > 0) ? uri.getPort() : 5060)
+                    .setRealm(uri.getHost());
+            /* display name not yet implemented server side for direct calls */
+            /* .setUsername("guest") */
+            /* .setGuestDisplayName(name)*/
+            SipAccount pjSipAndroidAccount = new SipAccount(this, sipAccountData);
+            pjSipAndroidAccount.createGuest();
+            mConfiguredGuestAccount = pjSipAndroidAccount.getData();
+
+            // Overwrite the old value if present
+            mActiveSipAccounts.put(accountID, pjSipAndroidAccount);
+
+            SipCall call = mActiveSipAccounts.get(accountID).addOutgoingCall(sipUri, isVideo, isVideoConference);
+            if (call != null) {
+                call.setVideoParams(isVideo, isVideoConference);
+                mBroadcastEmitter.outgoingCall(accountID, call.getId(), uri.getUserInfo(), isVideo, isVideoConference);
+            } else {
+                Logger.error(TAG, "Error while making a direct call as Guest");
+                mBroadcastEmitter.outgoingCall(accountID, -1, uri.getUserInfo(), false, false);
+            }
+        } catch (Exception ex) {
+            Logger.error(TAG, "Error while making a direct call as Guest", ex);
+            mBroadcastEmitter.outgoingCall(accountID, -1, uri.getUserInfo(), false, false);
+        }
+    }
+
+    private void handleReconnectCall() {
+        try {
+            getBroadcastEmitter().callReconnectionState(CallReconnectionState.PROGRESS);
+            mEndpoint.handleIpChange(new IpChangeParam());
+            Logger.info(TAG, "Call reconnection started");
+        } catch (Exception exc) {
+            Logger.error(TAG, "Error while reconnecting the call", exc);
+        }
+    }
+
+    public void setLastCallStatus(int callStatus) {
+        this.callStatus = callStatus;
+    }
+
+    /***   Sip Account Management    ***/
+
     private void handleRefreshRegistration(Intent intent) {
         String accountID = intent.getStringExtra(PARAM_ACCOUNT_ID);
         int regExpTimeout = intent.getIntExtra(PARAM_REG_EXP_TIMEOUT, 0);
@@ -493,6 +632,8 @@ public class SipService extends BackgroundService implements SipServiceConstants
         if (!mActiveSipAccounts.isEmpty() && mActiveSipAccounts.containsKey(accountID)){
             try {
                 SipAccount sipAccount = mActiveSipAccounts.get(accountID);
+                if (sipAccount == null) return;
+
                 if (regExpTimeout != 0 && regExpTimeout != sipAccount.getData().getRegExpirationTimeout()) {
                     sipAccount.getData().setRegExpirationTimeout(regExpTimeout);
                     Logger.debug(TAG, String.valueOf(regExpTimeout));
@@ -600,6 +741,33 @@ public class SipService extends BackgroundService implements SipServiceConstants
             }
         }
     }
+
+    private void handleGetRegistrationStatus(Intent intent) {
+        String accountID = intent.getStringExtra(PARAM_ACCOUNT_ID);
+
+        if (!mStarted || mActiveSipAccounts.get(accountID) == null) {
+            mBroadcastEmitter.registrationState("", 400);
+            return;
+        }
+
+        SipAccount account = mActiveSipAccounts.get(accountID);
+        try {
+            mBroadcastEmitter.registrationState(accountID, account.getInfo().getRegStatus());
+        } catch (Exception exc) {
+            Logger.error(TAG, "Error while getting registration status for " + accountID, exc);
+        }
+    }
+
+    private void handleSetDND(Intent intent) {
+        boolean dnd = intent.getBooleanExtra(PARAM_DND, false);
+        mSharedPreferencesHelper.setDND(dnd);
+    }
+
+    public boolean isDND() {
+        return mSharedPreferencesHelper.isDND();
+    }
+
+    /***   Sip Stack Management    ***/
 
     private void loadNativeLibraries() {
         try {
@@ -826,22 +994,6 @@ public class SipService extends BackgroundService implements SipServiceConstants
         }
     }
 
-    private void handleGetRegistrationStatus(Intent intent) {
-        String accountID = intent.getStringExtra(PARAM_ACCOUNT_ID);
-
-        if (!mStarted || mActiveSipAccounts.get(accountID) == null) {
-            mBroadcastEmitter.registrationState("", 400);
-            return;
-        }
-
-        SipAccount account = mActiveSipAccounts.get(accountID);
-        try {
-            mBroadcastEmitter.registrationState(accountID, account.getInfo().getRegStatus());
-        } catch (Exception exc) {
-            Logger.error(TAG, "Error while getting registration status for " + accountID, exc);
-        }
-    }
-
     @SuppressWarnings("unused")
     private void removeAllActiveAccounts() {
         if (!mActiveSipAccounts.isEmpty()) {
@@ -932,207 +1084,6 @@ public class SipService extends BackgroundService implements SipServiceConstants
 
     protected BroadcastEventEmitter getBroadcastEmitter() {
         return mBroadcastEmitter;
-    }
-
-    public void setLastCallStatus(int callStatus) {
-        this.callStatus = callStatus;
-    }
-
-    private void handleSetDND(Intent intent) {
-        boolean dnd = intent.getBooleanExtra(PARAM_DND, false);
-        mSharedPreferencesHelper.setDND(dnd);
-    }
-
-    public boolean isDND() {
-        return mSharedPreferencesHelper.isDND();
-    }
-
-    private void handleSetIncomingVideoFeed(Intent intent) {
-        String accountID = intent.getStringExtra(PARAM_ACCOUNT_ID);
-        int callID = intent.getIntExtra(PARAM_CALL_ID, 0);
-        SipCall sipCall = getCall(accountID, callID);
-
-        if (sipCall == null) {
-            notifyCallDisconnected(accountID, callID);
-            return;
-        }
-        Bundle bundle = intent.getExtras();
-        if (bundle != null) {
-            Surface surface = bundle.getParcelable(PARAM_SURFACE);
-            sipCall.setIncomingVideoFeed(surface);
-        }
-    }
-    private void handleSetSelfVideoOrientation(Intent intent) {
-        String accountID = intent.getStringExtra(PARAM_ACCOUNT_ID);
-        int callID = intent.getIntExtra(PARAM_CALL_ID, 0);
-        int orientation = intent.getIntExtra(PARAM_ORIENTATION, -1);
-
-        SipAccount sipAccount = mActiveSipAccounts.get(accountID);
-        if (sipAccount != null) {
-            SipCall sipCall = getCall(accountID, callID);
-            if (sipCall == null) {
-                notifyCallDisconnected(accountID, callID);
-                return;
-            }
-            setSelfVideoOrientation(sipCall, orientation);
-        }
-    }
-
-    void setSelfVideoOrientation(SipCall sipCall, int orientation) {
-        try {
-            int pjmediaOrientation;
-
-            switch (orientation) {
-                case Surface.ROTATION_0:   // Portrait
-                    pjmediaOrientation = pjmedia_orient.PJMEDIA_ORIENT_ROTATE_270DEG;
-                    break;
-                case Surface.ROTATION_90:  // Landscape, home button on the right
-                    pjmediaOrientation = pjmedia_orient.PJMEDIA_ORIENT_NATURAL;
-                    break;
-                case Surface.ROTATION_180:
-                    pjmediaOrientation = pjmedia_orient.PJMEDIA_ORIENT_ROTATE_90DEG;
-                    break;
-                case Surface.ROTATION_270: // Landscape, home button on the left
-                    pjmediaOrientation = pjmedia_orient.PJMEDIA_ORIENT_ROTATE_180DEG;
-                    break;
-                default:
-                    pjmediaOrientation = pjmedia_orient.PJMEDIA_ORIENT_UNKNOWN;
-            }
-
-            if (pjmediaOrientation != pjmedia_orient.PJMEDIA_ORIENT_UNKNOWN)
-            // set orientation to the correct current device
-            getVidDevManager().setCaptureOrient(
-                    sipCall.isFrontCamera()
-                            ? FRONT_CAMERA_CAPTURE_DEVICE
-                            : BACK_CAMERA_CAPTURE_DEVICE,
-                    pjmediaOrientation, true);
-
-        } catch (Exception iex) {
-            Logger.error(TAG, "Error while changing video orientation");
-        }
-    }
-
-    private void handleSetVideoMute(Intent intent) {
-        String accountID = intent.getStringExtra(PARAM_ACCOUNT_ID);
-        int callID = intent.getIntExtra(PARAM_CALL_ID, 0);
-        SipCall sipCall = getCall(accountID, callID);
-
-        if (sipCall == null) {
-            notifyCallDisconnected(accountID, callID);
-            return;
-        }
-        boolean mute = intent.getBooleanExtra(PARAM_VIDEO_MUTE, false);
-        sipCall.setVideoMute(mute);
-    }
-
-    private void handleStartVideoPreview(Intent intent) {
-        String accountID = intent.getStringExtra(PARAM_ACCOUNT_ID);
-        int callID = intent.getIntExtra(PARAM_CALL_ID, 0);
-        SipCall sipCall = getCall(accountID, callID);
-
-        if (sipCall == null) {
-            notifyCallDisconnected(accountID, callID);
-            return;
-        }
-        Bundle bundle = intent.getExtras();
-        if (bundle != null) {
-            Surface surface = intent.getExtras().getParcelable(PARAM_SURFACE);
-            sipCall.startPreviewVideoFeed(surface);
-        }
-    }
-
-    private void handleStopVideoPreview(Intent intent) {
-        String accountID = intent.getStringExtra(PARAM_ACCOUNT_ID);
-        int callID = intent.getIntExtra(PARAM_CALL_ID, 0);
-        SipCall sipCall = getCall(accountID, callID);
-
-        if (sipCall == null) {
-            notifyCallDisconnected(accountID, callID);
-            return;
-        }
-
-        sipCall.stopPreviewVideoFeed();
-    }
-
-    // Switch Camera
-    private void handleSwitchVideoCaptureDevice(Intent intent) {
-        String accountID = intent.getStringExtra(PARAM_ACCOUNT_ID);
-        int callID = intent.getIntExtra(PARAM_CALL_ID, 0);
-
-        final SipCall sipCall = getCall(accountID, callID);
-        if (sipCall == null) {
-            notifyCallDisconnected(accountID, callID);
-            return;
-        }
-
-        try {
-            CallVidSetStreamParam callVidSetStreamParam = new CallVidSetStreamParam();
-            callVidSetStreamParam.setCapDev(sipCall.isFrontCamera()
-                    ? BACK_CAMERA_CAPTURE_DEVICE
-                    : FRONT_CAMERA_CAPTURE_DEVICE);
-            sipCall.setFrontCamera(!sipCall.isFrontCamera());
-            sipCall.vidSetStream(pjsua_call_vid_strm_op.PJSUA_CALL_VID_STRM_CHANGE_CAP_DEV, callVidSetStreamParam);
-        } catch (Exception ex) {
-            Logger.error(TAG, "Error while switching capture device", ex);
-        }
-    }
-
-    private void handleMakeDirectCall(Intent intent) {
-        Bundle bundle = intent.getExtras();
-        if (bundle == null) return;
-        Uri uri = bundle.getParcelable(PARAM_DIRECT_CALL_URI);
-        if (uri == null) return;
-        String sipServer = intent.getStringExtra(PARAM_DIRECT_CALL_SIP_SERVER);
-        String name = intent.getStringExtra(PARAM_GUEST_NAME);
-        boolean isVideo = intent.getBooleanExtra(PARAM_IS_VIDEO, false);
-        boolean isVideoConference = false;
-        if (isVideo) {
-            isVideoConference = intent.getBooleanExtra(PARAM_IS_VIDEO_CONF, false);
-        }
-
-        Logger.debug(TAG, "Making call to " + uri.getUserInfo());
-        String accountID = "sip:"+name+"@"+uri.getHost();
-        String sipUri = "sip:" + uri.getUserInfo()+"@"+uri.getHost();
-
-        try {
-            startStack();
-            SipAccountData sipAccountData = new SipAccountData()
-                    .setHost(sipServer != null ? sipServer : uri.getHost())
-                    .setUsername(name)
-                    .setPort((uri.getPort() > 0) ? uri.getPort() : 5060)
-                    .setRealm(uri.getHost());
-                    /* display name not yet implemented server side for direct calls */
-                    /* .setUsername("guest") */
-                    /* .setGuestDisplayName(name)*/
-            SipAccount pjSipAndroidAccount = new SipAccount(this, sipAccountData);
-            pjSipAndroidAccount.createGuest();
-            mConfiguredGuestAccount = pjSipAndroidAccount.getData();
-
-            // Overwrite the old value if present
-            mActiveSipAccounts.put(accountID, pjSipAndroidAccount);
-
-            SipCall call = mActiveSipAccounts.get(accountID).addOutgoingCall(sipUri, isVideo, isVideoConference);
-            if (call != null) {
-                call.setVideoParams(isVideo, isVideoConference);
-                mBroadcastEmitter.outgoingCall(accountID, call.getId(), uri.getUserInfo(), isVideo, isVideoConference);
-            } else {
-                Logger.error(TAG, "Error while making a direct call as Guest");
-                mBroadcastEmitter.outgoingCall(accountID, -1, uri.getUserInfo(), false, false);
-            }
-        } catch (Exception ex) {
-            Logger.error(TAG, "Error while making a direct call as Guest", ex);
-            mBroadcastEmitter.outgoingCall(accountID, -1, uri.getUserInfo(), false, false);
-        }
-    }
-
-    private void handleReconnectCall() {
-        try {
-            getBroadcastEmitter().callReconnectionState(CallReconnectionState.PROGRESS);
-            mEndpoint.handleIpChange(new IpChangeParam());
-            Logger.info(TAG, "Call reconnection started");
-        } catch (Exception exc) {
-            Logger.error(TAG, "Error while reconnecting the call", exc);
-        }
     }
 
     public static ConcurrentHashMap<String, SipAccount> getActiveSipAccounts() {
