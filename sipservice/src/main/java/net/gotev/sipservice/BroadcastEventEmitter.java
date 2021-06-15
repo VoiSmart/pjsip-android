@@ -26,6 +26,7 @@ public class BroadcastEventEmitter implements SipServiceConstants {
         REGISTRATION,
         INCOMING_CALL,
         CALL_STATE,
+        CALL_MEDIA_STATE,
         OUTGOING_CALL,
         STACK_STATUS,
         CODEC_PRIORITIES,
@@ -106,6 +107,23 @@ public class BroadcastEventEmitter implements SipServiceConstants {
         intent.putExtra(PARAM_LOCAL_MUTE, isLocalMute);
         intent.putExtra(PARAM_LOCAL_VIDEO_MUTE, isLocalVideoMute);
 
+        mContext.sendBroadcast(intent);
+    }
+
+    /**
+     * Emit a call state broadcast intent.
+     * @param accountID call's account IdUri
+     * @param callID call ID number
+     * @param state MediaState state updated
+     * @param value call media state update value
+     */
+    public synchronized void callMediaState(String accountID, int callID, MediaState state, boolean value) {
+        final Intent intent = new Intent()
+            .setAction(getAction(BroadcastAction.CALL_MEDIA_STATE))
+            .putExtra(PARAM_ACCOUNT_ID, accountID)
+            .putExtra(PARAM_CALL_ID, callID)
+            .putExtra(PARAM_MEDIA_STATE_KEY, state)
+            .putExtra(PARAM_MEDIA_STATE_VALUE, value);
         mContext.sendBroadcast(intent);
     }
 

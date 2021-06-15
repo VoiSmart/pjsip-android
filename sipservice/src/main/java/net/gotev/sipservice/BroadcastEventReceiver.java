@@ -49,6 +49,12 @@ public class BroadcastEventReceiver extends BroadcastReceiver implements SipServ
                         intent.getBooleanExtra(PARAM_LOCAL_MUTE, false),
                         intent.getBooleanExtra(PARAM_LOCAL_VIDEO_MUTE, false));
 
+        } else if (BroadcastEventEmitter.getAction(BroadcastEventEmitter.BroadcastAction.CALL_MEDIA_STATE).equals(action)) {
+            onCallMediaState(intent.getStringExtra(PARAM_ACCOUNT_ID),
+                    intent.getIntExtra(PARAM_CALL_ID, -1),
+                    (MediaState) intent.getSerializableExtra(PARAM_MEDIA_STATE_KEY),
+                    intent.getBooleanExtra(PARAM_MEDIA_STATE_VALUE, false));
+
         } else if (BroadcastEventEmitter.getAction(BroadcastEventEmitter.BroadcastAction.OUTGOING_CALL).equals(action)) {
             onOutgoingCall(intent.getStringExtra(PARAM_ACCOUNT_ID),
                     intent.getIntExtra(PARAM_CALL_ID, -1),
@@ -77,8 +83,8 @@ public class BroadcastEventReceiver extends BroadcastReceiver implements SipServ
             int callStatus = intent.getIntExtra(PARAM_CALL_STATUS, -1);
             onCallStats(intent.getIntExtra(PARAM_CALL_STATS_DURATION, 0),
                 intent.getStringExtra(PARAM_CALL_STATS_AUDIO_CODEC), callStatus,
-                (RtpStreamStats) intent.getParcelableExtra(PARAM_CALL_STATS_RX_STREAM),
-                (RtpStreamStats) intent.getParcelableExtra(PARAM_CALL_STATS_TX_STREAM));
+                intent.getParcelableExtra(PARAM_CALL_STATS_RX_STREAM),
+                intent.getParcelableExtra(PARAM_CALL_STATS_TX_STREAM));
         } else if (BroadcastEventEmitter.getAction(BroadcastEventEmitter.BroadcastAction.CALL_RECONNECTION_STATE).equals(action)) {
             onCallReconnectionState((CallReconnectionState) intent.getSerializableExtra(PARAM_CALL_RECONNECTION_STATE));
         }
@@ -103,6 +109,8 @@ public class BroadcastEventReceiver extends BroadcastReceiver implements SipServ
                 BroadcastEventEmitter.BroadcastAction.INCOMING_CALL));
         intentFilter.addAction(BroadcastEventEmitter.getAction(
                 BroadcastEventEmitter.BroadcastAction.CALL_STATE));
+        intentFilter.addAction(BroadcastEventEmitter.getAction(
+                BroadcastEventEmitter.BroadcastAction.CALL_MEDIA_STATE));
         intentFilter.addAction(BroadcastEventEmitter.getAction(
                 BroadcastEventEmitter.BroadcastAction.OUTGOING_CALL));
         intentFilter.addAction(BroadcastEventEmitter.getAction(
@@ -154,6 +162,13 @@ public class BroadcastEventReceiver extends BroadcastReceiver implements SipServ
                 ", isLocalHold: " + isLocalHold +
                 ", isLocalMute: " + isLocalMute +
                 ", isLocalVideoMute: " + isLocalVideoMute);
+    }
+
+    public void onCallMediaState(String accountID, int callID, MediaState stateType, boolean stateValue) {
+        Logger.debug(LOG_TAG, "onCallState - accountID: " + accountID +
+                ", callID: " + callID +
+                ", mediaStateType: " + stateType.name() +
+                ", mediaStateValue: " + stateValue);
     }
 
     public void onOutgoingCall(String accountID, int callID, String number, boolean isVideo, boolean isVideoConference) {

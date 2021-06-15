@@ -68,6 +68,8 @@ public interface SipServiceConstants {
     String PARAM_CONNECT_TIMESTAMP = "connectTimestamp";
     String PARAM_STACK_STARTED = "stackStarted";
     String PARAM_CODEC_PRIORITIES_LIST = "codecPrioritiesList";
+    String PARAM_MEDIA_STATE_KEY = "mediaStateKey";
+    String PARAM_MEDIA_STATE_VALUE = "mediaStateValue";
     String PARAM_LOCAL_HOLD = "localHold";
     String PARAM_LOCAL_MUTE = "localMute";
     String PARAM_LOCAL_VIDEO_MUTE = "localVideoMute";
