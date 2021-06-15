@@ -307,6 +307,8 @@ public class SipCall extends Call {
                     if (mute) mgr.getCaptureDevMedia().stopTransmit(audioMedia);
                     else mgr.getCaptureDevMedia().startTransmit(audioMedia);
                     localMute = mute;
+                    account.getService().getBroadcastEmitter().callMediaState(
+                            account.getData().getIdUri(), getId(), MediaState.LOCAL_MUTE, localMute);
                 } catch (Exception exc) {
                     Logger.error(LOG_TAG, "setMute: error while connecting audio media to sound device", exc);
                 }
@@ -349,7 +351,7 @@ public class SipCall extends Call {
 
     public void setHold(boolean hold) {
         // return immediately if we are not changing the current state
-        if ((localHold && hold) || (!localHold && !hold)) return;
+        if (localHold == hold) return;
 
         CallOpParam param = new CallOpParam();
 
@@ -357,7 +359,6 @@ public class SipCall extends Call {
             if (hold) {
                 Logger.debug(LOG_TAG, "holding call with ID " + getId());
                 setHold(param);
-                localHold = true;
             } else {
                 // http://lists.pjsip.org/pipermail/pjsip_lists.pjsip.org/2015-March/018246.html
                 Logger.debug(LOG_TAG, "un-holding call with ID " + getId());
@@ -365,8 +366,10 @@ public class SipCall extends Call {
                 CallSetting opt = param.getOpt();
                 opt.setFlag(pjsua_call_flag.PJSUA_CALL_UNHOLD);
                 reinvite(param);
-                localHold = false;
             }
+            localHold = hold;
+            account.getService().getBroadcastEmitter().callMediaState(
+                    account.getData().getIdUri(), getId(), MediaState.LOCAL_HOLD, localHold);
         } catch (Exception exc) {
             String operation = hold ? "hold" : "unhold";
             Logger.error(LOG_TAG, "Error while trying to " + operation + " call", exc);
@@ -540,6 +543,8 @@ public class SipCall extends Call {
                     : pjsua_call_vid_strm_op.PJSUA_CALL_VID_STRM_START_TRANSMIT,
                 new CallVidSetStreamParam());
             localVideoMute = videoMute;
+            account.getService().getBroadcastEmitter().callMediaState(
+                    account.getData().getIdUri(), getId(), MediaState.LOCAL_VIDEO_MUTE, localVideoMute);
         } catch(Exception ex) {
             Logger.error(LOG_TAG, "Error while toggling video transmission", ex);
         }
