@@ -324,14 +324,8 @@ public class SipCall extends Call {
         return localMute;
     }
 
-    public boolean toggleMute() {
-        if (localMute) {
-            setMute(false);
-            return !localHold;
-        }
-
-        setMute(true);
-        return localHold;
+    public void toggleMute() {
+        setMute(!localMute);
     }
 
     /**
@@ -385,14 +379,8 @@ public class SipCall extends Call {
         }
     }
 
-    public boolean toggleHold() {
-        if (localHold) {
-            setHold(false);
-            return !localHold;
-        }
-
-        setHold(true);
-        return localHold;
+    public void toggleHold() {
+        setHold(!localHold);
     }
 
     public boolean isLocalHold() {
@@ -575,15 +563,12 @@ public class SipCall extends Call {
         this.frontCamera = frontCamera;
     }
 
-    private final Runnable sendKeyFrameRunnable = new Runnable() {
-        @Override
-        public void run() {
-            try {
-                vidSetStream(pjsua_call_vid_strm_op.PJSUA_CALL_VID_STRM_SEND_KEYFRAME, new CallVidSetStreamParam());
-                startSendingKeyFrame();
-            } catch (Exception ex) {
-                Logger.error(LOG_TAG, "error while sending periodic keyframe");
-            }
+    private final Runnable sendKeyFrameRunnable = () -> {
+        try {
+            vidSetStream(pjsua_call_vid_strm_op.PJSUA_CALL_VID_STRM_SEND_KEYFRAME, new CallVidSetStreamParam());
+            startSendingKeyFrame();
+        } catch (Exception ex) {
+            Logger.error(LOG_TAG, "error while sending periodic keyframe");
         }
     };
 
