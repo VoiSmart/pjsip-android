@@ -282,7 +282,7 @@ public class SipCall extends Call {
      */
     public void setMute(boolean mute) {
         // return immediately if we are not changing the current state
-        if ((localMute && mute) || (!localMute && !mute)) return;
+        if (localMute == mute) return;
 
         CallInfo info;
         try {
@@ -304,15 +304,9 @@ public class SipCall extends Call {
                 // connect or disconnect the captured audio
                 try {
                     AudDevManager mgr = account.getService().getAudDevManager();
-
-                    if (mute) {
-                        mgr.getCaptureDevMedia().stopTransmit(audioMedia);
-                        localMute = true;
-                    } else {
-                        mgr.getCaptureDevMedia().startTransmit(audioMedia);
-                        localMute = false;
-                    }
-
+                    if (mute) mgr.getCaptureDevMedia().stopTransmit(audioMedia);
+                    else mgr.getCaptureDevMedia().startTransmit(audioMedia);
+                    localMute = mute;
                 } catch (Exception exc) {
                     Logger.error(LOG_TAG, "setMute: error while connecting audio media to sound device", exc);
                 }
