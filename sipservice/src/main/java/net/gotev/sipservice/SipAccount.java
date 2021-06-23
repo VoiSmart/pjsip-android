@@ -78,7 +78,7 @@ public class SipAccount extends Account {
         }
 
         // allow calls only if there are no other ongoing calls
-        if (totalCalls == 0) {
+        if (totalCalls <= 1) {
             SipCall call = new SipCall(this);
             call.setVideoParams(isVideo, isVideoConference);
 

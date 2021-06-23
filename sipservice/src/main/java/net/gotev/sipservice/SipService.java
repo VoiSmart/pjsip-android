@@ -7,6 +7,7 @@ import android.os.IBinder;
 import android.view.Surface;
 
 import org.pjsip.pjsua2.AudDevManager;
+import org.pjsip.pjsua2.CallOpParam;
 import org.pjsip.pjsua2.CallVidSetStreamParam;
 import org.pjsip.pjsua2.CodecFmtpVector;
 import org.pjsip.pjsua2.CodecInfo;
@@ -133,6 +134,9 @@ public class SipService extends BackgroundService implements SipServiceConstants
                     break;
                 case ACTION_TRANSFER_CALL:
                     handleTransferCall(intent);
+                    break;
+                case ACTION_ATTENDED_TRANSFER_CALL:
+                    handleAttendedTransferCall(intent);
                     break;
                 case ACTION_GET_CODEC_PRIORITIES:
                     handleGetCodecPriorities();
@@ -416,6 +420,23 @@ public class SipService extends BackgroundService implements SipServiceConstants
         } catch (Exception exc) {
             Logger.error(TAG, "Error while transferring call to " + number, exc);
             notifyCallDisconnected(accountID, callID);
+        }
+    }
+
+    private void handleAttendedTransferCall(Intent intent) {
+        String accountID = intent.getStringExtra(PARAM_ACCOUNT_ID);
+        int callIdOrig = intent.getIntExtra(PARAM_CALL_ID, 0);
+
+        try {
+            SipCall sipCallOrig = getCall(accountID, callIdOrig);
+            if (sipCallOrig != null) {
+                int callIdDest = intent.getIntExtra(PARAM_CALL_ID_DEST, 0);
+                SipCall sipCallDest = getCall(accountID, callIdDest);
+                sipCallOrig.xferReplaces(sipCallDest, new CallOpParam());
+            }
+        } catch (Exception exc) {
+            Logger.error(TAG, "Error while finalizing attended transfer", exc);
+            notifyCallDisconnected(accountID, callIdOrig);
         }
     }
 

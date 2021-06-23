@@ -21,6 +21,7 @@ public interface SipServiceConstants {
     String ACTION_TOGGLE_HOLD = "callToggleHold";
     String ACTION_TOGGLE_MUTE = "callToggleMute";
     String ACTION_TRANSFER_CALL = "callTransfer";
+    String ACTION_ATTENDED_TRANSFER_CALL = "callAttendedTransfer";
     String ACTION_GET_CODEC_PRIORITIES = "codecPriorities";
     String ACTION_SET_CODEC_PRIORITIES = "setCodecPriorities";
     String ACTION_GET_REGISTRATION_STATUS = "getRegistrationStatus";
@@ -42,6 +43,7 @@ public interface SipServiceConstants {
     String PARAM_ACCOUNT_ID = "accountID";
     String PARAM_NUMBER = "number";
     String PARAM_CALL_ID = "callId";
+    String PARAM_CALL_ID_DEST = "callIdDest";
     String PARAM_DTMF = "dtmf";
     String PARAM_HOLD = "hold";
     String PARAM_MUTE = "mute";
