@@ -125,8 +125,16 @@ public class SipServiceCommand implements SipServiceConstants {
      * @param numberToCall number to call
      * @param isVideo whether the call has video or not
      * @param isVideoConference whether the call is video conference or not
+     * @param isTransfer whether this (second) call will eventually be transferred to the current
      */
-    public static void makeCall(Context context, String accountID, String numberToCall, boolean isVideo, boolean isVideoConference) {
+    public static void makeCall(
+            Context context,
+            String accountID,
+            String numberToCall,
+            boolean isVideo,
+            boolean isVideoConference,
+            boolean isTransfer
+    ) {
         checkAccount(accountID);
 
         Intent intent = new Intent(context, SipService.class);
@@ -135,11 +143,20 @@ public class SipServiceCommand implements SipServiceConstants {
         intent.putExtra(PARAM_NUMBER, numberToCall);
         intent.putExtra(PARAM_IS_VIDEO, isVideo);
         intent.putExtra(PARAM_IS_VIDEO_CONF, isVideoConference);
+        intent.putExtra(PARAM_IS_TRANSFER, isTransfer);
         context.startService(intent);
     }
 
+    public static void makeCall(Context context, String accountID, String numberToCall, boolean isVideo, boolean isVideoConference) {
+        makeCall(context, accountID, numberToCall, isVideo, isVideoConference, false);
+    }
+
     public static void makeCall(Context context, String accountID, String numberToCall) {
-        makeCall(context, accountID, numberToCall, false, false);
+        makeCall(context, accountID, numberToCall, false, false, false);
+    }
+
+    public static void makeCall(Context context, String accountID, String numberToCall, boolean isTransfer) {
+        makeCall(context, accountID, numberToCall, false, false, isTransfer);
     }
 
     /**

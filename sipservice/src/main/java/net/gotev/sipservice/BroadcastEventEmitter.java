@@ -120,16 +120,15 @@ public class BroadcastEventEmitter implements SipServiceConstants {
         mContext.sendBroadcast(intent);
     }
 
-    public void outgoingCall(String accountID, int callID, String number, boolean isVideo, boolean isVideoConference) {
-        final Intent intent = new Intent();
-
-        intent.setAction(getAction(BroadcastAction.OUTGOING_CALL));
-        intent.putExtra(PARAM_ACCOUNT_ID, accountID);
-        intent.putExtra(PARAM_CALL_ID, callID);
-        intent.putExtra(PARAM_NUMBER, number);
-        intent.putExtra(PARAM_IS_VIDEO, isVideo);
-        intent.putExtra(PARAM_IS_VIDEO_CONF, isVideoConference);
-
+    public void outgoingCall(String accountID, int callID, String number, boolean isVideo, boolean isVideoConference, boolean isTransfer) {
+        final Intent intent = new Intent()
+            .setAction(getAction(BroadcastAction.OUTGOING_CALL))
+            .putExtra(PARAM_ACCOUNT_ID, accountID)
+            .putExtra(PARAM_CALL_ID, callID)
+            .putExtra(PARAM_NUMBER, number)
+            .putExtra(PARAM_IS_VIDEO, isVideo)
+            .putExtra(PARAM_IS_VIDEO_CONF, isVideoConference)
+            .putExtra(PARAM_IS_TRANSFER, isTransfer);
         sendExplicitBroadcast(intent);
     }
 

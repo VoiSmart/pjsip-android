@@ -69,7 +69,7 @@ public class SipAccount extends Account {
         return call;
     }
 
-    public SipCall addOutgoingCall(final String numberToDial, boolean isVideo, boolean isVideoConference) {
+    public SipCall addOutgoingCall(final String numberToDial, boolean isVideo, boolean isVideoConference, boolean isTransfer) {
 
         // check if there's already an ongoing call
         int totalCalls = 0;
@@ -78,7 +78,7 @@ public class SipAccount extends Account {
         }
 
         // allow calls only if there are no other ongoing calls
-        if (totalCalls <= 1) {
+        if (totalCalls <= (isTransfer ? 1 : 0)) {
             SipCall call = new SipCall(this);
             call.setVideoParams(isVideo, isVideoConference);
 
@@ -107,7 +107,7 @@ public class SipAccount extends Account {
     }
 
     public SipCall addOutgoingCall(final String numberToDial) {
-        return addOutgoingCall(numberToDial, false, false);
+        return addOutgoingCall(numberToDial, false, false, false);
     }
 
     @Override

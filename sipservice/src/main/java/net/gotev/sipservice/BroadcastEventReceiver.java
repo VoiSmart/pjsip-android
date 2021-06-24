@@ -57,7 +57,8 @@ public class BroadcastEventReceiver extends BroadcastReceiver implements SipServ
                     intent.getIntExtra(PARAM_CALL_ID, -1),
                     intent.getStringExtra(PARAM_NUMBER),
                     intent.getBooleanExtra(PARAM_IS_VIDEO, false),
-                    intent.getBooleanExtra(PARAM_IS_VIDEO_CONF, false));
+                    intent.getBooleanExtra(PARAM_IS_VIDEO_CONF, false),
+                    intent.getBooleanExtra(PARAM_IS_TRANSFER, false));
 
         } else if (BroadcastEventEmitter.getAction(BroadcastEventEmitter.BroadcastAction.STACK_STATUS).equals(action)) {
             onStackStatus(intent.getBooleanExtra(PARAM_STACK_STARTED, false));
@@ -76,12 +77,14 @@ public class BroadcastEventReceiver extends BroadcastReceiver implements SipServ
         } else if (BroadcastEventEmitter.getAction(BroadcastEventEmitter.BroadcastAction.VIDEO_SIZE).equals(action)) {
             onVideoSize(intent.getIntExtra(PARAM_INCOMING_VIDEO_WIDTH, H264_DEF_WIDTH),
                     intent.getIntExtra(PARAM_INCOMING_VIDEO_HEIGHT, H264_DEF_HEIGHT));
+
         } else if (BroadcastEventEmitter.getAction(BroadcastEventEmitter.BroadcastAction.CALL_STATS).equals(action)) {
             int callStatus = intent.getIntExtra(PARAM_CALL_STATUS, -1);
             onCallStats(intent.getIntExtra(PARAM_CALL_STATS_DURATION, 0),
                 intent.getStringExtra(PARAM_CALL_STATS_AUDIO_CODEC), callStatus,
                 intent.getParcelableExtra(PARAM_CALL_STATS_RX_STREAM),
                 intent.getParcelableExtra(PARAM_CALL_STATS_TX_STREAM));
+
         } else if (BroadcastEventEmitter.getAction(BroadcastEventEmitter.BroadcastAction.CALL_RECONNECTION_STATE).equals(action)) {
             onCallReconnectionState((CallReconnectionState) intent.getSerializableExtra(PARAM_CALL_RECONNECTION_STATE));
         }
@@ -164,7 +167,7 @@ public class BroadcastEventReceiver extends BroadcastReceiver implements SipServ
                 ", mediaStateValue: " + stateValue);
     }
 
-    public void onOutgoingCall(String accountID, int callID, String number, boolean isVideo, boolean isVideoConference) {
+    public void onOutgoingCall(String accountID, int callID, String number, boolean isVideo, boolean isVideoConference, boolean isTransfer) {
         Logger.debug(LOG_TAG, "onOutgoingCall - accountID: " + accountID +
                 ", callID: " + callID +
                 ", number: " + number);

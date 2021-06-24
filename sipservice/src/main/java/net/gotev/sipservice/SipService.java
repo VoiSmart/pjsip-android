@@ -562,19 +562,23 @@ public class SipService extends BackgroundService implements SipServiceConstants
         String number = intent.getStringExtra(PARAM_NUMBER);
         boolean isVideo = intent.getBooleanExtra(PARAM_IS_VIDEO, false);
         boolean isVideoConference = false;
+        boolean isTransfer = false;
         if (isVideo) {
             isVideoConference = intent.getBooleanExtra(PARAM_IS_VIDEO_CONF, false);
+        // do not allow attended transfer on video call for now
+        } else {
+            isTransfer = intent.getBooleanExtra(PARAM_IS_TRANSFER, false);
         }
 
         Logger.debug(TAG, "Making call to " + number);
 
         try {
-            SipCall call = mActiveSipAccounts.get(accountID).addOutgoingCall(number, isVideo, isVideoConference);
+            SipCall call = mActiveSipAccounts.get(accountID).addOutgoingCall(number, isVideo, isVideoConference, isTransfer);
             call.setVideoParams(isVideo, isVideoConference);
-            mBroadcastEmitter.outgoingCall(accountID, call.getId(), number, isVideo, isVideoConference);
+            mBroadcastEmitter.outgoingCall(accountID, call.getId(), number, isVideo, isVideoConference, isTransfer);
         } catch (Exception exc) {
             Logger.error(TAG, "Error while making outgoing call", exc);
-            mBroadcastEmitter.outgoingCall(accountID, -1, number, false, false);
+            mBroadcastEmitter.outgoingCall(accountID, -1, number, false, false, false);
         }
     }
 
@@ -612,17 +616,17 @@ public class SipService extends BackgroundService implements SipServiceConstants
             // Overwrite the old value if present
             mActiveSipAccounts.put(accountID, pjSipAndroidAccount);
 
-            SipCall call = mActiveSipAccounts.get(accountID).addOutgoingCall(sipUri, isVideo, isVideoConference);
+            SipCall call = mActiveSipAccounts.get(accountID).addOutgoingCall(sipUri, isVideo, isVideoConference, false);
             if (call != null) {
                 call.setVideoParams(isVideo, isVideoConference);
-                mBroadcastEmitter.outgoingCall(accountID, call.getId(), uri.getUserInfo(), isVideo, isVideoConference);
+                mBroadcastEmitter.outgoingCall(accountID, call.getId(), uri.getUserInfo(), isVideo, isVideoConference, false);
             } else {
                 Logger.error(TAG, "Error while making a direct call as Guest");
-                mBroadcastEmitter.outgoingCall(accountID, -1, uri.getUserInfo(), false, false);
+                mBroadcastEmitter.outgoingCall(accountID, -1, uri.getUserInfo(), false, false, false);
             }
         } catch (Exception ex) {
             Logger.error(TAG, "Error while making a direct call as Guest", ex);
-            mBroadcastEmitter.outgoingCall(accountID, -1, uri.getUserInfo(), false, false);
+            mBroadcastEmitter.outgoingCall(accountID, -1, uri.getUserInfo(), false, false, false);
         }
     }
 
