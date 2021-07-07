@@ -179,16 +179,15 @@ public class BroadcastEventEmitter implements SipServiceConstants {
         mContext.sendBroadcast(intent);
     }
 
-    void callStats(int duration, String audioCodec, int callStateStatus, RtpStreamStats rx, RtpStreamStats tx) {
-        final Intent intent = new Intent();
-
-        intent.setAction(getAction(BroadcastAction.CALL_STATS));
-        intent.putExtra(PARAM_CALL_STATS_DURATION, duration);
-        intent.putExtra(PARAM_CALL_STATS_AUDIO_CODEC, audioCodec);
-        intent.putExtra(PARAM_CALL_STATS_CALL_STATUS, callStateStatus);
-        intent.putExtra(PARAM_CALL_STATS_RX_STREAM, rx);
-        intent.putExtra(PARAM_CALL_STATS_TX_STREAM, tx);
-
+    void callStats(int callID, int duration, String audioCodec, int callStateStatus, RtpStreamStats rx, RtpStreamStats tx) {
+        final Intent intent = new Intent()
+            .setAction(getAction(BroadcastAction.CALL_STATS))
+            .putExtra(PARAM_CALL_ID, callID)
+            .putExtra(PARAM_CALL_STATS_DURATION, duration)
+            .putExtra(PARAM_CALL_STATS_AUDIO_CODEC, audioCodec)
+            .putExtra(PARAM_CALL_STATS_CALL_STATUS, callStateStatus)
+            .putExtra(PARAM_CALL_STATS_RX_STREAM, rx)
+            .putExtra(PARAM_CALL_STATS_TX_STREAM, tx);
         mContext.sendBroadcast(intent);
     }
 

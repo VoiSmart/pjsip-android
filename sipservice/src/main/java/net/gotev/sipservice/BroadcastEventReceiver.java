@@ -80,7 +80,9 @@ public class BroadcastEventReceiver extends BroadcastReceiver implements SipServ
 
         } else if (BroadcastEventEmitter.getAction(BroadcastEventEmitter.BroadcastAction.CALL_STATS).equals(action)) {
             int callStatus = intent.getIntExtra(PARAM_CALL_STATUS, -1);
-            onCallStats(intent.getIntExtra(PARAM_CALL_STATS_DURATION, 0),
+            onCallStats(
+                intent.getIntExtra(PARAM_CALL_ID, -1),
+                intent.getIntExtra(PARAM_CALL_STATS_DURATION, 0),
                 intent.getStringExtra(PARAM_CALL_STATS_AUDIO_CODEC), callStatus,
                 intent.getParcelableExtra(PARAM_CALL_STATS_RX_STREAM),
                 intent.getParcelableExtra(PARAM_CALL_STATS_TX_STREAM));
@@ -196,7 +198,7 @@ public class BroadcastEventReceiver extends BroadcastReceiver implements SipServ
         Logger.debug(LOG_TAG, "Video resolution " + width+"x"+height);
     }
 
-    protected void onCallStats(int duration, String audioCodec, int callStatusCode, RtpStreamStats rx, RtpStreamStats tx) {
+    protected void onCallStats(int callID, int duration, String audioCodec, int callStatusCode, RtpStreamStats rx, RtpStreamStats tx) {
         Logger.debug(LOG_TAG, "Call Stats sent "+duration+" "+audioCodec);
     }
 

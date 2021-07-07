@@ -121,7 +121,7 @@ public class SipCall extends Call {
                 account.removeCall(callID);
                 if (connectTimestamp > 0 && streamInfo != null && streamStat != null) {
                     try {
-                        sendCallStats(info.getConnectDuration().getSec(), callStatus);
+                        sendCallStats(callID, info.getConnectDuration().getSec(), callStatus);
                     } catch (Exception ex) {
                         Logger.error(LOG_TAG, "Error while sending call stats", ex);
                         throw ex;
@@ -578,7 +578,7 @@ public class SipCall extends Call {
         account.getService().dequeueJob(sendKeyFrameRunnable);
     }
 
-    private void sendCallStats(int duration, int callStatus) {
+    private void sendCallStats(int callID, int duration, int callStatus) {
         String audioCodec = streamInfo.getCodecName().toLowerCase()+"_"+streamInfo.getCodecClockRate();
 
         RtcpStreamStat rxStat = streamStat.getRtcp().getRxStat();
@@ -612,7 +612,7 @@ public class SipCall extends Call {
                 txJitter
         );
 
-        account.getService().getBroadcastEmitter().callStats(duration, audioCodec, callStatus, rx, tx);
+        account.getService().getBroadcastEmitter().callStats(callID, duration, audioCodec, callStatus, rx, tx);
         streamInfo = null;
         streamStat = null;
     }
