@@ -7,6 +7,8 @@ import android.content.IntentFilter;
 
 import java.util.ArrayList;
 
+import static net.gotev.sipservice.ObfuscationHelper.getValue;
+
 /**
  * Reference implementation to receive events emitted by the sip service.
  * @author gotev (Aleksandar Gotev)
@@ -143,19 +145,19 @@ public class BroadcastEventReceiver extends BroadcastReceiver implements SipServ
     }
 
     public void onRegistration(String accountID, int registrationStateCode) {
-        Logger.debug(LOG_TAG, "onRegistration - accountID: " + accountID +
+        Logger.debug(LOG_TAG, "onRegistration - accountID: " + getValue(getReceiverContext(), accountID) +
                 ", registrationStateCode: " + registrationStateCode);
     }
 
     public void onIncomingCall(String accountID, int callID, String displayName, String remoteUri, boolean isVideo) {
-        Logger.debug(LOG_TAG, "onIncomingCall - accountID: " + accountID +
+        Logger.debug(LOG_TAG, "onIncomingCall - accountID: " + getValue(getReceiverContext(), accountID) +
                 ", callID: " + callID +
                 ", displayName: " + displayName +
                 ", remoteUri: " + remoteUri);
     }
 
     public void onCallState(String accountID, int callID, int callStateCode, int callStatusCode, long connectTimestamp) {
-        Logger.debug(LOG_TAG, "onCallState - accountID: " + accountID +
+        Logger.debug(LOG_TAG, "onCallState - accountID: " + getValue(getReceiverContext(), accountID) +
                 ", callID: " + callID +
                 ", callStateCode: " + callStateCode +
                 ", callStatusCode: " + callStatusCode +
@@ -163,14 +165,14 @@ public class BroadcastEventReceiver extends BroadcastReceiver implements SipServ
     }
 
     public void onCallMediaState(String accountID, int callID, MediaState stateType, boolean stateValue) {
-        Logger.debug(LOG_TAG, "onCallState - accountID: " + accountID +
+        Logger.debug(LOG_TAG, "onCallState - accountID: " + getValue(getReceiverContext(), accountID) +
                 ", callID: " + callID +
                 ", mediaStateType: " + stateType.name() +
                 ", mediaStateValue: " + stateValue);
     }
 
     public void onOutgoingCall(String accountID, int callID, String number, boolean isVideo, boolean isVideoConference, boolean isTransfer) {
-        Logger.debug(LOG_TAG, "onOutgoingCall - accountID: " + accountID +
+        Logger.debug(LOG_TAG, "onOutgoingCall - accountID: " + getValue(getReceiverContext(), accountID) +
                 ", callID: " + callID +
                 ", number: " + number);
     }
@@ -191,7 +193,7 @@ public class BroadcastEventReceiver extends BroadcastReceiver implements SipServ
     }
 
     public void onMissedCall(String displayName, String uri) {
-        Logger.debug(LOG_TAG, "Missed call from " + displayName);
+        Logger.debug(LOG_TAG, "Missed call from " + getValue(getReceiverContext(), displayName));
     }
 
     protected void onVideoSize(int width, int height) {

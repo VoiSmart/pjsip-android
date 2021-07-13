@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static net.gotev.sipservice.ObfuscationHelper.getValue;
 import static net.gotev.sipservice.SipServiceCommand.AGENT_NAME;
 
 /**
@@ -247,7 +248,7 @@ public class SipService extends BackgroundService implements SipServiceConstants
                 sipCall.dialDtmf(dtmf);
             } catch (Exception exc) {
                 Logger.error(TAG, "Error while dialing dtmf: " + dtmf + ". AccountID: "
-                             + accountID + ", CallID: " + callID);
+                             + getValue(getApplicationContext(), accountID) + ", CallID: " + callID);
             }
         }
     }
@@ -264,7 +265,7 @@ public class SipService extends BackgroundService implements SipServiceConstants
                 sipCall.acceptIncomingCall();
             } catch (Exception exc) {
                 Logger.error(TAG, "Error while accepting incoming call. AccountID: "
-                        + accountID + ", CallID: " + callID);
+                        + getValue(getApplicationContext(), accountID) + ", CallID: " + callID);
             }
         }
     }
@@ -280,7 +281,7 @@ public class SipService extends BackgroundService implements SipServiceConstants
                 sipCall.setHold(hold);
             } catch (Exception exc) {
                 Logger.error(TAG, "Error while setting hold. AccountID: "
-                        + accountID + ", CallID: " + callID);
+                        + getValue(getApplicationContext(), accountID) + ", CallID: " + callID);
             }
         }
     }
@@ -295,7 +296,7 @@ public class SipService extends BackgroundService implements SipServiceConstants
                 sipCall.toggleHold();
             } catch (Exception exc) {
                 Logger.error(TAG, "Error while toggling hold. AccountID: "
-                        + accountID + ", CallID: " + callID);
+                        + getValue(getApplicationContext(), accountID) + ", CallID: " + callID);
             }
         }
     }
@@ -311,7 +312,7 @@ public class SipService extends BackgroundService implements SipServiceConstants
                 sipCall.setMute(mute);
             } catch (Exception exc) {
                 Logger.error(TAG, "Error while setting mute. AccountID: "
-                        + accountID + ", CallID: " + callID);
+                        + getValue(getApplicationContext(), accountID) + ", CallID: " + callID);
             }
         }
     }
@@ -326,7 +327,7 @@ public class SipService extends BackgroundService implements SipServiceConstants
                 sipCall.toggleMute();
             } catch (Exception exc) {
                 Logger.error(TAG, "Error while toggling mute. AccountID: "
-                        + accountID + ", CallID: " + callID);
+                        + getValue(getApplicationContext(), accountID) + ", CallID: " + callID);
             }
         }
     }
@@ -341,7 +342,7 @@ public class SipService extends BackgroundService implements SipServiceConstants
                 sipCall.declineIncomingCall();
             } catch (Exception exc) {
                 Logger.error(TAG, "Error while declining incoming call. AccountID: "
-                        + accountID + ", CallID: " + callID);
+                        + getValue(getApplicationContext(), accountID) + ", CallID: " + callID);
             }
         }
     }
@@ -418,7 +419,7 @@ public class SipService extends BackgroundService implements SipServiceConstants
                 sipCall.transferTo(number);
             }
         } catch (Exception exc) {
-            Logger.error(TAG, "Error while transferring call to " + number, exc);
+            Logger.error(TAG, "Error while transferring call to " + getValue(getApplicationContext(), number), exc);
             notifyCallDisconnected(accountID, callID);
         }
     }
@@ -570,7 +571,7 @@ public class SipService extends BackgroundService implements SipServiceConstants
             isTransfer = intent.getBooleanExtra(PARAM_IS_TRANSFER, false);
         }
 
-        Logger.debug(TAG, "Making call to " + number);
+        Logger.debug(TAG, "Making call to " + getValue(getApplicationContext(), number));
 
         try {
             SipCall call = mActiveSipAccounts.get(accountID).addOutgoingCall(number, isVideo, isVideoConference, isTransfer);
@@ -595,7 +596,7 @@ public class SipService extends BackgroundService implements SipServiceConstants
             isVideoConference = intent.getBooleanExtra(PARAM_IS_VIDEO_CONF, false);
         }
 
-        Logger.debug(TAG, "Making call to " + uri.getUserInfo());
+        Logger.debug(TAG, "Making call to " + getValue(getApplicationContext(), uri.getUserInfo()));
         String accountID = "sip:"+name+"@"+uri.getHost();
         String sipUri = "sip:" + uri.getUserInfo()+"@"+uri.getHost();
 
@@ -662,7 +663,7 @@ public class SipService extends BackgroundService implements SipServiceConstants
                     refresh = false;
                 }
                 if (regContactParams != null && !(regContactParams.equals(sipAccount.getData().getContactUriParams()))) {
-                    Logger.debug(TAG, regContactParams);
+                    Logger.debug(TAG, getValue(getApplicationContext(), regContactParams));
                     sipAccount.getData().setContactUriParams(regContactParams);
                     refresh = false;
                     mActiveSipAccounts.put(accountID, sipAccount);
@@ -681,7 +682,7 @@ public class SipService extends BackgroundService implements SipServiceConstants
                 ex.printStackTrace();
             }
         } else {
-            Logger.debug(TAG, "account "+accountID+" not set");
+            Logger.debug(TAG, "account "+getValue(getApplicationContext(), accountID)+" not set");
         }
     }
 
@@ -703,7 +704,7 @@ public class SipService extends BackgroundService implements SipServiceConstants
                 removeAccount(data.getIdUri());
                 iterator.remove();
             } catch (Exception exc) {
-                Logger.error(TAG, "Error while removing account " + data.getIdUri(), exc);
+                Logger.error(TAG, "Error while removing account " + getValue(getApplicationContext(), data.getIdUri()), exc);
             }
         }
 
@@ -713,7 +714,7 @@ public class SipService extends BackgroundService implements SipServiceConstants
     private void handleRemoveAccount(Intent intent) {
         String accountIDtoRemove = intent.getStringExtra(PARAM_ACCOUNT_ID);
 
-        Logger.debug(TAG, "Removing " + accountIDtoRemove);
+        Logger.debug(TAG, "Removing " + getValue(getApplicationContext(), accountIDtoRemove));
 
         Iterator<SipAccountData> iterator = mConfiguredAccounts.iterator();
 
@@ -726,7 +727,7 @@ public class SipService extends BackgroundService implements SipServiceConstants
                     iterator.remove();
                     persistConfiguredAccounts();
                 } catch (Exception exc) {
-                    Logger.error(TAG, "Error while removing account " + accountIDtoRemove, exc);
+                    Logger.error(TAG, "Error while removing account " + getValue(getApplicationContext(), accountIDtoRemove), exc);
                 }
                 break;
             }
@@ -739,7 +740,7 @@ public class SipService extends BackgroundService implements SipServiceConstants
         int index = mConfiguredAccounts.indexOf(data);
         if (index == -1) {
             handleResetAccounts();
-            Logger.debug(TAG, "Adding " + data.getIdUri());
+            Logger.debug(TAG, "Adding " + getValue(getApplicationContext(), data.getIdUri()));
 
             try {
                 handleSetCodecPriorities(intent);
@@ -747,10 +748,10 @@ public class SipService extends BackgroundService implements SipServiceConstants
                 mConfiguredAccounts.add(data);
                 persistConfiguredAccounts();
             } catch (Exception exc) {
-                Logger.error(TAG, "Error while adding " + data.getIdUri(), exc);
+                Logger.error(TAG, "Error while adding " + getValue(getApplicationContext(), data.getIdUri()), exc);
             }
         } else {
-            Logger.debug(TAG, "Reconfiguring " + data.getIdUri());
+            Logger.debug(TAG, "Reconfiguring " + getValue(getApplicationContext(), data.getIdUri()));
 
             try {
                 //removeAccount(data.getIdUri());
@@ -759,7 +760,7 @@ public class SipService extends BackgroundService implements SipServiceConstants
                 mConfiguredAccounts.set(index, data);
                 persistConfiguredAccounts();
             } catch (Exception exc) {
-                Logger.error(TAG, "Error while reconfiguring " + data.getIdUri(), exc);
+                Logger.error(TAG, "Error while reconfiguring " + getValue(getApplicationContext(), data.getIdUri()), exc);
             }
         }
     }
@@ -776,7 +777,7 @@ public class SipService extends BackgroundService implements SipServiceConstants
         try {
             mBroadcastEmitter.registrationState(accountID, account.getInfo().getRegStatus());
         } catch (Exception exc) {
-            Logger.error(TAG, "Error while getting registration status for " + accountID, exc);
+            Logger.error(TAG, "Error while getting registration status for " + getValue(getApplicationContext(), accountID), exc);
         }
     }
 
@@ -1023,7 +1024,7 @@ public class SipService extends BackgroundService implements SipServiceConstants
                 try {
                     removeAccount(accountID);
                 } catch (Exception exc) {
-                    Logger.error(TAG, "Error while removing " + accountID);
+                    Logger.error(TAG, "Error while removing " + getValue(getApplicationContext(), accountID));
                 }
             }
         }
@@ -1035,7 +1036,7 @@ public class SipService extends BackgroundService implements SipServiceConstants
                 try {
                     addAccount(accountData);
                 } catch (Exception exc) {
-                    Logger.error(TAG, "Error while adding " + accountData.getIdUri());
+                    Logger.error(TAG, "Error while adding " + getValue(getApplicationContext(), accountData.getIdUri()));
                 }
             }
         }
@@ -1058,7 +1059,7 @@ public class SipService extends BackgroundService implements SipServiceConstants
             SipAccount pjSipAndroidAccount = new SipAccount(this, account);
             pjSipAndroidAccount.create();
             mActiveSipAccounts.put(accountString, pjSipAndroidAccount);
-            Logger.debug(TAG, "SIP account " + account.getIdUri() + " successfully added");
+            Logger.debug(TAG, "SIP account " + getValue(getApplicationContext(), account.getIdUri()) + " successfully added");
         } else {
             sipAccount.setRegistration(true);
         }
@@ -1071,13 +1072,13 @@ public class SipService extends BackgroundService implements SipServiceConstants
         SipAccount account = mActiveSipAccounts.remove(accountID);
 
         if (account == null) {
-            Logger.error(TAG, "No account for ID: " + accountID);
+            Logger.error(TAG, "No account for ID: " + getValue(getApplicationContext(), accountID));
             return;
         }
 
-        Logger.debug(TAG, "Removing SIP account " + accountID);
+        Logger.debug(TAG, "Removing SIP account " + getValue(getApplicationContext(), accountID));
         account.delete();
-        Logger.debug(TAG, "SIP account " + accountID + " successfully removed");
+        Logger.debug(TAG, "SIP account " + getValue(getApplicationContext(), accountID) + " successfully removed");
     }
 
     private void persistConfiguredAccounts() {

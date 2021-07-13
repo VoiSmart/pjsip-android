@@ -10,6 +10,8 @@ import org.pjsip.pjsua2.pjsip_status_code;
 import java.util.HashMap;
 import java.util.Set;
 
+import static net.gotev.sipservice.ObfuscationHelper.getValue;
+
 /**
  * Wrapper around PJSUA2 Account object.
  * @author gotev (Aleksandar Gotev)
@@ -65,7 +67,9 @@ public class SipAccount extends Account {
 
         SipCall call = new SipCall(this, callId);
         activeCalls.put(callId, call);
-        Logger.debug(LOG_TAG, "Added incoming call with ID " + callId + " to " + data.getIdUri());
+        Logger.debug(LOG_TAG, "Added incoming call with ID " + callId
+                + " to " + getValue(service.getApplicationContext(), data.getIdUri())
+        );
         return call;
     }
 
