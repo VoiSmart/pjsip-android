@@ -22,6 +22,7 @@ Native PJSIP library for Android is compiled using [PJSIP Android Builder](https
   - hold
   - un-hold
   - blind transfer
+  - Attended call transfer
   - send DTMF (RFC 2833)
 - Accept an incoming call
 - Answer with video an incoming call
@@ -44,7 +45,6 @@ Native PJSIP library for Android is compiled using [PJSIP Android Builder](https
   - be able to handle other calls coming in while you have an active call
   - be able to hold the current call and make another one (this is the base for attended transfers and conference calls)
 - Conference calls
-- Attended call transfer
 - Complete multiple accounts support
 - Respond to a call and play a sound file
 - Support for In-Call RTCP signaling to get call statistics
