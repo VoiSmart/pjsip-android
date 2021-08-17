@@ -2,7 +2,7 @@ package net.gotev.sipservice.broadcast_events
 
 import net.gotev.sipservice.MediaState
 
-data class MediaStateEvent(
+data class CallMediaStateEvent(
     val accountID: String,
     val callID: Int,
     val stateType: MediaState,

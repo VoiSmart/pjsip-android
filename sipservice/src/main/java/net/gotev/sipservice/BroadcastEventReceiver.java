@@ -14,7 +14,7 @@ import net.gotev.sipservice.broadcast_events.CallStatsEvent;
 import net.gotev.sipservice.broadcast_events.CodecPrioritiesEvent;
 import net.gotev.sipservice.broadcast_events.CodecPrioritiesSetStatusEvent;
 import net.gotev.sipservice.broadcast_events.IncomingCallEvent;
-import net.gotev.sipservice.broadcast_events.MediaStateEvent;
+import net.gotev.sipservice.broadcast_events.CallMediaStateEvent;
 import net.gotev.sipservice.broadcast_events.MissedCallEvent;
 import net.gotev.sipservice.broadcast_events.OutgoingCallEvent;
 import net.gotev.sipservice.broadcast_events.RegistrationEvent;
@@ -65,7 +65,7 @@ public class BroadcastEventReceiver extends BroadcastReceiver implements SipServ
             ));
 
         } else if (BroadcastEventEmitter.getAction(BroadcastEventEmitter.BroadcastAction.CALL_MEDIA_STATE).equals(action)) {
-            onCallMediaState(new MediaStateEvent(
+            onCallMediaState(new CallMediaStateEvent(
                     intent.getStringExtra(PARAM_ACCOUNT_ID),
                     intent.getIntExtra(PARAM_CALL_ID, -1),
                     (MediaState) intent.getSerializableExtra(PARAM_MEDIA_STATE_KEY),
@@ -184,8 +184,8 @@ public class BroadcastEventReceiver extends BroadcastReceiver implements SipServ
         Logger.debug(LOG_TAG, "onCallState - callStateEvent: " + callStateEvent.toString());
     }
 
-    public void onCallMediaState(MediaStateEvent mediaStateEvent) {
-        Logger.debug(LOG_TAG, "onCallState - mediaStateEvent: " + mediaStateEvent.toString());
+    public void onCallMediaState(CallMediaStateEvent callMediaStateEvent) {
+        Logger.debug(LOG_TAG, "onCallState - callMediaStateEvent: " + callMediaStateEvent.toString());
     }
 
     public void onOutgoingCall(OutgoingCallEvent outgoingCallEvent) {
@@ -220,6 +220,6 @@ public class BroadcastEventReceiver extends BroadcastReceiver implements SipServ
     }
 
     protected void onCallReconnectionState(CallReconnectionState state) {
-        Logger.debug(LOG_TAG, "Call reconnection state " + state.name());
+        Logger.debug(LOG_TAG, "onCallReconnectionState - state : " + state.name());
     }
 }
