@@ -1,12 +1,18 @@
 Change Log
 ==========
 
+### Version 2.7.0
+
+_2021-11-17_
+ * **Issues fixed**:
+    + #148
+
 ### Version 2.6.0
 
 _2021-07-22_
  * Added Attended Transfer feature
  * Added Option to obfuscate sensitive data in logs
- * Fixed hold/mute/mute video state not properly broadcasted
+ * Fixed hold/mute/mute video state not properly broadcast
  * **Issues fixed**:
     + #130
     + #134
