@@ -852,11 +852,13 @@ public class SipService extends BackgroundService implements SipServiceConstants
             ArrayList<CodecPriority> codecPriorities = getConfiguredCodecPriorities();
             if (codecPriorities != null) {
                 Logger.debug(TAG, "Setting saved codec priorities...");
+                StringBuilder log = new StringBuilder();
+                log.append("Saved codec priorities set:\n");
                 for (CodecPriority codecPriority : codecPriorities) {
-                    Logger.debug(TAG, "Setting " + codecPriority.getCodecId() + " priority to " + codecPriority.getPriority());
                     mEndpoint.codecSetPriority(codecPriority.getCodecId(), (short) codecPriority.getPriority());
+                    log.append(codecPriority).append(",");
                 }
-                Logger.debug(TAG, "Saved codec priorities set!");
+                Logger.debug(TAG, log.toString());
             } else {
                 mEndpoint.codecSetPriority("OPUS", (short) (CodecPriority.PRIORITY_MAX - 1));
                 mEndpoint.codecSetPriority("PCMA/8000", (short) (CodecPriority.PRIORITY_MAX - 2));
@@ -870,6 +872,9 @@ public class SipService extends BackgroundService implements SipServiceConstants
                 mEndpoint.codecSetPriority("G7221/16000", (short) CodecPriority.PRIORITY_DISABLED);
                 mEndpoint.codecSetPriority("G7221/32000", (short) CodecPriority.PRIORITY_DISABLED);
                 mEndpoint.codecSetPriority("ilbc/8000", (short) CodecPriority.PRIORITY_DISABLED);
+                mEndpoint.codecSetPriority("AMR-WB/16000", (short) CodecPriority.PRIORITY_DISABLED);
+                mEndpoint.codecSetPriority("AMR/8000", (short) CodecPriority.PRIORITY_DISABLED);
+                Logger.debug(TAG, "Default codec priorities set!");
             }
 
             // Set H264 Parameters
@@ -1004,7 +1009,7 @@ public class SipService extends BackgroundService implements SipServiceConstants
 
             for (CodecPriority codecPriority : codecPriorities) {
                 mEndpoint.codecSetPriority(codecPriority.getCodecId(), (short) codecPriority.getPriority());
-                log.append(codecPriority.toString()).append("\n");
+                log.append(codecPriority).append(",");
             }
 
             persistConfiguredCodecPriorities(codecPriorities);
