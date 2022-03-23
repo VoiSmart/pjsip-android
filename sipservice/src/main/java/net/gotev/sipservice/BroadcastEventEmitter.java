@@ -198,10 +198,9 @@ public class BroadcastEventEmitter implements SipServiceConstants {
         mContext.sendBroadcast(intent);
     }
 
-    private boolean sendExplicitBroadcast(Intent intent) {
+    private void sendExplicitBroadcast(Intent intent) {
         PackageManager pm=mContext.getPackageManager();
         List<ResolveInfo> matches=pm.queryBroadcastReceivers(intent, 0);
-        boolean sent = false;
 
         for (ResolveInfo resolveInfo : matches) {
             ComponentName cn=
@@ -210,9 +209,8 @@ public class BroadcastEventEmitter implements SipServiceConstants {
 
             intent.setComponent(cn);
             intent.addFlags(Intent.FLAG_RECEIVER_FOREGROUND);
-            mContext.sendBroadcast(intent);
-            sent = true;
         }
-        return sent;
+
+        mContext.sendBroadcast(intent);
     }
 }
