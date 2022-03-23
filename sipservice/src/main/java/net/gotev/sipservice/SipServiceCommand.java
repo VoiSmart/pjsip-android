@@ -21,6 +21,13 @@ public class SipServiceCommand implements SipServiceConstants {
     public static String AGENT_NAME = "AndroidSipService";
 
     /**
+     * Enables pjsip logging (valid only for debug builds)
+     */
+    public static void EnableDebugLogging(boolean enable) {
+        SipServiceUtils.ENABLE_SIP_LOGGING = enable;
+    }
+
+    /**
      * Adds a new SIP account.
      * @param context application context
      * @param sipAccount sip account data

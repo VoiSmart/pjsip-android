@@ -838,6 +838,7 @@ public class SipService extends BackgroundService implements SipServiceConstants
             epConfig.getMedConfig().setEcOptions(1);
             epConfig.getMedConfig().setEcTailLen(200);
             epConfig.getMedConfig().setThreadCnt(2);
+            SipServiceUtils.setSipLogger(epConfig);
             mEndpoint.libInit(epConfig);
 
             TransportConfig udpTransport = new TransportConfig();
