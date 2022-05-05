@@ -23,7 +23,7 @@ public class SipServiceCommand implements SipServiceConstants {
     /**
      * Enables pjsip logging (valid only for debug builds)
      */
-    public static void EnableDebugLogging(boolean enable) {
+    public static void enableSipDebugLogging(boolean enable) {
         SipServiceUtils.ENABLE_SIP_LOGGING = enable;
     }
 
