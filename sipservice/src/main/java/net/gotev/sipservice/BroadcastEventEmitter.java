@@ -34,7 +34,8 @@ public class BroadcastEventEmitter implements SipServiceConstants {
         MISSED_CALL,
         VIDEO_SIZE,
         CALL_STATS,
-        CALL_RECONNECTION_STATE
+        CALL_RECONNECTION_STATE,
+        SILENT_CALL_STATUS
     }
 
     public BroadcastEventEmitter(Context context) {
@@ -196,6 +197,14 @@ public class BroadcastEventEmitter implements SipServiceConstants {
         intent.setAction(getAction(BroadcastAction.CALL_RECONNECTION_STATE));
         intent.putExtra(PARAM_CALL_RECONNECTION_STATE, state);
         mContext.sendBroadcast(intent);
+    }
+
+    void silentCallStatus(boolean status, String number) {
+        final Intent intent = new Intent();
+        intent.setAction(getAction(BroadcastAction.SILENT_CALL_STATUS));
+        intent.putExtra(PARAM_SILENT_CALL_STATUS, status);
+        intent.putExtra(PARAM_NUMBER, number);
+        sendExplicitBroadcast(intent);
     }
 
     private void sendExplicitBroadcast(Intent intent) {

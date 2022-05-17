@@ -167,6 +167,26 @@ public class SipServiceCommand implements SipServiceConstants {
     }
 
     /**
+     * Makes a silent call, i.e. the outgoing call event is sent through broadcast
+     * {@link BroadcastEventEmitter#silentCallStatus(boolean, String)}
+     * Instead of {@link BroadcastEventEmitter#outgoingCall(String, int, String, boolean, boolean, boolean)}
+     * Useful when the calls only enables/disables features/services on the pbx via feature codes
+     * E.g. enable dnd, join/leave queue, ...
+     * @param context application context
+     * @param accountID account ID used to make the call
+     * @param numberToCall number to call
+     */
+    public static void makeSilentCall(Context context, String accountID, String numberToCall) {
+        checkAccount(accountID);
+
+        Intent intent = new Intent(context, SipService.class);
+        intent.setAction(ACTION_MAKE_SILENT_CALL);
+        intent.putExtra(PARAM_ACCOUNT_ID, accountID);
+        intent.putExtra(PARAM_NUMBER, numberToCall);
+        context.startService(intent);
+    }
+
+    /**
      * Makes a Direct call.
      * @param context application context
      * @param guestName name to display when making guest calls

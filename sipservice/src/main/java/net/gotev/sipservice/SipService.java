@@ -1,5 +1,8 @@
 package net.gotev.sipservice;
 
+import static net.gotev.sipservice.ObfuscationHelper.getValue;
+import static net.gotev.sipservice.SipServiceCommand.AGENT_NAME;
+
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -32,9 +35,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-
-import static net.gotev.sipservice.ObfuscationHelper.getValue;
-import static net.gotev.sipservice.SipServiceCommand.AGENT_NAME;
 
 /**
  * Sip Service.
@@ -177,6 +177,9 @@ public class SipService extends BackgroundService implements SipServiceConstants
                     break;
                 case ACTION_RECONNECT_CALL:
                     handleReconnectCall();
+                    break;
+                case ACTION_MAKE_SILENT_CALL:
+                    handleMakeSilentCall(intent);
                     break;
                 default: break;
             }
@@ -628,6 +631,20 @@ public class SipService extends BackgroundService implements SipServiceConstants
         } catch (Exception ex) {
             Logger.error(TAG, "Error while making a direct call as Guest", ex);
             mBroadcastEmitter.outgoingCall(accountID, -1, uri.getUserInfo(), false, false, false);
+        }
+    }
+
+    private void handleMakeSilentCall(Intent intent) {
+        String accountID = intent.getStringExtra(PARAM_ACCOUNT_ID);
+        String number = intent.getStringExtra(PARAM_NUMBER);
+
+        Logger.debug(TAG, "Making silent call to " + getValue(getApplicationContext(), number));
+
+        try {
+            mBroadcastEmitter.silentCallStatus(mActiveSipAccounts.get(accountID).addOutgoingCall(number) != null, number);
+        } catch (Exception exc) {
+            mBroadcastEmitter.silentCallStatus(false, number);
+            Logger.error(TAG, "Error while making silent call", exc);
         }
     }
 
