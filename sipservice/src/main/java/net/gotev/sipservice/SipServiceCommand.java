@@ -474,7 +474,7 @@ public class SipServiceCommand implements SipServiceConstants {
     }
 
     private static void checkAccount(String accountID) {
-        if (accountID == null || accountID.isEmpty() || !accountID.startsWith("sip:")) {
+        if (accountID == null || !accountID.startsWith("sip:")) {
             throw new IllegalArgumentException("Invalid accountID! Example: sip:user@domain");
         }
     }
