@@ -2,8 +2,11 @@ package net.gotev.sipservice;
 
 import android.content.Context;
 import android.content.Intent;
+import android.hardware.camera2.CameraManager;
 import android.net.Uri;
 import android.view.Surface;
+
+import org.pjsip.PjCameraInfo2;
 
 import java.util.ArrayList;
 
@@ -643,5 +646,14 @@ public class SipServiceCommand implements SipServiceConstants {
         Intent intent = new Intent(context, SipService.class);
         intent.setAction(ACTION_RECONNECT_CALL);
         context.startService(intent);
+    }
+
+    /**
+     * Sets the camera manager within the PjCamera2Info class
+     * it is used to enumerate the video devices without the CAMERA permission
+     * @param cm CameraManager retrieved with {@link Context#getSystemService(String)}}
+     */
+    public static void setCameraManager(CameraManager cm) {
+        PjCameraInfo2.SetCameraManager(cm);
     }
 }
