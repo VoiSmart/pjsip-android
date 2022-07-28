@@ -232,11 +232,11 @@ public class SipAccountData implements Parcelable {
         }
         accountConfig.getRegConfig().setRegistrarUri(getRegistrarUri());
         accountConfig.getRegConfig().setTimeoutSec(regExpirationTimeout);
+        accountConfig.getRegConfig().setContactUriParams(contactUriParams);
 
         // account sip stuff configs
         accountConfig.getSipConfig().getAuthCreds().add(getAuthCredInfo());
         accountConfig.getSipConfig().getProxies().add(getProxyUri());
-        accountConfig.getSipConfig().setContactUriParams(contactUriParams);
 
         // nat configs to allow call reconnection across networks
         accountConfig.getNatConfig().setSdpNatRewriteUse(pj_constants_.PJ_TRUE);
