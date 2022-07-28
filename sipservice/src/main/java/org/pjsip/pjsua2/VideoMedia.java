@@ -56,6 +56,10 @@ public class VideoMedia extends Media {
     pjsua2JNI.VideoMedia_stopTransmit(swigCPtr, this, VideoMedia.getCPtr(sink), sink);
   }
 
+  public void update() throws java.lang.Exception {
+    pjsua2JNI.VideoMedia_update(swigCPtr, this);
+  }
+
   public VideoMedia() {
     this(pjsua2JNI.new_VideoMedia(), true);
   }

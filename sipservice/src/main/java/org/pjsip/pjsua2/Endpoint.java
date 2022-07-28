@@ -319,4 +319,8 @@ public class Endpoint {
     if (getClass() == Endpoint.class) pjsua2JNI.Endpoint_onMediaEvent(swigCPtr, this, OnMediaEventParam.getCPtr(prm), prm); else pjsua2JNI.Endpoint_onMediaEventSwigExplicitEndpoint(swigCPtr, this, OnMediaEventParam.getCPtr(prm), prm);
   }
 
+  public int onCredAuth(OnCredAuthParam prm) {
+    return (getClass() == Endpoint.class) ? pjsua2JNI.Endpoint_onCredAuth(swigCPtr, this, OnCredAuthParam.getCPtr(prm), prm) : pjsua2JNI.Endpoint_onCredAuthSwigExplicitEndpoint(swigCPtr, this, OnCredAuthParam.getCPtr(prm), prm);
+  }
+
 }

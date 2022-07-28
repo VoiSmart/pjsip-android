@@ -31,6 +31,10 @@ public class VidDevManager {
     }
   }
 
+  public void initSubsys() throws java.lang.Exception {
+    pjsua2JNI.VidDevManager_initSubsys(swigCPtr, this);
+  }
+
   public void refreshDevs() throws java.lang.Exception {
     pjsua2JNI.VidDevManager_refreshDevs(swigCPtr, this);
   }

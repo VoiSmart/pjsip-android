@@ -69,6 +69,14 @@ public class AccountRegConfig extends PersistentObject {
     return pjsua2JNI.AccountRegConfig_contactParams_get(swigCPtr, this);
   }
 
+  public void setContactUriParams(String value) {
+    pjsua2JNI.AccountRegConfig_contactUriParams_set(swigCPtr, this, value);
+  }
+
+  public String getContactUriParams() {
+    return pjsua2JNI.AccountRegConfig_contactUriParams_get(swigCPtr, this);
+  }
+
   public void setTimeoutSec(long value) {
     pjsua2JNI.AccountRegConfig_timeoutSec_set(swigCPtr, this, value);
   }

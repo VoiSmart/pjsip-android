@@ -93,6 +93,24 @@ public class pjsua2JNI {
   public final static native int IntVector_doSet(long jarg1, IntVector jarg1_, int jarg2, int jarg3);
   public final static native void IntVector_doRemoveRange(long jarg1, IntVector jarg1_, int jarg2, int jarg3);
   public final static native void delete_IntVector(long jarg1);
+  public final static native long new_StringToStringMap__SWIG_0();
+  public final static native long new_StringToStringMap__SWIG_1(long jarg1, StringToStringMap jarg1_);
+  public final static native long StringToStringMap_Iterator_getNextUnchecked(long jarg1, StringToStringMap.Iterator jarg1_);
+  public final static native boolean StringToStringMap_Iterator_isNot(long jarg1, StringToStringMap.Iterator jarg1_, long jarg2, StringToStringMap.Iterator jarg2_);
+  public final static native String StringToStringMap_Iterator_getKey(long jarg1, StringToStringMap.Iterator jarg1_);
+  public final static native String StringToStringMap_Iterator_getValue(long jarg1, StringToStringMap.Iterator jarg1_);
+  public final static native void StringToStringMap_Iterator_setValue(long jarg1, StringToStringMap.Iterator jarg1_, String jarg2);
+  public final static native void delete_StringToStringMap_Iterator(long jarg1);
+  public final static native boolean StringToStringMap_isEmpty(long jarg1, StringToStringMap jarg1_);
+  public final static native void StringToStringMap_clear(long jarg1, StringToStringMap jarg1_);
+  public final static native long StringToStringMap_find(long jarg1, StringToStringMap jarg1_, String jarg2);
+  public final static native long StringToStringMap_begin(long jarg1, StringToStringMap jarg1_);
+  public final static native long StringToStringMap_end(long jarg1, StringToStringMap jarg1_);
+  public final static native int StringToStringMap_sizeImpl(long jarg1, StringToStringMap jarg1_);
+  public final static native boolean StringToStringMap_containsImpl(long jarg1, StringToStringMap jarg1_, String jarg2);
+  public final static native void StringToStringMap_putUnchecked(long jarg1, StringToStringMap jarg1_, String jarg2, String jarg3);
+  public final static native void StringToStringMap_removeUnchecked(long jarg1, StringToStringMap jarg1_, long jarg2, StringToStringMap.Iterator jarg2_);
+  public final static native void delete_StringToStringMap(long jarg1);
   public final static native void Error_status_set(long jarg1, Error jarg1_, int jarg2);
   public final static native int Error_status_get(long jarg1, Error jarg1_);
   public final static native void Error_title_set(long jarg1, Error jarg1_, String jarg2);
@@ -1032,6 +1050,7 @@ public class pjsua2JNI {
   public final static native long VideoMedia_getPortInfoFromId(int jarg1) throws java.lang.Exception;
   public final static native void VideoMedia_startTransmit(long jarg1, VideoMedia jarg1_, long jarg2, VideoMedia jarg2_, long jarg3, VideoMediaTransmitParam jarg3_) throws java.lang.Exception;
   public final static native void VideoMedia_stopTransmit(long jarg1, VideoMedia jarg1_, long jarg2, VideoMedia jarg2_) throws java.lang.Exception;
+  public final static native void VideoMedia_update(long jarg1, VideoMedia jarg1_) throws java.lang.Exception;
   public final static native long new_VideoMedia();
   public final static native void delete_VideoMedia(long jarg1);
   public final static native void WindowHandle_setWindow(long jarg1, WindowHandle jarg1_, java.lang.Object jarg2);
@@ -1066,6 +1085,7 @@ public class pjsua2JNI {
   public final static native void VideoWindow_rotate(long jarg1, VideoWindow jarg1_, int jarg2) throws java.lang.Exception;
   public final static native void VideoWindow_setWindow(long jarg1, VideoWindow jarg1_, long jarg2, VideoWindowHandle jarg2_) throws java.lang.Exception;
   public final static native void VideoWindow_setFullScreen(long jarg1, VideoWindow jarg1_, boolean jarg2) throws java.lang.Exception;
+  public final static native void VideoWindow_setFullScreen2(long jarg1, VideoWindow jarg1_, int jarg2) throws java.lang.Exception;
   public final static native void delete_VideoWindow(long jarg1);
   public final static native void VideoPreviewOpParam_rendId_set(long jarg1, VideoPreviewOpParam jarg1_, int jarg2);
   public final static native int VideoPreviewOpParam_rendId_get(long jarg1, VideoPreviewOpParam jarg1_);
@@ -1104,6 +1124,7 @@ public class pjsua2JNI {
   public final static native int VideoSwitchParam_target_id_get(long jarg1, VideoSwitchParam jarg1_);
   public final static native long new_VideoSwitchParam();
   public final static native void delete_VideoSwitchParam(long jarg1);
+  public final static native void VidDevManager_initSubsys(long jarg1, VidDevManager jarg1_) throws java.lang.Exception;
   public final static native void VidDevManager_refreshDevs(long jarg1, VidDevManager jarg1_) throws java.lang.Exception;
   public final static native long VidDevManager_getDevCount(long jarg1, VidDevManager jarg1_);
   public final static native long VidDevManager_getDevInfo(long jarg1, VidDevManager jarg1_, int jarg2) throws java.lang.Exception;
@@ -1288,6 +1309,7 @@ public class pjsua2JNI {
   public final static native void delete_Buddy(long jarg1);
   public final static native void Buddy_create(long jarg1, Buddy jarg1_, long jarg2, Account jarg2_, long jarg3, BuddyConfig jarg3_) throws java.lang.Exception;
   public final static native boolean Buddy_isValid(long jarg1, Buddy jarg1_);
+  public final static native int Buddy_getId(long jarg1, Buddy jarg1_);
   public final static native long Buddy_getInfo(long jarg1, Buddy jarg1_) throws java.lang.Exception;
   public final static native void Buddy_subscribePresence(long jarg1, Buddy jarg1_, boolean jarg2) throws java.lang.Exception;
   public final static native void Buddy_updatePresence(long jarg1, Buddy jarg1_) throws java.lang.Exception;
@@ -1307,6 +1329,8 @@ public class pjsua2JNI {
   public final static native long AccountRegConfig_headers_get(long jarg1, AccountRegConfig jarg1_);
   public final static native void AccountRegConfig_contactParams_set(long jarg1, AccountRegConfig jarg1_, String jarg2);
   public final static native String AccountRegConfig_contactParams_get(long jarg1, AccountRegConfig jarg1_);
+  public final static native void AccountRegConfig_contactUriParams_set(long jarg1, AccountRegConfig jarg1_, String jarg2);
+  public final static native String AccountRegConfig_contactUriParams_get(long jarg1, AccountRegConfig jarg1_);
   public final static native void AccountRegConfig_timeoutSec_set(long jarg1, AccountRegConfig jarg1_, long jarg2);
   public final static native long AccountRegConfig_timeoutSec_get(long jarg1, AccountRegConfig jarg1_);
   public final static native void AccountRegConfig_retryIntervalSec_set(long jarg1, AccountRegConfig jarg1_, long jarg2);
@@ -1495,6 +1519,10 @@ public class pjsua2JNI {
   public final static native boolean AccountMediaConfig_rtcpMuxEnabled_get(long jarg1, AccountMediaConfig jarg1_);
   public final static native void AccountMediaConfig_rtcpFbConfig_set(long jarg1, AccountMediaConfig jarg1_, long jarg2, RtcpFbConfig jarg2_);
   public final static native long AccountMediaConfig_rtcpFbConfig_get(long jarg1, AccountMediaConfig jarg1_);
+  public final static native void AccountMediaConfig_useLoopMedTp_set(long jarg1, AccountMediaConfig jarg1_, boolean jarg2);
+  public final static native boolean AccountMediaConfig_useLoopMedTp_get(long jarg1, AccountMediaConfig jarg1_);
+  public final static native void AccountMediaConfig_enableLoopback_set(long jarg1, AccountMediaConfig jarg1_, boolean jarg2);
+  public final static native boolean AccountMediaConfig_enableLoopback_get(long jarg1, AccountMediaConfig jarg1_);
   public final static native long new_AccountMediaConfig();
   public final static native void AccountMediaConfig_readObject(long jarg1, AccountMediaConfig jarg1_, long jarg2, ContainerNode jarg2_) throws java.lang.Exception;
   public final static native void AccountMediaConfig_writeObject(long jarg1, AccountMediaConfig jarg1_, long jarg2, ContainerNode jarg2_) throws java.lang.Exception;
@@ -1851,6 +1879,8 @@ public class pjsua2JNI {
   public final static native long CallSetting_audioCount_get(long jarg1, CallSetting jarg1_);
   public final static native void CallSetting_videoCount_set(long jarg1, CallSetting jarg1_, long jarg2);
   public final static native long CallSetting_videoCount_get(long jarg1, CallSetting jarg1_);
+  public final static native void CallSetting_mediaDir_set(long jarg1, CallSetting jarg1_, long jarg2, IntVector jarg2_);
+  public final static native long CallSetting_mediaDir_get(long jarg1, CallSetting jarg1_);
   public final static native long new_CallSetting__SWIG_0(boolean jarg1);
   public final static native long new_CallSetting__SWIG_1();
   public final static native boolean CallSetting_isEmpty(long jarg1, CallSetting jarg1_);
@@ -2374,6 +2404,58 @@ public class pjsua2JNI {
   public final static native long OnMediaEventParam_ev_get(long jarg1, OnMediaEventParam jarg1_);
   public final static native long new_OnMediaEventParam();
   public final static native void delete_OnMediaEventParam(long jarg1);
+  public final static native void DigestChallenge_realm_set(long jarg1, DigestChallenge jarg1_, String jarg2);
+  public final static native String DigestChallenge_realm_get(long jarg1, DigestChallenge jarg1_);
+  public final static native void DigestChallenge_otherParam_set(long jarg1, DigestChallenge jarg1_, long jarg2, StringToStringMap jarg2_);
+  public final static native long DigestChallenge_otherParam_get(long jarg1, DigestChallenge jarg1_);
+  public final static native void DigestChallenge_domain_set(long jarg1, DigestChallenge jarg1_, String jarg2);
+  public final static native String DigestChallenge_domain_get(long jarg1, DigestChallenge jarg1_);
+  public final static native void DigestChallenge_nonce_set(long jarg1, DigestChallenge jarg1_, String jarg2);
+  public final static native String DigestChallenge_nonce_get(long jarg1, DigestChallenge jarg1_);
+  public final static native void DigestChallenge_opaque_set(long jarg1, DigestChallenge jarg1_, String jarg2);
+  public final static native String DigestChallenge_opaque_get(long jarg1, DigestChallenge jarg1_);
+  public final static native void DigestChallenge_stale_set(long jarg1, DigestChallenge jarg1_, int jarg2);
+  public final static native int DigestChallenge_stale_get(long jarg1, DigestChallenge jarg1_);
+  public final static native void DigestChallenge_algorithm_set(long jarg1, DigestChallenge jarg1_, String jarg2);
+  public final static native String DigestChallenge_algorithm_get(long jarg1, DigestChallenge jarg1_);
+  public final static native void DigestChallenge_qop_set(long jarg1, DigestChallenge jarg1_, String jarg2);
+  public final static native String DigestChallenge_qop_get(long jarg1, DigestChallenge jarg1_);
+  public final static native long new_DigestChallenge();
+  public final static native void delete_DigestChallenge(long jarg1);
+  public final static native void DigestCredential_realm_set(long jarg1, DigestCredential jarg1_, String jarg2);
+  public final static native String DigestCredential_realm_get(long jarg1, DigestCredential jarg1_);
+  public final static native void DigestCredential_otherParam_set(long jarg1, DigestCredential jarg1_, long jarg2, StringToStringMap jarg2_);
+  public final static native long DigestCredential_otherParam_get(long jarg1, DigestCredential jarg1_);
+  public final static native void DigestCredential_username_set(long jarg1, DigestCredential jarg1_, String jarg2);
+  public final static native String DigestCredential_username_get(long jarg1, DigestCredential jarg1_);
+  public final static native void DigestCredential_nonce_set(long jarg1, DigestCredential jarg1_, String jarg2);
+  public final static native String DigestCredential_nonce_get(long jarg1, DigestCredential jarg1_);
+  public final static native void DigestCredential_uri_set(long jarg1, DigestCredential jarg1_, String jarg2);
+  public final static native String DigestCredential_uri_get(long jarg1, DigestCredential jarg1_);
+  public final static native void DigestCredential_response_set(long jarg1, DigestCredential jarg1_, String jarg2);
+  public final static native String DigestCredential_response_get(long jarg1, DigestCredential jarg1_);
+  public final static native void DigestCredential_algorithm_set(long jarg1, DigestCredential jarg1_, String jarg2);
+  public final static native String DigestCredential_algorithm_get(long jarg1, DigestCredential jarg1_);
+  public final static native void DigestCredential_cnonce_set(long jarg1, DigestCredential jarg1_, String jarg2);
+  public final static native String DigestCredential_cnonce_get(long jarg1, DigestCredential jarg1_);
+  public final static native void DigestCredential_opaque_set(long jarg1, DigestCredential jarg1_, String jarg2);
+  public final static native String DigestCredential_opaque_get(long jarg1, DigestCredential jarg1_);
+  public final static native void DigestCredential_qop_set(long jarg1, DigestCredential jarg1_, String jarg2);
+  public final static native String DigestCredential_qop_get(long jarg1, DigestCredential jarg1_);
+  public final static native void DigestCredential_nc_set(long jarg1, DigestCredential jarg1_, String jarg2);
+  public final static native String DigestCredential_nc_get(long jarg1, DigestCredential jarg1_);
+  public final static native long new_DigestCredential();
+  public final static native void delete_DigestCredential(long jarg1);
+  public final static native void OnCredAuthParam_digestChallenge_set(long jarg1, OnCredAuthParam jarg1_, long jarg2, DigestChallenge jarg2_);
+  public final static native long OnCredAuthParam_digestChallenge_get(long jarg1, OnCredAuthParam jarg1_);
+  public final static native void OnCredAuthParam_credentialInfo_set(long jarg1, OnCredAuthParam jarg1_, long jarg2, AuthCredInfo jarg2_);
+  public final static native long OnCredAuthParam_credentialInfo_get(long jarg1, OnCredAuthParam jarg1_);
+  public final static native void OnCredAuthParam_method_set(long jarg1, OnCredAuthParam jarg1_, String jarg2);
+  public final static native String OnCredAuthParam_method_get(long jarg1, OnCredAuthParam jarg1_);
+  public final static native void OnCredAuthParam_digestCredential_set(long jarg1, OnCredAuthParam jarg1_, long jarg2, DigestCredential jarg2_);
+  public final static native long OnCredAuthParam_digestCredential_get(long jarg1, OnCredAuthParam jarg1_);
+  public final static native long new_OnCredAuthParam();
+  public final static native void delete_OnCredAuthParam(long jarg1);
   public final static native void UaConfig_maxCalls_set(long jarg1, UaConfig jarg1_, long jarg2);
   public final static native long UaConfig_maxCalls_get(long jarg1, UaConfig jarg1_);
   public final static native void UaConfig_threadCnt_set(long jarg1, UaConfig jarg1_, long jarg2);
@@ -2569,6 +2651,8 @@ public class pjsua2JNI {
   public final static native void Endpoint_onIpChangeProgressSwigExplicitEndpoint(long jarg1, Endpoint jarg1_, long jarg2, OnIpChangeProgressParam jarg2_);
   public final static native void Endpoint_onMediaEvent(long jarg1, Endpoint jarg1_, long jarg2, OnMediaEventParam jarg2_);
   public final static native void Endpoint_onMediaEventSwigExplicitEndpoint(long jarg1, Endpoint jarg1_, long jarg2, OnMediaEventParam jarg2_);
+  public final static native int Endpoint_onCredAuth(long jarg1, Endpoint jarg1_, long jarg2, OnCredAuthParam jarg2_);
+  public final static native int Endpoint_onCredAuthSwigExplicitEndpoint(long jarg1, Endpoint jarg1_, long jarg2, OnCredAuthParam jarg2_);
   public final static native void Endpoint_director_connect(Endpoint obj, long cptr, boolean mem_own, boolean weak_global);
   public final static native void Endpoint_change_ownership(Endpoint obj, long cptr, boolean take_or_release);
   public final static native long AuthCredInfo_SWIGUpcast(long jarg1);
@@ -2733,6 +2817,9 @@ public class pjsua2JNI {
   }
   public static void SwigDirector_Endpoint_onMediaEvent(Endpoint jself, long prm) {
     jself.onMediaEvent(new OnMediaEventParam(prm, false));
+  }
+  public static int SwigDirector_Endpoint_onCredAuth(Endpoint jself, long prm) {
+    return jself.onCredAuth(new OnCredAuthParam(prm, false));
   }
 
   private final static native void swig_module_init();

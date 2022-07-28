@@ -16,5 +16,6 @@ public final class pjsua_call_flag {
   public final static int PJSUA_CALL_REINIT_MEDIA = 16;
   public final static int PJSUA_CALL_UPDATE_VIA = 32;
   public final static int PJSUA_CALL_UPDATE_TARGET = 64;
+  public final static int PJSUA_CALL_SET_MEDIA_DIR = 128;
 }
 

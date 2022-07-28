@@ -64,6 +64,10 @@ public class Buddy {
     return pjsua2JNI.Buddy_isValid(swigCPtr, this);
   }
 
+  public int getId() {
+    return pjsua2JNI.Buddy_getId(swigCPtr, this);
+  }
+
   public BuddyInfo getInfo() throws java.lang.Exception {
     return new BuddyInfo(pjsua2JNI.Buddy_getInfo(swigCPtr, this), true);
   }

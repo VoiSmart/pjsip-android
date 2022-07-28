@@ -68,6 +68,15 @@ public class CallSetting {
     return pjsua2JNI.CallSetting_videoCount_get(swigCPtr, this);
   }
 
+  public void setMediaDir(IntVector value) {
+    pjsua2JNI.CallSetting_mediaDir_set(swigCPtr, this, IntVector.getCPtr(value), value);
+  }
+
+  public IntVector getMediaDir() {
+    long cPtr = pjsua2JNI.CallSetting_mediaDir_get(swigCPtr, this);
+    return (cPtr == 0) ? null : new IntVector(cPtr, false);
+  }
+
   public CallSetting(boolean useDefaultValues) {
     this(pjsua2JNI.new_CallSetting__SWIG_0(useDefaultValues), true);
   }

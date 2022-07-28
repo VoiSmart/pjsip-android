@@ -72,4 +72,8 @@ public class VideoWindow {
     pjsua2JNI.VideoWindow_setFullScreen(swigCPtr, this, enabled);
   }
 
+  public void setFullScreen2(int mode) throws java.lang.Exception {
+    pjsua2JNI.VideoWindow_setFullScreen2(swigCPtr, this, mode);
+  }
+
 }
