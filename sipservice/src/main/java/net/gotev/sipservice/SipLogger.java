@@ -12,7 +12,7 @@ import org.pjsip.pjsua2.pj_log_decoration;
  */
 public class SipLogger extends LogWriter {
     public void write(LogEntry entry) {
-        Logger.error(entry.getThreadName(), entry.getMsg());
+        Logger.debug(entry.getThreadName(), entry.getMsg());
     }
 
     /**
@@ -27,7 +27,6 @@ public class SipLogger extends LogWriter {
                 | pj_log_decoration.PJ_LOG_HAS_LEVEL_TEXT
                 | pj_log_decoration.PJ_LOG_HAS_TIME
                 | pj_log_decoration.PJ_LOG_HAS_SENDER
-                | pj_log_decoration.PJ_LOG_HAS_SPACE
-                | pj_log_decoration.PJ_LOG_HAS_THREAD_ID;
+                | pj_log_decoration.PJ_LOG_HAS_SPACE;
     }
 }

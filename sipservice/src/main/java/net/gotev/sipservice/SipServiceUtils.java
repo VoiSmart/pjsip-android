@@ -13,6 +13,10 @@ public class SipServiceUtils {
 
     public static boolean ENABLE_SIP_LOGGING = false;
 
+    // Keeping the reference avoids the logger being garbage collected thus crashing the lib
+    @SuppressWarnings("FieldCanBeLocal")
+    private static SipLogger sipLogger;
+
     /**
      * Sets logger writer and decor flags on the endpoint config
      * Change flags as needed
@@ -21,9 +25,9 @@ public class SipServiceUtils {
     public static void setSipLogger(EpConfig epConfig) {
         if (BuildConfig.DEBUG && ENABLE_SIP_LOGGING) {
             LogConfig logCfg = epConfig.getLogConfig();
-            SipLogger sipLogger = new SipLogger();
+            sipLogger = new SipLogger();
             logCfg.setWriter(sipLogger);
-            logCfg.setDecor(sipLogger.getDecor());
+            logCfg.setDecor(sipLogger.getDecor() | sipLogger.getDecor());
         }
     }
 }
