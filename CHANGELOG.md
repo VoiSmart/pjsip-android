@@ -1,6 +1,24 @@
 Change Log
 ==========
 
+### Version 2.8.0
+
+_2022-08-02_
+
+* **\[NEW\] PJSIP** version 2.12.1
+* TLS and SRTP Support
+* SIP Logging
+* **TargetSdk increased** - Minimum SDK is now increased to api 30
+* Silent Call Feature
+* **Issues fixed**:
+   * #147
+   * #155
+   * #158
+   * #159
+   * #160
+   * #163
+   * #164
+
 ### Version 2.7.0
 
 _2021-11-17_

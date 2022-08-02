@@ -44,6 +44,8 @@ Native PJSIP library for Android is compiled using [PJSIP Android Builder](https
 - Get Call Statistics on call disconnected
 - Sip Credential encryption on device. Refer to VoiSmart [Crypto](https://github.com/VoiSmart/crypto) library for more details
 - Call Reconnection: useful after a network disconnection, it will try to reconnect the call with new ip/port
+- TLS and SRTP support
+- Silent Calls
 
 ### What is missing (contributions are welcome)
 
@@ -96,6 +98,10 @@ You can customize such behaviour by either:
     ```
 
    [Timber](https://github.com/JakeWharton/timber) can be configured as you wish, to log everything or just in debug mode, or log to anywhere.
+
+## SIP Logging
+
+To allow see PjSip logs you need to set `SipServiceUtils.ENABLE_SIP_LOGGING` to `true` which will log all pjsip logs while in debug mode.
 
 ## Recompile native libraries
 
