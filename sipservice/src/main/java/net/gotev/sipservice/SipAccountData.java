@@ -1,5 +1,7 @@
 package net.gotev.sipservice;
 
+import static net.gotev.sipservice.SipServiceConstants.DEFAULT_SIP_PORT;
+
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -25,7 +27,7 @@ public class SipAccountData implements Parcelable {
     private String password;
     private String realm;
     private String host;
-    private long port = 5060;
+    private long port = DEFAULT_SIP_PORT;
     private boolean tcpTransport = false;
     private String authenticationType = AUTH_TYPE_DIGEST;
     private String contactUriParams = "";

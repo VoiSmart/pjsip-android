@@ -112,4 +112,9 @@ public interface SipServiceConstants {
      * Generic Constants
      */
     int DELAYED_JOB_DEFAULT_DELAY = 5000;
+
+    /**
+     * SIP DEFAULT PORTS
+     */
+    int DEFAULT_SIP_PORT = 5060;
 }

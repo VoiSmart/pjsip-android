@@ -608,7 +608,7 @@ public class SipService extends BackgroundService implements SipServiceConstants
             SipAccountData sipAccountData = new SipAccountData()
                     .setHost(sipServer != null ? sipServer : uri.getHost())
                     .setUsername(name)
-                    .setPort((uri.getPort() > 0) ? uri.getPort() : 5060)
+                    .setPort((uri.getPort() > 0) ? uri.getPort() : DEFAULT_SIP_PORT)
                     .setRealm(uri.getHost());
             /* display name not yet implemented server side for direct calls */
             /* .setUsername("guest") */
