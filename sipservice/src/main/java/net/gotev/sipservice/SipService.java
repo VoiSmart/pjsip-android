@@ -862,9 +862,12 @@ public class SipService extends BackgroundService implements SipServiceConstants
             udpTransport.setQosType(pj_qos_type.PJ_QOS_TYPE_VOICE);
             TransportConfig tcpTransport = new TransportConfig();
             tcpTransport.setQosType(pj_qos_type.PJ_QOS_TYPE_VOICE);
+            TransportConfig tlsTransport = new TransportConfig();
+            tlsTransport.setQosType(pj_qos_type.PJ_QOS_TYPE_VOICE);
 
             mEndpoint.transportCreate(pjsip_transport_type_e.PJSIP_TRANSPORT_UDP, udpTransport);
             mEndpoint.transportCreate(pjsip_transport_type_e.PJSIP_TRANSPORT_TCP, tcpTransport);
+            mEndpoint.transportCreate(pjsip_transport_type_e.PJSIP_TRANSPORT_TLS, tlsTransport);
             mEndpoint.libStart();
 
             ArrayList<CodecPriority> codecPriorities = getConfiguredCodecPriorities();
