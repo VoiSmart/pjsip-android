@@ -210,9 +210,13 @@ public class SipCall extends Call {
 
     @Override
     public void onStreamDestroyed(OnStreamDestroyedParam prm) {
+        long idx = prm.getStreamIdx();
         try {
-            streamInfo = getStreamInfo(0);
-            streamStat = getStreamStat(0);
+            CallInfo callInfo = getInfo();
+            if (getInfo().getMedia().get((int)idx).getType() == pjmedia_type.PJMEDIA_TYPE_AUDIO) {
+                streamInfo = getStreamInfo(idx);
+                streamStat = getStreamStat(idx);
+            }
         } catch (Exception ex) {
             Logger.error(LOG_TAG, "onStreamDestroyed: error while getting call stats", ex);
         }
