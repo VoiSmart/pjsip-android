@@ -117,4 +117,9 @@ public interface SipServiceConstants {
      * SIP DEFAULT PORTS
      */
     int DEFAULT_SIP_PORT = 5060;
+
+    /**
+     * PJSIP TLS VERIFY PEER ERROR
+     */
+    int PJSIP_TLS_ECERTVERIF = 171173;
 }

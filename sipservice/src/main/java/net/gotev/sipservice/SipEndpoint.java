@@ -2,7 +2,9 @@ package net.gotev.sipservice;
 
 import org.pjsip.pjsua2.Endpoint;
 import org.pjsip.pjsua2.OnIpChangeProgressParam;
+import org.pjsip.pjsua2.OnTransportStateParam;
 import org.pjsip.pjsua2.pj_constants_;
+import org.pjsip.pjsua2.pjsip_transport_state;
 import org.pjsip.pjsua2.pjsua_ip_change_op;
 
 public class SipEndpoint extends Endpoint {
@@ -11,6 +13,17 @@ public class SipEndpoint extends Endpoint {
     public SipEndpoint(SipService service) {
         super();
         this.service = service;
+    }
+
+    @Override
+    public void onTransportState(OnTransportStateParam prm) {
+        super.onTransportState(prm);
+        if (prm.getState() == pjsip_transport_state.PJSIP_TP_STATE_DISCONNECTED &&
+                prm.getLastError() == SipServiceConstants.PJSIP_TLS_ECERTVERIF) {
+            service.getBroadcastEmitter().notifyTlsVerifyStatusFailed();
+            service.stopSelf();
+        }
+
     }
 
     @Override

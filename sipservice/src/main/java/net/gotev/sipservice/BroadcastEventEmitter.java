@@ -35,7 +35,8 @@ public class BroadcastEventEmitter implements SipServiceConstants {
         VIDEO_SIZE,
         CALL_STATS,
         CALL_RECONNECTION_STATE,
-        SILENT_CALL_STATUS
+        SILENT_CALL_STATUS,
+        NOTIFY_TLS_VERIFY_STATUS_FAILED
     }
 
     public BroadcastEventEmitter(Context context) {
@@ -204,6 +205,12 @@ public class BroadcastEventEmitter implements SipServiceConstants {
         intent.setAction(getAction(BroadcastAction.SILENT_CALL_STATUS));
         intent.putExtra(PARAM_SILENT_CALL_STATUS, status);
         intent.putExtra(PARAM_NUMBER, number);
+        sendExplicitBroadcast(intent);
+    }
+
+    void notifyTlsVerifyStatusFailed() {
+        final Intent intent = new Intent();
+        intent.setAction(getAction(BroadcastAction.NOTIFY_TLS_VERIFY_STATUS_FAILED));
         sendExplicitBroadcast(intent);
     }
 

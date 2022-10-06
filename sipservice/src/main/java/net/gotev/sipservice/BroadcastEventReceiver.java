@@ -98,6 +98,8 @@ public class BroadcastEventReceiver extends BroadcastReceiver implements SipServ
                     intent.getStringExtra(PARAM_NUMBER)
             );
 
+        } else if (BroadcastEventEmitter.getAction(BroadcastEventEmitter.BroadcastAction.NOTIFY_TLS_VERIFY_STATUS_FAILED).equals(action)) {
+            onTlsVerifyStatusFailed();
         }
     }
 
@@ -140,6 +142,8 @@ public class BroadcastEventReceiver extends BroadcastReceiver implements SipServ
                 BroadcastEventEmitter.BroadcastAction.CALL_RECONNECTION_STATE));
         intentFilter.addAction(BroadcastEventEmitter.getAction(
                 BroadcastEventEmitter.BroadcastAction.SILENT_CALL_STATUS));
+        intentFilter.addAction(BroadcastEventEmitter.getAction(
+                BroadcastEventEmitter.BroadcastAction.NOTIFY_TLS_VERIFY_STATUS_FAILED));
         context.registerReceiver(this, intentFilter);
     }
 
@@ -219,5 +223,9 @@ public class BroadcastEventReceiver extends BroadcastReceiver implements SipServ
 
     protected void onSilentCallStatus(boolean success, String number) {
         Logger.debug(LOG_TAG, "Success: " +success+ " for silent call: " +number);
+    }
+
+    protected void onTlsVerifyStatusFailed() {
+        Logger.debug(LOG_TAG, "TlsVerifyStatusFailed");
     }
 }

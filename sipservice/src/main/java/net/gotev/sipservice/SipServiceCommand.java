@@ -656,4 +656,13 @@ public class SipServiceCommand implements SipServiceConstants {
     public static void setCameraManager(CameraManager cm) {
         PjCameraInfo2.SetCameraManager(cm);
     }
+
+    /**
+     *
+     * @param context the context
+     * @param verify enables and disables the sip server certificate verification
+     */
+    public static void setVerifySipServerCert(Context context, boolean verify) {
+        SharedPreferencesHelper.getInstance(context).setVerifySipServerCert(verify);
+    }
 }
