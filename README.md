@@ -45,6 +45,7 @@ Native PJSIP library for Android is compiled using [PJSIP Android Builder](https
 - Sip Credential encryption on device. Refer to VoiSmart [Crypto](https://github.com/VoiSmart/crypto) library for more details
 - Call Reconnection: useful after a network disconnection, it will try to reconnect the call with new ip/port
 - TLS and SRTP support
+  - with server certificate verification option
 - Silent Calls
 
 ### What is missing (contributions are welcome)
