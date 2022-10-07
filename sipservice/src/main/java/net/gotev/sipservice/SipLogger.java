@@ -12,7 +12,7 @@ import org.pjsip.pjsua2.pj_log_decoration;
  */
 public class SipLogger extends LogWriter {
     public void write(LogEntry entry) {
-        Logger.debug(entry.getThreadName(), entry.getMsg());
+        Logger.debug("PJSIP "+entry.getThreadName(), entry.getMsg());
     }
 
     /**
