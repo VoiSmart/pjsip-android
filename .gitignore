@@ -42,6 +42,9 @@ ehthumbs.db
 Thumbs.db
 *.log
 
-#Vagrant
+# Vagrant
 .vagrant
 .idea/copyright/
+
+# CA Bundle (use your own)
+ca-bundle.crt

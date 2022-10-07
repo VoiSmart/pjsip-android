@@ -19,7 +19,6 @@ import org.pjsip.pjsua2.Endpoint;
 import org.pjsip.pjsua2.EpConfig;
 import org.pjsip.pjsua2.IpChangeParam;
 import org.pjsip.pjsua2.MediaFormatVideo;
-import org.pjsip.pjsua2.TlsConfig;
 import org.pjsip.pjsua2.TransportConfig;
 import org.pjsip.pjsua2.VidCodecParam;
 import org.pjsip.pjsua2.VidDevManager;
@@ -865,7 +864,7 @@ public class SipService extends BackgroundService implements SipServiceConstants
             tcpTransport.setQosType(pj_qos_type.PJ_QOS_TYPE_VOICE);
             TransportConfig tlsTransport = new TransportConfig();
             tlsTransport.setQosType(pj_qos_type.PJ_QOS_TYPE_VOICE);
-            setTlsOptions(tlsTransport);
+            SipTlsUtils.setTlsConfig(this, mSharedPreferencesHelper.isVerifySipServerCert(), tlsTransport);
 
             mEndpoint.transportCreate(pjsip_transport_type_e.PJSIP_TRANSPORT_UDP, udpTransport);
             mEndpoint.transportCreate(pjsip_transport_type_e.PJSIP_TRANSPORT_TCP, tcpTransport);
@@ -1123,14 +1122,6 @@ public class SipService extends BackgroundService implements SipServiceConstants
 
     private ArrayList<CodecPriority> getConfiguredCodecPriorities() {
         return mSharedPreferencesHelper.retrieveConfiguredCodecPriorities();
-    }
-
-    private void setTlsOptions(TransportConfig tlsTransport) {
-        if (mSharedPreferencesHelper.isVerifySipServerCert()) {
-            TlsConfig tlsConfig = tlsTransport.getTlsConfig();
-            tlsConfig.setVerifyServer(true);
-            tlsTransport.setTlsConfig(tlsConfig);
-        }
     }
 
     protected synchronized AudDevManager getAudDevManager() {
