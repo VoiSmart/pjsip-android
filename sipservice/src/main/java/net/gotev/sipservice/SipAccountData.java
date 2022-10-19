@@ -166,6 +166,7 @@ public class SipAccountData implements Parcelable {
 
     public SipAccountData setTransport(SipAccountTransport transport) {
         this.transport = transport;
+        this.tcpTransport = false; // Cancel all tcpTransport usefulness
         return this;
     }
 
@@ -259,7 +260,11 @@ public class SipAccountData implements Parcelable {
             case TCP: return ";transport=tcp";
             case TLS: return ";transport=tls";
             case UDP:
-            default: return "";
+            default: {
+                // backward compatibility
+                if (tcpTransport) return ";transport=tcp";
+                else return "";
+            }
         }
     }
 
