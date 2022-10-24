@@ -23,6 +23,7 @@ public class SipAccount extends Account {
     private final HashMap<Integer, SipCall> activeCalls = new HashMap<>();
     private final SipAccountData data;
     private final SipService service;
+    private boolean isGuest = false;
 
     protected SipAccount(SipService service, SipAccountData data) {
         super();
@@ -43,6 +44,7 @@ public class SipAccount extends Account {
     }
 
     public void createGuest() throws Exception {
+        isGuest = true;
         create(data.getGuestAccountConfig());
     }
 
@@ -52,6 +54,11 @@ public class SipAccount extends Account {
         if (call != null) {
             Logger.debug(LOG_TAG, "Removing call with ID: " + callId);
             activeCalls.remove(callId);
+        }
+
+        if (isGuest) {
+            service.removeGuestAccount();
+            delete();
         }
     }
 

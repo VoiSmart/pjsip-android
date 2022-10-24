@@ -1144,4 +1144,9 @@ public class SipService extends BackgroundService implements SipServiceConstants
     public static ConcurrentHashMap<String, SipAccount> getActiveSipAccounts() {
         return mActiveSipAccounts;
     }
+
+    public void removeGuestAccount() {
+        removeAccount(mConfiguredGuestAccount.getIdUri());
+        mConfiguredGuestAccount = null;
+    }
 }
