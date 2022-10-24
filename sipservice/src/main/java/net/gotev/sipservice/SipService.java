@@ -49,6 +49,11 @@ public class SipService extends BackgroundService implements SipServiceConstants
     private static final ConcurrentHashMap<String, SipAccount> mActiveSipAccounts = new ConcurrentHashMap<>();
     private BroadcastEventEmitter mBroadcastEmitter;
     private Endpoint mEndpoint;
+
+    public SharedPreferencesHelper getSharedPreferencesHelper() {
+        return mSharedPreferencesHelper;
+    }
+
     private SharedPreferencesHelper mSharedPreferencesHelper;
     private volatile boolean mStarted;
     private int callStatus;
