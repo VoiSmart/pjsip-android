@@ -10,6 +10,7 @@ import android.os.Parcelable;
 public class CodecPriority implements Parcelable, Comparable<CodecPriority> {
 
     public static final int PRIORITY_MAX = 254;
+    public static final int PRIORITY_MAX_VIDEO = 128;
     public static final int PRIORITY_MIN = 1;
     public static final int PRIORITY_DISABLED = 0;
 

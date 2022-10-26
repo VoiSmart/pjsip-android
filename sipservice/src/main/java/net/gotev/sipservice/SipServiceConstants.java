@@ -97,9 +97,12 @@ public interface SipServiceConstants {
     int FRONT_CAMERA_CAPTURE_DEVICE = 1;    // Front Camera idx
     int BACK_CAMERA_CAPTURE_DEVICE = 2;     // Back Camera idx
     int DEFAULT_RENDER_DEVICE = 0;          // OpenGL Render
-    String H264_CODEC_ID = "H264/97";
+    String OPENH264_CODEC_ID = "H264/97";
     int H264_DEF_WIDTH = 640;
     int H264_DEF_HEIGHT = 360;
+    String ANDROID_H264_CODEC_ID = "H264/99";
+    String ANDROID_VP8_CODEC_ID = "VP8/103";
+    String ANDROID_VP9_CODEC_ID = "VP9/106";
 
     /**
      * Janus Bridge call specific parameters.

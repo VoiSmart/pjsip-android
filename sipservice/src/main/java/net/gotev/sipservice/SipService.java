@@ -12,15 +12,11 @@ import android.view.Surface;
 import org.pjsip.pjsua2.AudDevManager;
 import org.pjsip.pjsua2.CallOpParam;
 import org.pjsip.pjsua2.CallVidSetStreamParam;
-import org.pjsip.pjsua2.CodecFmtpVector;
 import org.pjsip.pjsua2.CodecInfo;
 import org.pjsip.pjsua2.CodecInfoVector2;
-import org.pjsip.pjsua2.Endpoint;
 import org.pjsip.pjsua2.EpConfig;
 import org.pjsip.pjsua2.IpChangeParam;
-import org.pjsip.pjsua2.MediaFormatVideo;
 import org.pjsip.pjsua2.TransportConfig;
-import org.pjsip.pjsua2.VidCodecParam;
 import org.pjsip.pjsua2.VidDevManager;
 import org.pjsip.pjsua2.pj_qos_type;
 import org.pjsip.pjsua2.pjmedia_orient;
@@ -48,7 +44,7 @@ public class SipService extends BackgroundService implements SipServiceConstants
     private SipAccountData mConfiguredGuestAccount;
     private static final ConcurrentHashMap<String, SipAccount> mActiveSipAccounts = new ConcurrentHashMap<>();
     private BroadcastEventEmitter mBroadcastEmitter;
-    private Endpoint mEndpoint;
+    private SipEndpoint mEndpoint;
 
     public SharedPreferencesHelper getSharedPreferencesHelper() {
         return mSharedPreferencesHelper;
@@ -877,49 +873,9 @@ public class SipService extends BackgroundService implements SipServiceConstants
             mEndpoint.libStart();
 
             ArrayList<CodecPriority> codecPriorities = getConfiguredCodecPriorities();
-            if (codecPriorities != null) {
-                Logger.debug(TAG, "Setting saved codec priorities...");
-                StringBuilder log = new StringBuilder();
-                log.append("Saved codec priorities set:\n");
-                for (CodecPriority codecPriority : codecPriorities) {
-                    mEndpoint.codecSetPriority(codecPriority.getCodecId(), (short) codecPriority.getPriority());
-                    log.append(codecPriority).append(",");
-                }
-                Logger.debug(TAG, log.toString());
-            } else {
-                mEndpoint.codecSetPriority("OPUS", (short) (CodecPriority.PRIORITY_MAX - 1));
-                mEndpoint.codecSetPriority("PCMA/8000", (short) (CodecPriority.PRIORITY_MAX - 2));
-                mEndpoint.codecSetPriority("PCMU/8000", (short) (CodecPriority.PRIORITY_MAX -3));
-                mEndpoint.codecSetPriority("G729/8000", (short) CodecPriority.PRIORITY_DISABLED);
-                mEndpoint.codecSetPriority("speex/8000", (short) CodecPriority.PRIORITY_DISABLED);
-                mEndpoint.codecSetPriority("speex/16000", (short) CodecPriority.PRIORITY_DISABLED);
-                mEndpoint.codecSetPriority("speex/32000", (short) CodecPriority.PRIORITY_DISABLED);
-                mEndpoint.codecSetPriority("GSM/8000", (short) CodecPriority.PRIORITY_DISABLED);
-                mEndpoint.codecSetPriority("G722/16000", (short) CodecPriority.PRIORITY_DISABLED);
-                mEndpoint.codecSetPriority("G7221/16000", (short) CodecPriority.PRIORITY_DISABLED);
-                mEndpoint.codecSetPriority("G7221/32000", (short) CodecPriority.PRIORITY_DISABLED);
-                mEndpoint.codecSetPriority("ilbc/8000", (short) CodecPriority.PRIORITY_DISABLED);
-                mEndpoint.codecSetPriority("AMR-WB/16000", (short) CodecPriority.PRIORITY_DISABLED);
-                mEndpoint.codecSetPriority("AMR/8000", (short) CodecPriority.PRIORITY_DISABLED);
-                Logger.debug(TAG, "Default codec priorities set!");
-            }
+            SipServiceUtils.setAudioCodecPriorities(codecPriorities, mEndpoint);
 
-            // Set H264 Parameters
-            VidCodecParam vidCodecParam = mEndpoint.getVideoCodecParam(H264_CODEC_ID);
-            CodecFmtpVector codecFmtpVector = vidCodecParam.getDecFmtp();
-            MediaFormatVideo mediaFormatVideo = vidCodecParam.getEncFmt();
-            mediaFormatVideo.setWidth(H264_DEF_WIDTH);
-            mediaFormatVideo.setHeight(H264_DEF_HEIGHT);
-            vidCodecParam.setEncFmt(mediaFormatVideo);
-
-            for (int i = 0; i < codecFmtpVector.size(); i++) {
-                if (PROFILE_LEVEL_ID_HEADER.equals(codecFmtpVector.get(i).getName())) {
-                    codecFmtpVector.get(i).setVal(PROFILE_LEVEL_ID_JANUS_BRIDGE);
-                    break;
-                }
-            }
-            vidCodecParam.setDecFmtp(codecFmtpVector);
-            mEndpoint.setVideoCodecParam(H264_CODEC_ID, vidCodecParam);
+            SipServiceUtils.setVideoCodecPriorities(mEndpoint);
 
             Logger.debug(TAG, "PJSIP started!");
             mStarted = true;
