@@ -12,6 +12,7 @@ import java.util.ArrayList;
 
 public class SipEndpoint extends Endpoint {
     private final SipService service;
+    @SuppressWarnings("FieldCanBeLocal")
     private final String TAG = "SipEndpoint";
 
     public SipEndpoint(SipService service) {
@@ -23,13 +24,15 @@ public class SipEndpoint extends Endpoint {
     public void onTransportState(OnTransportStateParam prm) {
         super.onTransportState(prm);
 
-        if (service.getSharedPreferencesHelper().isVerifySipServerCert()) {
+        if (service.getSharedPreferencesHelper().isVerifySipServerCert() &&
+                prm.getType().equalsIgnoreCase("TLS")
+        ) {
             long verifyMsg = prm.getTlsInfo().getVerifyStatus();
             int binSuccessMsg = pj_ssl_cert_verify_flag_t.PJ_SSL_CERT_ESUCCESS;
             int binIdentityNotMatchMsg = pj_ssl_cert_verify_flag_t.PJ_SSL_CERT_EIDENTITY_NOT_MATCH;
             boolean isSuccess = verifyMsg == binSuccessMsg;
             boolean isIdentityMismatch = verifyMsg == binIdentityNotMatchMsg;
-            String host = service.getActiveSipAccounts().elements().nextElement().getData().getHost();
+            String host = SipService.getActiveSipAccounts().elements().nextElement().getData().getHost();
             if (!(isSuccess || (isIdentityMismatch && SipTlsUtils.isWildcardValid(getCertNames(prm), host)))) {
                 Logger.error(TAG, "The Sip Certificate is not valid");
                 service.getBroadcastEmitter().notifyTlsVerifyStatusFailed();
