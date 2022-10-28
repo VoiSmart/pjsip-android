@@ -4,7 +4,7 @@
 
 What you need to work with this library:
 
-- An android device with Android API 21+ (4.3.3 or higher)
+- An android device with Android API 23
 - A PBX (E.g. VoiSmart Orchestra NG or FreeSWITCH, which is open). I'm not going to enter in the detail of how to properly configure your PBX, because that's a different topic and there are excellent tutorials out there.
 
 ## Architecture
