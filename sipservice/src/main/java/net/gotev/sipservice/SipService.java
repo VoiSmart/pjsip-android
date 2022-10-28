@@ -599,6 +599,9 @@ public class SipService extends BackgroundService implements SipServiceConstants
         if (isVideo) {
             isVideoConference = intent.getBooleanExtra(PARAM_IS_VIDEO_CONF, false);
         }
+        SipAccountTransport transport = SipAccountTransport.getTransportByCode(
+                intent.getIntExtra(PARAM_DIRECT_CALL_TRANSPORT, 0)
+        );
 
         Logger.debug(TAG, "Making call to " + getValue(getApplicationContext(), uri.getUserInfo()));
         String accountID = "sip:"+name+"@"+uri.getHost();
@@ -610,6 +613,7 @@ public class SipService extends BackgroundService implements SipServiceConstants
                     .setHost(sipServer != null ? sipServer : uri.getHost())
                     .setUsername(name)
                     .setPort((uri.getPort() > 0) ? uri.getPort() : DEFAULT_SIP_PORT)
+                    .setTransport(transport)
                     .setRealm(uri.getHost());
             /* display name not yet implemented server side for direct calls */
             /* .setUsername("guest") */

@@ -197,9 +197,17 @@ public class SipServiceCommand implements SipServiceConstants {
      * @param sipUri sip uri to call in the format: sip:number@realm:port
      * @param isVideo whether the call has video or not
      * @param isVideoConference whether the call is video conference or not
+     * @param transport transport to be configured on guest account
      */
-    public static void makeDirectCall(Context context, String guestName, Uri sipUri, String host, boolean isVideo, boolean isVideoConference) {
-
+    public static void makeDirectCall(
+            Context context,
+            String guestName,
+            Uri sipUri,
+            String host,
+            boolean isVideo,
+            boolean isVideoConference,
+            SipAccountTransport transport
+    ) {
         Intent intent = new Intent(context, SipService.class);
         intent.setAction(ACTION_MAKE_DIRECT_CALL);
         intent.putExtra(PARAM_GUEST_NAME, guestName);
@@ -207,7 +215,12 @@ public class SipServiceCommand implements SipServiceConstants {
         intent.putExtra(PARAM_DIRECT_CALL_SIP_SERVER, host);
         intent.putExtra(PARAM_IS_VIDEO, isVideo);
         intent.putExtra(PARAM_IS_VIDEO_CONF, isVideoConference);
+        intent.putExtra(PARAM_DIRECT_CALL_TRANSPORT, transport.ordinal());
         context.startService(intent);
+    }
+
+    public static void makeDirectCall(Context context, String guestName, Uri sipUri, String host, boolean isVideo, boolean isVideoConference) {
+        makeDirectCall(context, guestName, sipUri, host, isVideo, isVideoConference, SipAccountTransport.UDP);
     }
 
     /**
