@@ -1,8 +1,5 @@
 package net.gotev.sipservice;
 
-import static net.gotev.sipservice.SipServiceConstants.ANDROID_H264_CODEC_ID;
-import static net.gotev.sipservice.SipServiceConstants.ANDROID_VP8_CODEC_ID;
-import static net.gotev.sipservice.SipServiceConstants.ANDROID_VP9_CODEC_ID;
 import static net.gotev.sipservice.SipServiceConstants.OPENH264_CODEC_ID;
 import static net.gotev.sipservice.SipServiceConstants.H264_DEF_HEIGHT;
 import static net.gotev.sipservice.SipServiceConstants.H264_DEF_WIDTH;
@@ -10,6 +7,7 @@ import static net.gotev.sipservice.SipServiceConstants.PROFILE_LEVEL_ID_HEADER;
 import static net.gotev.sipservice.SipServiceConstants.PROFILE_LEVEL_ID_JANUS_BRIDGE;
 
 import org.pjsip.pjsua2.CodecFmtpVector;
+import org.pjsip.pjsua2.CodecInfo;
 import org.pjsip.pjsua2.EpConfig;
 import org.pjsip.pjsua2.LogConfig;
 import org.pjsip.pjsua2.MediaFormatVideo;
@@ -79,9 +77,15 @@ public class SipServiceUtils {
 
     public static void setVideoCodecPriorities (SipEndpoint sipEndpoint) throws Exception {
         sipEndpoint.videoCodecSetPriority(OPENH264_CODEC_ID, (short) (CodecPriority.PRIORITY_MAX_VIDEO -1));
-        sipEndpoint.videoCodecSetPriority(ANDROID_H264_CODEC_ID, (short) CodecPriority.PRIORITY_DISABLED);
-        sipEndpoint.videoCodecSetPriority(ANDROID_VP8_CODEC_ID, (short) CodecPriority.PRIORITY_DISABLED);
-        sipEndpoint.videoCodecSetPriority(ANDROID_VP9_CODEC_ID, (short) CodecPriority.PRIORITY_DISABLED);
+
+        for (CodecInfo codecInfo: sipEndpoint.videoCodecEnum2()) {
+            if (!OPENH264_CODEC_ID.equals(codecInfo.getCodecId())) {
+                sipEndpoint.videoCodecSetPriority(
+                        codecInfo.getCodecId(),
+                        (short) CodecPriority.PRIORITY_DISABLED
+                );
+            }
+        }
 
         // Set H264 Parameters
         VidCodecParam vidCodecParam = sipEndpoint.getVideoCodecParam(OPENH264_CODEC_ID);
