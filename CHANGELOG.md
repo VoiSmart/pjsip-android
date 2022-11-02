@@ -1,6 +1,17 @@
 Change Log
 ==========
 
+### Version 2.9.4
+
+_2022-11-02_
+* **Encryption enabled by default**
+* **TargetSdk increased** - Target SDK is now increased to api 31
+* **MinSdk increased** - Minimum SDK is now increased to api 23
+* **Issues fixed**:
+  * #176
+  * #177
+  * #180
+
 ### Version 2.9.3
 
 _2022-10-28_
@@ -44,7 +55,7 @@ _2022-08-02_
 * **\[NEW\] PJSIP** version 2.12.1
 * TLS and SRTP Support
 * SIP Logging
-* **TargetSdk increased** - Minimum SDK is now increased to api 30
+* **TargetSdk increased** - Target SDK is now increased to api 30
 * Silent Call Feature
 * **Issues fixed**:
    * #147

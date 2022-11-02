@@ -42,7 +42,7 @@ Native PJSIP library for Android is compiled using [PJSIP Android Builder](https
   - video preview
 - Use of a fixed SIP `Call-ID Header`. Refer to [this](https://github.com/VoiSmart/pjsip-android-builder/tree/master/patches/fixed_callid) for more details
 - Get Call Statistics on call disconnected
-- Sip Credential encryption on device. Refer to VoiSmart [Crypto](https://github.com/VoiSmart/crypto) library for more details
+- Sip Credential encryption on device. Refer to [Android Jetpack Security](https://developer.android.com/topic/security/data) library for more details
 - Call Reconnection: useful after a network disconnection, it will try to reconnect the call with new ip/port
 - TLS and SRTP support
   - with server certificate verification option (enabled via SipServiceCommand#setVerifySipServerCert but to make it work, it is necessary to add a `ca-bundle.crt` file in the sip`./sipservice/src/main/assets/` directory; without that the verification will not be enabled)
