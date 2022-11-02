@@ -568,9 +568,10 @@ public class SipCall extends Call {
     private final Runnable sendKeyFrameRunnable = () -> {
         try {
             vidSetStream(pjsua_call_vid_strm_op.PJSUA_CALL_VID_STRM_SEND_KEYFRAME, new CallVidSetStreamParam());
-            startSendingKeyFrame();
         } catch (Exception ex) {
-            Logger.error(LOG_TAG, "error while sending periodic keyframe");
+            Logger.error(LOG_TAG, "Error sending periodic keyframe", ex);
+        } finally {
+            startSendingKeyFrame();
         }
     };
 
