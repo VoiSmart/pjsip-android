@@ -32,15 +32,13 @@ public class SipServiceUtils {
     /**
      * Sets logger writer and decor flags on the endpoint config
      * Change flags as needed
-     * Applies only for debug builds
      */
     public static void setSipLogger(EpConfig epConfig) {
-        if (BuildConfig.DEBUG && ENABLE_SIP_LOGGING) {
-            LogConfig logCfg = epConfig.getLogConfig();
-            sipLogger = new SipLogger();
-            logCfg.setWriter(sipLogger);
-            logCfg.setDecor(sipLogger.getDecor() | sipLogger.getDecor());
-        }
+        LogConfig logCfg = epConfig.getLogConfig();
+        sipLogger = new SipLogger();
+        logCfg.setWriter(sipLogger);
+        logCfg.setDecor(sipLogger.getDecor());
+        logCfg.setLevel(ENABLE_SIP_LOGGING ? 6 : 0);
     }
 
     public static void setAudioCodecPriorities (
