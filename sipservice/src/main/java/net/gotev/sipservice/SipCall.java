@@ -13,6 +13,7 @@ import org.pjsip.pjsua2.CallOpParam;
 import org.pjsip.pjsua2.CallSetting;
 import org.pjsip.pjsua2.CallVidSetStreamParam;
 import org.pjsip.pjsua2.Media;
+import org.pjsip.pjsua2.MediaFmtChangedEvent;
 import org.pjsip.pjsua2.OnCallMediaEventParam;
 import org.pjsip.pjsua2.OnCallMediaStateParam;
 import org.pjsip.pjsua2.OnCallStateParam;
@@ -24,6 +25,7 @@ import org.pjsip.pjsua2.VideoPreview;
 import org.pjsip.pjsua2.VideoPreviewOpParam;
 import org.pjsip.pjsua2.VideoWindow;
 import org.pjsip.pjsua2.VideoWindowHandle;
+import org.pjsip.pjsua2.pjmedia_dir;
 import org.pjsip.pjsua2.pjmedia_event_type;
 import org.pjsip.pjsua2.pjmedia_type;
 import org.pjsip.pjsua2.pjsip_inv_state;
@@ -195,15 +197,25 @@ public class SipCall extends Call {
 
     @Override
     public void onCallMediaEvent(OnCallMediaEventParam prm) {
-        if (prm.getEv().getType() == pjmedia_event_type.PJMEDIA_EVENT_FMT_CHANGED) {
-            // Sending new video size
-            try {
-                account.getService().getBroadcastEmitter().videoSize(
-                        (int) mVideoWindow.getInfo().getSize().getW(),
-                        (int) mVideoWindow.getInfo().getSize().getH());
-            } catch (Exception ex) {
-                Logger.error(LOG_TAG, "Unable to get video dimensions", ex);
-            }
+        int evType = prm.getEv().getType();
+        switch (evType) {
+            case pjmedia_event_type.PJMEDIA_EVENT_FMT_CHANGED:
+                try {
+                    CallInfo callInfo = getInfo();
+                    CallMediaInfo mediaInfo = callInfo.getMedia().get((int)prm.getMedIdx());
+                    if (mediaInfo.getType() == pjmedia_type.PJMEDIA_TYPE_VIDEO &&
+                            mediaInfo.getDir() == pjmedia_dir.PJMEDIA_DIR_DECODING) {
+                        MediaFmtChangedEvent fmtEvent = prm.getEv().getData().getFmtChanged();
+                        Logger.info(LOG_TAG, "Notify new video size");
+                        account.getService().getBroadcastEmitter().videoSize(
+                                (int) fmtEvent.getNewWidth(),
+                                (int) fmtEvent.getNewHeight()
+                        );
+                    }
+                } catch (Exception ex) {
+                    Logger.error(LOG_TAG, "Unable to get video dimensions", ex);
+                }
+                break;
         }
         super.onCallMediaEvent(prm);
     }
