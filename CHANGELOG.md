@@ -1,7 +1,18 @@
 Change Log
 ==========
 
-### Version 2.9.4
+### Version 2.11.0
+
+_2022-11-22_
+* **Native debug logs enabled**
+* **Issues fixed**:
+  * #181
+  * #182
+  * #184
+  * #185
+  * #186
+
+### Version 2.10.0
 
 _2022-11-02_
 * **Encryption enabled by default**
