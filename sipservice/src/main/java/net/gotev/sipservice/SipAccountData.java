@@ -22,6 +22,7 @@ public class SipAccountData implements Parcelable {
 
     public static final String AUTH_TYPE_DIGEST = "digest";
     public static final String AUTH_TYPE_PLAIN = "plain";
+    private final int sessionTimerExpireSec = 600;
 
     private String username;
     private String password;
@@ -303,6 +304,9 @@ public class SipAccountData implements Parcelable {
         accountConfig.getMediaConfig().setSrtpSecureSignaling(srtpSecureSignalling);
         setVideoConfig(accountConfig);
 
+        // account call config
+        accountConfig.getCallConfig().setTimerSessExpiresSec(sessionTimerExpireSec);
+
         return accountConfig;
     }
 
@@ -315,6 +319,7 @@ public class SipAccountData implements Parcelable {
         accountConfig.setIdUri(idUri);
         accountConfig.getSipConfig().getProxies().add(getProxyUri());
         accountConfig.getRegConfig().setRegisterOnAdd(false);
+        accountConfig.getCallConfig().setTimerSessExpiresSec(sessionTimerExpireSec);
         setVideoConfig(accountConfig);
         return accountConfig;
     }
