@@ -54,6 +54,15 @@ public class MediaEventData {
     return (cPtr == 0) ? null : new AudDevErrorEvent(cPtr, false);
   }
 
+  public void setRtcpFb(RtcpFbEvent value) {
+    pjsua2JNI.MediaEventData_rtcpFb_set(swigCPtr, this, RtcpFbEvent.getCPtr(value), value);
+  }
+
+  public RtcpFbEvent getRtcpFb() {
+    long cPtr = pjsua2JNI.MediaEventData_rtcpFb_get(swigCPtr, this);
+    return (cPtr == 0) ? null : new RtcpFbEvent(cPtr, false);
+  }
+
   public void setPtr(SWIGTYPE_p_void value) {
     pjsua2JNI.MediaEventData_ptr_set(swigCPtr, this, SWIGTYPE_p_void.getCPtr(value));
   }

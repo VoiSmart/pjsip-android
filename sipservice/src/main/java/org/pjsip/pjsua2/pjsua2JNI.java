@@ -1247,10 +1247,18 @@ public class pjsua2JNI {
   public final static native int AudDevErrorEvent_status_get(long jarg1, AudDevErrorEvent jarg1_);
   public final static native long new_AudDevErrorEvent();
   public final static native void delete_AudDevErrorEvent(long jarg1);
+  public final static native void RtcpFbEvent_fbType_set(long jarg1, RtcpFbEvent jarg1_, int jarg2);
+  public final static native int RtcpFbEvent_fbType_get(long jarg1, RtcpFbEvent jarg1_);
+  public final static native void RtcpFbEvent_isParamLengthZero_set(long jarg1, RtcpFbEvent jarg1_, boolean jarg2);
+  public final static native boolean RtcpFbEvent_isParamLengthZero_get(long jarg1, RtcpFbEvent jarg1_);
+  public final static native long new_RtcpFbEvent();
+  public final static native void delete_RtcpFbEvent(long jarg1);
   public final static native void MediaEventData_fmtChanged_set(long jarg1, MediaEventData jarg1_, long jarg2, MediaFmtChangedEvent jarg2_);
   public final static native long MediaEventData_fmtChanged_get(long jarg1, MediaEventData jarg1_);
   public final static native void MediaEventData_audDevError_set(long jarg1, MediaEventData jarg1_, long jarg2, AudDevErrorEvent jarg2_);
   public final static native long MediaEventData_audDevError_get(long jarg1, MediaEventData jarg1_);
+  public final static native void MediaEventData_rtcpFb_set(long jarg1, MediaEventData jarg1_, long jarg2, RtcpFbEvent jarg2_);
+  public final static native long MediaEventData_rtcpFb_get(long jarg1, MediaEventData jarg1_);
   public final static native void MediaEventData_ptr_set(long jarg1, MediaEventData jarg1_, long jarg2);
   public final static native long MediaEventData_ptr_get(long jarg1, MediaEventData jarg1_);
   public final static native long new_MediaEventData();
