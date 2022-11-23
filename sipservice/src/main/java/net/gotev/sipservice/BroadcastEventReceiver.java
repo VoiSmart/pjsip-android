@@ -114,6 +114,7 @@ public class BroadcastEventReceiver extends BroadcastReceiver implements SipServ
      * @param context context in which to register this receiver
      */
     public void register(final Context context) {
+        Logger.info(LOG_TAG, "Registering receiver: "+this+" from context: "+context);
 
         final IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(BroadcastEventEmitter.getAction(
@@ -154,7 +155,12 @@ public class BroadcastEventReceiver extends BroadcastReceiver implements SipServ
      * @param context context in which to unregister this receiver
      */
     public void unregister(final Context context) {
-        context.unregisterReceiver(this);
+        try {
+            Logger.info(LOG_TAG, "Unregistering BER: " + this + " from context: " + context);
+            context.unregisterReceiver(this);
+        } catch (Exception e) {
+            Logger.error(LOG_TAG, "Error while unregistering BER", e);
+        }
     }
 
     public void onRegistration(String accountID, int registrationStateCode) {
