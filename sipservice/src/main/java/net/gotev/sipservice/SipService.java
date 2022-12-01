@@ -844,7 +844,10 @@ public class SipService extends BackgroundService implements SipServiceConstants
      */
     private void startStack() {
 
-        if (mStarted) return;
+        if (mStarted) {
+            Logger.info(TAG, "SipService already started");
+            return;
+        }
 
         try {
             Logger.debug(TAG, "Starting PJSIP");
@@ -895,7 +898,10 @@ public class SipService extends BackgroundService implements SipServiceConstants
      */
     private void stopStack() {
 
-        if (!mStarted) return;
+        if (!mStarted) {
+            Logger.error(TAG, "SipService not started");
+            return;
+        }
 
         try {
             Logger.debug(TAG, "Stopping PJSIP");
