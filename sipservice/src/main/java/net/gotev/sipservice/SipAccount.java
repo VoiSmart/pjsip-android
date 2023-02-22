@@ -153,9 +153,9 @@ public class SipAccount extends Account {
                 CallerInfo contactInfo = new CallerInfo(call.getInfo());
                 service.getBroadcastEmitter().missedCall(contactInfo.getDisplayName(), contactInfo.getRemoteUri());
                 call.declineIncomingCall();
-                Logger.debug(LOG_TAG, "Decline call with ID: " + prm.getCallId());
+                Logger.debug(LOG_TAG, "DND - Decline call with ID: " + prm.getCallId());
             } catch(Exception ex) {
-                Logger.error(LOG_TAG, "Error while getting missed call info", ex);
+                Logger.error(LOG_TAG, "Error while getting -missed because declined- call info", ex);
             }
             return;
         }
