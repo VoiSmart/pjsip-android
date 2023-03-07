@@ -139,6 +139,9 @@ public class SipAccount extends Account {
 
     @Override
     public void onRegState(OnRegStateParam prm) {
+        Logger.info(LOG_TAG, "Sip Reg Info - Code: " + prm.getCode() +
+                ", Reason: " + prm.getReason() + ", Exp: " + prm.getExpiration() + ", Status: " + prm.getStatus()
+        );
         service.getBroadcastEmitter().registrationState(data.getIdUri(), prm.getCode());
     }
 
