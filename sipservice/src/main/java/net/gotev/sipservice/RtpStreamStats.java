@@ -3,10 +3,12 @@ package net.gotev.sipservice;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import androidx.annotation.NonNull;
+
 /**
  * sipservice
  *
- * Created by aenonGit on 19/04/19.
+ * Created by Vincenzo Esposito on 19/04/19.
  * Copyright © 2019 VoiSmart S.r.l. All rights reserved.
  */
 @SuppressWarnings("unused")
@@ -19,8 +21,8 @@ public class RtpStreamStats implements Parcelable {
     private final int dup;
     private final Jitter jitter;
 
-    RtpStreamStats(int pkts, int discard, int loss, int reorder, int dup, Jitter jitter) {
-        this.pkt = pkts;
+    RtpStreamStats(int pkt, int discard, int loss, int reorder, int dup, Jitter jitter) {
+        this.pkt = pkt;
         this.discard = discard;
         this.loss = loss;
         this.reorder = reorder;
@@ -66,9 +68,10 @@ public class RtpStreamStats implements Parcelable {
         return 0;
     }
 
+    @NonNull
     @Override
     public String toString() {
-        return "Pkts: "+pkt+"\n"
+        return "Packets: "+pkt+"\n"
                 +"Discard: "+discard+"\n"
                 +"Loss: "+loss+"\n"
                 +"Reorder: "+reorder+"\n"
@@ -76,7 +79,7 @@ public class RtpStreamStats implements Parcelable {
                 +"Jitter: "+jitter.toString()+"\n";
     }
 
-    public int getPkts() {
+    public int getPackets() {
         return pkt;
     }
 
