@@ -18,12 +18,17 @@ public class DefaultLoggerDelegate implements Logger.LoggerDelegate {
     }
 
     @Override
-    public void debug(String tag, String message) {
-        Log.d(tag, message);
+    public void warning(String tag, String message) {
+        Log.w(tag, message);
     }
 
     @Override
     public void info(String tag, String message) {
         Log.i(tag, message);
+    }
+
+    @Override
+    public void debug(String tag, String message) {
+        Log.d(tag, message);
     }
 }

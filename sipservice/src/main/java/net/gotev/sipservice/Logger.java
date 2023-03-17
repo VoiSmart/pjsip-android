@@ -13,6 +13,7 @@ public class Logger {
     public enum LogLevel {
         DEBUG,
         INFO,
+        WARNING,
         ERROR,
         OFF
     }
@@ -20,8 +21,9 @@ public class Logger {
     public interface LoggerDelegate {
         void error(String tag, String message);
         void error(String tag, String message, Throwable exception);
-        void debug(String tag, String message);
+        void warning(String tag, String message);
         void info(String tag, String message);
+        void debug(String tag, String message);
     }
 
     /**
@@ -68,6 +70,12 @@ public class Logger {
     public static void error(String tag, String message, Throwable exception) {
         if (SingletonHolder.instance.mLogLevel.compareTo(LogLevel.ERROR) <= 0) {
             SingletonHolder.instance.mDelegate.error(tag, message, exception);
+        }
+    }
+
+    public static void warning(String tag, String message) {
+        if (SingletonHolder.instance.mLogLevel.compareTo(LogLevel.WARNING) <= 0) {
+            SingletonHolder.instance.mDelegate.warning(tag, message);
         }
     }
 

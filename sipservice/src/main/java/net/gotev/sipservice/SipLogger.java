@@ -12,7 +12,22 @@ import org.pjsip.pjsua2.pj_log_decoration;
  */
 public class SipLogger extends LogWriter {
     public void write(LogEntry entry) {
-        Logger.debug("PJSIP "+entry.getThreadName(), entry.getMsg());
+        switch(entry.getLevel()) {
+            case 0:
+            case 1:
+                Logger.error("PJSIP "+entry.getThreadName(), entry.getMsg());
+                break;
+            case 2:
+                Logger.warning("PJSIP "+entry.getThreadName(), entry.getMsg());
+                break;
+            case 3:
+                Logger.info("PJSIP "+entry.getThreadName(), entry.getMsg());
+                break;
+            case 4:
+            default:
+                Logger.debug("PJSIP "+entry.getThreadName(), entry.getMsg());
+                break;
+        }
     }
 
     /**
@@ -21,12 +36,7 @@ public class SipLogger extends LogWriter {
      */
     public long getDecor() {
         return pj_log_decoration.PJ_LOG_HAS_CR
-                | pj_log_decoration.PJ_LOG_HAS_NEWLINE
-                | pj_log_decoration.PJ_LOG_HAS_COLOR
                 | pj_log_decoration.PJ_LOG_HAS_INDENT
-                | pj_log_decoration.PJ_LOG_HAS_LEVEL_TEXT
-                | pj_log_decoration.PJ_LOG_HAS_TIME
-                | pj_log_decoration.PJ_LOG_HAS_SENDER
-                | pj_log_decoration.PJ_LOG_HAS_SPACE;
+                | pj_log_decoration.PJ_LOG_HAS_SENDER;
     }
 }
