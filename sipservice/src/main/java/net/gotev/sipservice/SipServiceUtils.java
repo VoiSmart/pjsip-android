@@ -38,7 +38,7 @@ public class SipServiceUtils {
         sipLogger = new SipLogger();
         logCfg.setWriter(sipLogger);
         logCfg.setDecor(sipLogger.getDecor());
-        logCfg.setLevel(ENABLE_SIP_LOGGING ? 6 : 0);
+        logCfg.setLevel(ENABLE_SIP_LOGGING ? 5 : 0);
     }
 
     public static void setAudioCodecPriorities (
