@@ -1,6 +1,7 @@
 apply plugin: 'com.android.library'
 
 android {
+    namespace 'net.gotev.sipservice'
     compileSdkVersion 31
 
     defaultConfig {
