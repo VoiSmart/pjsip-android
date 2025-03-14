@@ -511,6 +511,15 @@ public class SipServiceCommand implements SipServiceConstants {
         context.startService(intent);
     }
 
+    public static void simpleRefreshRegistration(Context context, String accountID) {
+        checkAccount(accountID);
+
+        Intent intent = new Intent(context, SipService.class);
+        intent.setAction(ACTION_REFRESH_REGISTRATION);
+        intent.putExtra(PARAM_ACCOUNT_ID, accountID);
+        context.startService(intent);
+    }
+
     public static void setDND(Context context, boolean dnd) {
         Intent intent = new Intent(context, SipService.class);
         intent.setAction(ACTION_SET_DND);
@@ -640,7 +649,6 @@ public class SipServiceCommand implements SipServiceConstants {
      *      restarting the transport
      *      registering
      *      updating via & contact
-     *
      * Before calling this you should listen to network connection/disconnection events.
      * As soon as the connection comes back after a disconnection event you can call this
      * to try to reconnect the ongoing call
@@ -668,5 +676,12 @@ public class SipServiceCommand implements SipServiceConstants {
      */
     public static void setVerifySipServerCert(Context context, boolean verify) {
         SharedPreferencesHelper.getInstance(context).setVerifySipServerCert(verify);
+    }
+
+    /**
+     * Checks whether the sip stack is started and at least a sip account is active
+     */
+    public static boolean isSipServiceRunning() {
+        return SipService.isSipServiceRunning();
     }
 }

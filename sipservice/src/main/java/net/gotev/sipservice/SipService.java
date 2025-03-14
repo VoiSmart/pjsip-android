@@ -51,7 +51,7 @@ public class SipService extends BackgroundService implements SipServiceConstants
     }
 
     private SharedPreferencesHelper mSharedPreferencesHelper;
-    private volatile boolean mStarted;
+    private static volatile boolean mStarted;
     private int callStatus;
 
     /***   Service Lifecycle Callbacks    ***/
@@ -1113,5 +1113,9 @@ public class SipService extends BackgroundService implements SipServiceConstants
     public void removeGuestAccount() {
         removeAccount(mConfiguredGuestAccount.getIdUri());
         mConfiguredGuestAccount = null;
+    }
+
+    public static boolean isSipServiceRunning() {
+        return !mActiveSipAccounts.isEmpty() && mStarted;
     }
 }
