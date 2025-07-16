@@ -1,6 +1,5 @@
 package net.gotev.sipservice;
 
-import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.view.Surface;
 
@@ -119,7 +118,7 @@ public class SipCall extends Call {
             }
 
             if (callState == pjsip_inv_state.PJSIP_INV_STATE_DISCONNECTED) {
-                checkAndStopLocalRingBackTone();
+                account.getService().stopPjsipRingbackTone();
                 stopVideoFeeds();
                 account.removeCall(callID);
                 if (connectTimestamp > 0 && streamInfo != null && streamStat != null) {
@@ -131,23 +130,21 @@ public class SipCall extends Call {
                     }
                 }
             } else if (callState == pjsip_inv_state.PJSIP_INV_STATE_CONFIRMED) {
-                checkAndStopLocalRingBackTone();
+                account.getService().stopPjsipRingbackTone();
                 connectTimestamp = System.currentTimeMillis();
                 if (videoCall) {
                     setVideoMute(false);
                 }
 
                 // check whether the 183 has arrived or not
-            } else if (callState == pjsip_inv_state.PJSIP_INV_STATE_EARLY){
+            } else if (callState == pjsip_inv_state.PJSIP_INV_STATE_EARLY) {
                 int statusCode = info.getLastStatusCode();
                 // check if 180 && call is outgoing (ROLE UAC)
                 if (statusCode == pjsip_status_code.PJSIP_SC_RINGING && info.getRole() == pjsip_role_e.PJSIP_ROLE_UAC){
-                    checkAndStopLocalRingBackTone();
-                    toneGenerator = new ToneGenerator(AudioManager.STREAM_VOICE_CALL, 100);
-                    toneGenerator.startTone(ToneGenerator.TONE_SUP_RINGTONE);
+                    account.getService().startPjsipRingbackTone();
                     // check if 183
                 } else if (statusCode == pjsip_status_code.PJSIP_SC_PROGRESS){
-                    checkAndStopLocalRingBackTone();
+                    account.getService().stopPjsipRingbackTone();
                 }
             }
 
@@ -406,15 +403,6 @@ public class SipCall extends Call {
 
     public boolean isLocalHold() {
         return localHold;
-    }
-
-    // check if Local RingBack Tone has started, if so, stop it.
-    private void checkAndStopLocalRingBackTone(){
-        if (toneGenerator != null){
-            toneGenerator.stopTone();
-            toneGenerator.release();
-            toneGenerator = null;
-        }
     }
 
     // disable video programmatically

@@ -10,12 +10,16 @@ import android.os.IBinder;
 import android.view.Surface;
 
 import org.pjsip.pjsua2.AudDevManager;
+import org.pjsip.pjsua2.AudioMedia;
 import org.pjsip.pjsua2.CallOpParam;
 import org.pjsip.pjsua2.CallVidSetStreamParam;
 import org.pjsip.pjsua2.CodecInfo;
 import org.pjsip.pjsua2.CodecInfoVector2;
 import org.pjsip.pjsua2.EpConfig;
 import org.pjsip.pjsua2.IpChangeParam;
+import org.pjsip.pjsua2.ToneDesc;
+import org.pjsip.pjsua2.ToneDescVector;
+import org.pjsip.pjsua2.ToneGenerator;
 import org.pjsip.pjsua2.TransportConfig;
 import org.pjsip.pjsua2.VidDevManager;
 import org.pjsip.pjsua2.pj_qos_type;
@@ -53,6 +57,10 @@ public class SipService extends BackgroundService implements SipServiceConstants
     private SharedPreferencesHelper mSharedPreferencesHelper;
     private static volatile boolean mStarted;
     private int callStatus;
+
+    private ToneGenerator pjsipLocalRingbackGenerator;
+    private AudioMedia speakerAudioMedia; // Represents the physical speaker output
+    private boolean isPjsipRingbackPlaying = false; // To track state
 
     /***   Service Lifecycle Callbacks    ***/
 
@@ -883,6 +891,8 @@ public class SipService extends BackgroundService implements SipServiceConstants
 
             SipServiceUtils.setVideoCodecPriorities(mEndpoint);
 
+            initPjsipToneGeneratorAndSpeaker();
+
             Logger.debug(TAG, "PJSIP started!");
             mStarted = true;
             mBroadcastEmitter.stackStatus(true);
@@ -905,6 +915,7 @@ public class SipService extends BackgroundService implements SipServiceConstants
 
         try {
             Logger.debug(TAG, "Stopping PJSIP");
+            deInitPjsipToneGenerator();
 
             /*
              * Do not remove accounts on service stop anymore
@@ -1092,6 +1103,88 @@ public class SipService extends BackgroundService implements SipServiceConstants
 
     private ArrayList<CodecPriority> getConfiguredCodecPriorities() {
         return mSharedPreferencesHelper.retrieveConfiguredCodecPriorities();
+    }
+
+    // Call this once during PJSIP initialization (e.g., in Endpoint's onLibCreate or after libStart)
+    public void initPjsipToneGeneratorAndSpeaker() {
+        try {
+            if (pjsipLocalRingbackGenerator == null) {
+                pjsipLocalRingbackGenerator = new org.pjsip.pjsua2.ToneGenerator();
+                pjsipLocalRingbackGenerator.createToneGenerator(); // Initialize the tone generator
+                Logger.info(TAG, "PJSIP ToneGenerator created.");
+            }
+
+            if (speakerAudioMedia == null) {
+                speakerAudioMedia = mEndpoint.audDevManager().getPlaybackDevMedia();
+                Logger.info(TAG, "PJSIP Speaker media obtained.");
+            }
+        } catch (Exception e) {
+            Logger.info(TAG, "Failed to init PJSIP ToneGenerator or speaker: " + e.getMessage());
+        }
+    }
+
+    // Call this when PJSIP library is being destroyed
+    public void deInitPjsipToneGenerator() {
+        if (pjsipLocalRingbackGenerator != null) {
+            try {
+                stopPjsipRingbackTone(); // Ensure it's stopped and disconnected
+                pjsipLocalRingbackGenerator.delete(); // Release native resources
+                pjsipLocalRingbackGenerator = null;
+                Logger.info(TAG, "PJSIP ToneGenerator deleted.");
+            } catch (Exception e) {
+                Logger.info(TAG, "Error deleting PJSIP ToneGenerator: " + e.getMessage());
+            }
+        }
+        speakerAudioMedia = null; // Also clear reference to speaker media
+    }
+
+    // Method to start the PJSIP ringback tone
+    public void startPjsipRingbackTone() {
+        if (pjsipLocalRingbackGenerator == null || speakerAudioMedia == null || isPjsipRingbackPlaying) {
+            Logger.info(TAG, "PJSIP ToneGenerator not ready or already playing.");
+            return;
+        }
+
+        try {
+            // Define a European-style ringback tone (adjust frequencies/durations as needed)
+            ToneDesc ringbackSegment = new ToneDesc();
+            ringbackSegment.setFreq1((short)425); // Hz
+            ringbackSegment.setFreq2((short)0);   // Single tone
+            ringbackSegment.setOn_msec((short)1000); // 1 second on
+            ringbackSegment.setOff_msec((short)4000); // 4 seconds off (creating a 5-second cycle)
+            ringbackSegment.setVolume((short)0); // 0-255, 0 for max volume. Adjust if too loud.
+
+            ToneDescVector tones = new ToneDescVector();
+            tones.add(ringbackSegment);
+
+            // Connect the ToneGenerator as a source to the speaker as a sink
+            // The startTransmit method handles the connection through the conference bridge implicitly.
+            pjsipLocalRingbackGenerator.startTransmit(speakerAudioMedia);
+
+            // Play the tone in a loop indefinitely
+            pjsipLocalRingbackGenerator.play(tones, true);
+            isPjsipRingbackPlaying = true;
+            Logger.info(TAG, "PJSIP Local Ringback Tone started.");
+
+        } catch (Exception e) {
+            Logger.info(TAG, "Error starting PJSIP Local Ringback Tone: " + e.getMessage());
+            isPjsipRingbackPlaying = false;
+        }
+    }
+
+    // Method to stop the PJSIP ringback tone
+    public void stopPjsipRingbackTone() {
+        if (pjsipLocalRingbackGenerator != null && isPjsipRingbackPlaying) {
+            try {
+                pjsipLocalRingbackGenerator.stop(); // Stop the tone generation
+                // Disconnect the tone generator from the speaker
+                pjsipLocalRingbackGenerator.stopTransmit(speakerAudioMedia);
+                isPjsipRingbackPlaying = false;
+                Logger.info(TAG, "PJSIP Local Ringback Tone stopped.");
+            } catch (Exception e) {
+                Logger.info(TAG, "Error stopping PJSIP Local Ringback Tone: " + e.getMessage());
+            }
+        }
     }
 
     protected synchronized AudDevManager getAudDevManager() {
