@@ -23,6 +23,7 @@ public class SipAccountData implements Parcelable {
     public static final String AUTH_TYPE_DIGEST = "digest";
     public static final String AUTH_TYPE_PLAIN = "plain";
     private final int sessionTimerExpireSec = 600;
+    private static final String SIP_INSTANCE_PROTO = "urn:uuid:";
 
     private String username;
     private String password;
@@ -38,6 +39,7 @@ public class SipAccountData implements Parcelable {
     private int srtpUse = pjmedia_srtp_use.PJMEDIA_SRTP_OPTIONAL;
     private int srtpSecureSignalling = 0; // not required
     private SipAccountTransport transport = SipAccountTransport.UDP;
+    private String sipInstance;
 
     public SipAccountData() { }
 
@@ -71,6 +73,7 @@ public class SipAccountData implements Parcelable {
         parcel.writeInt(srtpUse);
         parcel.writeInt(srtpSecureSignalling);
         parcel.writeInt(transport.ordinal());
+        parcel.writeString(sipInstance);
     }
 
     private SipAccountData(Parcel in) {
@@ -88,6 +91,7 @@ public class SipAccountData implements Parcelable {
         srtpUse = in.readInt();
         srtpSecureSignalling = in.readInt();
         transport = SipAccountTransport.getTransportByCode(in.readInt());
+        sipInstance = in.readString();
     }
 
     @Override
@@ -233,6 +237,15 @@ public class SipAccountData implements Parcelable {
         this.srtpSecureSignalling = srtpSecureSignalling;
         return this;
     }
+
+    public String getSipInstance() {
+        return sipInstance;
+    }
+
+    public SipAccountData setSipInstance(String sipInstance) {
+        this.sipInstance = sipInstance;
+        return this;
+    }
     /*          Getters and Setters end        */
 
     /*****          Utilities        ******/
@@ -269,6 +282,17 @@ public class SipAccountData implements Parcelable {
         }
     }
 
+    String getValidSipInstance() {
+        if (sipInstance != null) {
+            if (sipInstance.startsWith(SIP_INSTANCE_PROTO))
+                return sipInstance;
+            else {
+                return SIP_INSTANCE_PROTO + sipInstance;
+            }
+        }
+        return null;
+    }
+
     public boolean isValid() {
         return ((username != null) && !username.isEmpty()
                 && (password != null) && !password.isEmpty()
@@ -294,6 +318,11 @@ public class SipAccountData implements Parcelable {
         accountConfig.getSipConfig().getAuthCreds().add(getAuthCredInfo());
         accountConfig.getSipConfig().getProxies().add(getProxyUri());
 
+        // NAT configs
+        String sipInst = getValidSipInstance();
+        if (sipInst != null && !sipInst.isEmpty()) {
+            accountConfig.getNatConfig().setSipOutboundInstanceId(sipInst);
+        }
         // nat configs to allow call reconnection across networks
         accountConfig.getNatConfig().setSdpNatRewriteUse(pj_constants_.PJ_TRUE);
         accountConfig.getNatConfig().setViaRewriteUse(pj_constants_.PJ_TRUE);
@@ -352,6 +381,7 @@ public class SipAccountData implements Parcelable {
         if (srtpUse != that.srtpUse) return false;
         if (srtpSecureSignalling != that.srtpSecureSignalling) return false;
         if (!Objects.equals(transport, that.transport)) return false;
+        if (!Objects.equals(sipInstance, that.sipInstance)) return false;
 
         return getIdUri().equals(that.getIdUri());
 
@@ -371,6 +401,7 @@ public class SipAccountData implements Parcelable {
         result = 31 * result + srtpUse;
         result = 31 * result + srtpSecureSignalling;
         result = 31 * result + transport.hashCode();
+        result = 31 * result + sipInstance.hashCode();
         return result;
     }
 
