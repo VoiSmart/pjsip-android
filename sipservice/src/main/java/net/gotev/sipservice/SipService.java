@@ -25,6 +25,7 @@ import org.pjsip.pjsua2.VidDevManager;
 import org.pjsip.pjsua2.pj_qos_type;
 import org.pjsip.pjsua2.pjmedia_orient;
 import org.pjsip.pjsua2.pjsip_inv_state;
+import org.pjsip.pjsua2.pjsip_status_code;
 import org.pjsip.pjsua2.pjsip_transport_type_e;
 import org.pjsip.pjsua2.pjsua_call_vid_strm_op;
 import org.pjsip.pjsua2.pjsua_destroy_flag;
@@ -346,11 +347,12 @@ public class SipService extends BackgroundService implements SipServiceConstants
     private void handleDeclineIncomingCall(Intent intent) {
         String accountID = intent.getStringExtra(PARAM_ACCOUNT_ID);
         int callID = intent.getIntExtra(PARAM_CALL_ID, 0);
+        int hangupStatus = intent.getIntExtra(PARAM_HANGUP_STATUS, pjsip_status_code.PJSIP_SC_DECLINE);
 
         SipCall sipCall = getCall(accountID, callID);
         if (sipCall != null) {
             try {
-                sipCall.declineIncomingCall();
+                sipCall.declineIncomingCall(hangupStatus);
             } catch (Exception exc) {
                 Logger.error(TAG, "Error while declining incoming call. AccountID: "
                         + getValue(getApplicationContext(), accountID) + ", CallID: " + callID);
@@ -361,9 +363,10 @@ public class SipService extends BackgroundService implements SipServiceConstants
     private void handleHangUpCall(Intent intent) {
         String accountID = intent.getStringExtra(PARAM_ACCOUNT_ID);
         int callID = intent.getIntExtra(PARAM_CALL_ID, 0);
+        int hangupStatus = intent.getIntExtra(PARAM_HANGUP_STATUS, pjsip_status_code.PJSIP_SC_OK);
 
         try {
-            hangupCall(accountID, callID);
+            hangupCall(accountID, callID, hangupStatus);
         } catch (Exception exc) {
             Logger.error(TAG, "Error while hanging up call", exc);
             notifyCallDisconnected(accountID, callID);
@@ -382,7 +385,7 @@ public class SipService extends BackgroundService implements SipServiceConstants
 
         for (int callID : activeCallIDs) {
             try {
-                hangupCall(accountID, callID);
+                hangupCall(accountID, callID, pjsip_status_code.PJSIP_SC_OK);
             } catch (Exception exc) {
                 Logger.error(TAG, "Error while hanging up call", exc);
                 notifyCallDisconnected(accountID, callID);
@@ -390,7 +393,7 @@ public class SipService extends BackgroundService implements SipServiceConstants
         }
     }
 
-    private void hangupCall(String accountID, int callID) {
+    private void hangupCall(String accountID, int callID, int statusCode) {
         SipCall sipCall = getCall(accountID, callID);
         if (sipCall != null) {
             sipCall.hangUpWithCode();
