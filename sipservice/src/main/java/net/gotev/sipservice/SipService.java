@@ -393,7 +393,7 @@ public class SipService extends BackgroundService implements SipServiceConstants
     private void hangupCall(String accountID, int callID) {
         SipCall sipCall = getCall(accountID, callID);
         if (sipCall != null) {
-            sipCall.hangUp();
+            sipCall.hangUpWithCode();
         }
     }
 

@@ -264,36 +264,35 @@ public class SipCall extends Call {
         }
     }
 
-    public void sendBusyHereToIncomingCall() {
-        CallOpParam param = new CallOpParam();
-        param.setStatusCode(pjsip_status_code.PJSIP_SC_BUSY_HERE);
-
-        try {
-            answer(param);
-        } catch (Exception exc) {
-            Logger.error(LOG_TAG, "Failed to send busy here", exc);
-        }
-    }
-
     public void declineIncomingCall() {
+        declineIncomingCall(pjsip_status_code.PJSIP_SC_DECLINE);
+    }
+
+    public void declineIncomingCall(int statusCode) {
         CallOpParam param = new CallOpParam();
-        param.setStatusCode(pjsip_status_code.PJSIP_SC_DECLINE);
+        param.setStatusCode(statusCode);
 
         try {
+            Logger.info(LOG_TAG, "Declining call with status code: " + statusCode);
             answer(param);
         } catch (Exception exc) {
-            Logger.error(LOG_TAG, "Failed to decline incoming call", exc);
+            Logger.error(LOG_TAG, "Failed to decline incoming call with code: " + statusCode, exc);
         }
     }
 
-    public void hangUp() {
+    public void hangUpWithCode() {
+        hangUpWithCode(pjsip_status_code.PJSIP_SC_OK);
+    }
+
+    public void hangUpWithCode(int statusCode) {
         CallOpParam param = new CallOpParam();
-        param.setStatusCode(pjsip_status_code.PJSIP_SC_DECLINE);
+        param.setStatusCode(statusCode);
 
         try {
+            Logger.info(LOG_TAG, "Terminating call with status code: " + statusCode);
             hangup(param);
         } catch (Exception exc) {
-            Logger.error(LOG_TAG, "Failed to hangUp call", exc);
+            Logger.error(LOG_TAG, "Failed to hangUp call with code: " + statusCode, exc);
         }
     }
 

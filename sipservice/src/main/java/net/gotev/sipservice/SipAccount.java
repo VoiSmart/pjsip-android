@@ -173,7 +173,7 @@ public class SipAccount extends Account {
             try {
                 CallerInfo contactInfo = new CallerInfo(call.getInfo());
                 service.getBroadcastEmitter().missedCall(contactInfo.getDisplayName(), contactInfo.getRemoteUri());
-                call.sendBusyHereToIncomingCall();
+                call.declineIncomingCall(pjsip_status_code.PJSIP_SC_BUSY_HERE);
                 Logger.debug(LOG_TAG, "Sending busy to call ID: " + prm.getCallId());
             } catch(Exception ex) {
                 Logger.error(LOG_TAG, "Error while getting missed call info", ex);

@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.view.Surface;
 
 import org.pjsip.PjCameraInfo2;
+import org.pjsip.pjsua2.pjsip_status_code;
 
 import java.util.ArrayList;
 
@@ -240,12 +241,26 @@ public class SipServiceCommand implements SipServiceConstants {
      * @param callID call ID to hang up
      */
     public static void hangUpCall(Context context, String accountID, int callID) {
+        hangUpCall(context, accountID, callID, pjsip_status_code.PJSIP_SC_OK);
+    }
+
+    /**
+     * Hangs up an active call. If the call does not exist or has been terminated, a disconnected
+     * state will be sent to
+     * {@link BroadcastEventReceiver#onCallState(String, int, int, int, long)}
+     * @param context application context
+     * @param accountID account ID
+     * @param callID call ID to hang up
+     * @param statusCode the status code to be used for hangup action. See {@link pjsip_status_code}
+     */
+    public static void hangUpCall(Context context, String accountID, int callID, int statusCode) {
         checkAccount(accountID);
 
         Intent intent = new Intent(context, SipService.class);
         intent.setAction(ACTION_HANG_UP_CALL);
         intent.putExtra(PARAM_ACCOUNT_ID, accountID);
         intent.putExtra(PARAM_CALL_ID, callID);
+        intent.putExtra(PARAM_HANGUP_STATUS, statusCode);
         context.startService(intent);
     }
 
@@ -331,12 +346,26 @@ public class SipServiceCommand implements SipServiceConstants {
      * @param callID call ID to hang up
      */
     public static void declineIncomingCall(Context context, String accountID, int callID) {
+        declineIncomingCall(context, accountID, callID, pjsip_status_code.PJSIP_SC_DECLINE);
+    }
+
+    /**
+     * Decline an incoming call. If the call does not exist or has been terminated, a disconnected
+     * state will be sent to
+     * {@link BroadcastEventReceiver#onCallState(String, int, int, int, long)}
+     * @param context application context
+     * @param accountID account ID
+     * @param callID call ID to hang up
+     * @param statusCode the status code to be used for decline action. See {@link pjsip_status_code}
+     */
+    public static void declineIncomingCall(Context context, String accountID, int callID, int statusCode) {
         checkAccount(accountID);
 
         Intent intent = new Intent(context, SipService.class);
         intent.setAction(ACTION_DECLINE_INCOMING_CALL);
         intent.putExtra(PARAM_ACCOUNT_ID, accountID);
         intent.putExtra(PARAM_CALL_ID, callID);
+        intent.putExtra(PARAM_HANGUP_STATUS, statusCode);
         context.startService(intent);
     }
 
