@@ -25,7 +25,7 @@ public class CodecPriority implements Parcelable, Comparable<CodecPriority> {
     private final String mCodecId;
     private int mPriority;
 
-    CodecPriority(String codecId, short priority) {
+    public CodecPriority(String codecId, short priority) {
         mCodecId = codecId;
         mPriority = priority;
     }
