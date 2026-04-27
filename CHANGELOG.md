@@ -5,10 +5,10 @@ Change Log
 
 _2026-04-27_
 * **MinSdkVersion** increased to api 24
-* **PJSIP** version increased to`2.16`
-* **OpenSSL** version increased to current LTS`3.5.5`
+* **PJSIP** version increased to `2.16`
+* **OpenSSL** version increased to current LTS `3.5.5`
 * **OpenH264**  version increased to `2.6.0`
-* **Opus** version increased to`1.6.1`
+* **Opus** version increased to `1.6.1`
 
 ### Version 2.13.0
 
