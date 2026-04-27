@@ -4,8 +4,8 @@
 
 What you need to work with this library:
 
-- An android device with Android API 23
-- A PBX (E.g. VoiSmart Orchestra NG or FreeSWITCH, which is open). I'm not going to enter in the detail of how to properly configure your PBX, because that's a different topic and there are excellent tutorials out there.
+- An android device with Android API 24
+- A PBX (E.g. VoiSmart Orchestra or FreeSWITCH, which is open). I'm not going to enter in the detail of how to properly configure your PBX, because that's a different topic and there are excellent tutorials out there.
 
 ## Architecture
 
@@ -41,7 +41,7 @@ Native PJSIP library for Android is compiled using [PJSIP Android Builder](https
   - mute/unmute video
   - video preview
 - Use of a fixed SIP `Call-ID Header`. Refer to [this](https://github.com/VoiSmart/pjsip-android-builder/tree/master/patches/fixed_callid) for more details
-- Get Call Statistics on call disconnected
+- Get Call Statistics on call disconnected. Refer to [this](https://github.com/VoiSmart/pjsip-android/commit/850679a1d4542954165d0ab4de3f6ae19a75aa80) for more details
 - Sip Credential encryption on device. Refer to [Android Jetpack Security](https://developer.android.com/topic/security/data) library for more details
 - Call Reconnection: useful after a network disconnection, it will try to reconnect the call with new ip/port
 - TLS and SRTP support
@@ -60,10 +60,10 @@ Native PJSIP library for Android is compiled using [PJSIP Android Builder](https
 
 ### Used Libraries versions
 
-- PJSIP: 2.12.1
-- OpenSSL: 1.1.1k
-- OpenH264: 2.1.0
-- Opus: 1.3.1
+- PJSIP: 2.16
+- OpenSSL: 3.5.5
+- OpenH264: 2.6.0
+- Opus: 1.6.1
 - bcg729: 1.1.1
 
 ## Logging
