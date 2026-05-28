@@ -1,0 +1,93 @@
+# Builds the sipservice API docs with Dokka and publishes them to gh-pages.
+#
+# Layout produced on the gh-pages branch:
+#   <version>/...   one folder per release (kept forever, version-switcher source)
+#   latest/...      mirror of the most recently published version
+#   index.html      meta-refresh redirect to latest/
+#
+# Triggered on every git tag push (releases) and on manual dispatch for ad-hoc
+# rebuilds. The version label comes from the tag name when present, otherwise
+# from the library's versionName (manual runs from a non-tag ref).
+name: Publish Dokka docs
+
+on:
+  push:
+    tags:
+      - '*'
+  workflow_dispatch:
+
+permissions:
+  contents: write  # needed by peaceiris/actions-gh-pages to push to gh-pages
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+
+      # Pull the existing gh-pages content into docs-history/ so Dokka's
+      # versioning plugin can render the version-switcher dropdown. On the
+      # very first publish the branch does not exist yet — that's fine,
+      # continue-on-error lets the workflow proceed.
+      - name: Checkout existing gh-pages
+        uses: actions/checkout@v4
+        continue-on-error: true
+        with:
+          ref: gh-pages
+          path: docs-history
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      # Resolve the version label: prefer the tag name, fall back to the
+      # library's versionName declared in sipservice/build.gradle for manual
+      # dispatch from a branch.
+      - name: Resolve docs version
+        id: ver
+        run: |
+          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
+            echo "version=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+          else
+            v=$(grep -E "versionName\s+\"" sipservice/build.gradle | head -1 | sed -E 's/.*"([^"]+)".*/\1/')
+            echo "version=${v}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build Dokka HTML
+        run: ./gradlew :sipservice:dokkaHtml --no-daemon
+
+      # Stage the freshly generated docs onto the gh-pages working copy:
+      # write/overwrite the version folder, mirror to latest/, and (re)create
+      # the root redirect.
+      - name: Stage docs for publish
+        run: |
+          set -euo pipefail
+          VERSION="${{ steps.ver.outputs.version }}"
+          SRC="build/dokka/${VERSION}"
+          if [ ! -d "$SRC" ]; then
+            echo "Dokka output not found at $SRC" >&2
+            exit 1
+          fi
+          mkdir -p docs-history
+          rm -rf "docs-history/${VERSION}" "docs-history/latest"
+          cp -R "$SRC" "docs-history/${VERSION}"
+          cp -R "$SRC" "docs-history/latest"
+          cat > docs-history/index.html <<'HTML'
+          <!doctype html>
+          <meta http-equiv="refresh" content="0; url=latest/">
+          <link rel="canonical" href="latest/">
+          HTML
+
+      - name: Publish to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: docs-history
+          publish_branch: gh-pages
+          commit_message: "docs: publish ${{ steps.ver.outputs.version }}"
