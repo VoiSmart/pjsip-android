@@ -1,1 +1,6 @@
+// Pin the root project name so subprojects can reliably detect whether
+// they're being built standalone (from this repo) or consumed as a
+// composite subproject by an outer app.
+rootProject.name = 'pjsip-android'
+
 include ':sipservice'
