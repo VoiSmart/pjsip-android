@@ -1,4 +1,5 @@
 apply plugin: 'com.android.library'
+apply plugin: 'org.jetbrains.dokka'
 
 android {
     namespace 'net.gotev.sipservice'
@@ -27,4 +28,57 @@ dependencies {
     implementation 'com.github.voismart:crypto:0.1.0'
     implementation 'androidx.security:security-crypto:1.0.0'
     testImplementation 'junit:junit:4.13.1'
+
+    // Dokka versioning plugin: produces the version-switcher dropdown in the
+    // rendered HTML docs so historical releases stay reachable.
+    dokkaPlugin 'org.jetbrains.dokka:versioning-plugin:1.9.20'
+}
+
+// --- Dokka configuration ------------------------------------------------------
+// Generates HTML API docs for the public net.gotev.sipservice surface only.
+// The bundled org.pjsip.pjsua2 SWIG bindings that live under the same source
+// tree are intentionally excluded — they are auto-generated native bindings,
+// not part of this library's public API.
+//
+// Output goes to <rootDir>/build/dokka/<versionName>/ so the CI workflow can
+// pick it up, drop it under gh-pages/<version>/ and gh-pages/latest/.
+def dokkaDocVersion = android.defaultConfig.versionName
+def dokkaOutputDir = rootProject.file("build/dokka/${dokkaDocVersion}")
+// Populated by the docs workflow with the existing gh-pages content so the
+// versioning plugin can render the version-switcher. Safe to be absent locally.
+def dokkaHistoryDir = rootProject.file('docs-history')
+
+tasks.named('dokkaHtml').configure {
+    moduleName.set('sipservice')
+    outputDirectory.set(dokkaOutputDir)
+
+    // Android library modules don't get a 'main' source set auto-registered
+    // by Dokka, so we create it explicitly.
+    dokkaSourceSets.create('main') {
+        // Restrict input to the package we want documented.
+        sourceRoots.from(file('src/main/java/net/gotev/sipservice'))
+        jdkVersion.set(17)
+        noAndroidSdkLink.set(false)
+
+        // Belt-and-braces: hide org.pjsip.* if anything ever leaks in via refs.
+        perPackageOption {
+            matchingRegex.set('org\\.pjsip(\\..*)?')
+            suppress.set(true)
+        }
+        // Hide any *.internal.* helpers from the rendered docs.
+        perPackageOption {
+            matchingRegex.set('.*\\.internal.*')
+            suppress.set(true)
+        }
+    }
+
+    // Configure the versioning plugin via the Groovy-friendly JSON map form.
+    // The 'olderVersionsDir' key is only included when the directory actually
+    // exists, so local runs (without gh-pages history) still succeed.
+    def versioningJson = dokkaHistoryDir.exists()
+            ? "{ \"version\": \"${dokkaDocVersion}\", \"olderVersionsDir\": \"${dokkaHistoryDir.absolutePath.replace('\\', '\\\\')}\" }"
+            : "{ \"version\": \"${dokkaDocVersion}\" }"
+    pluginsMapConfiguration.set([
+            'org.jetbrains.dokka.versioning.VersioningPlugin': versioningJson
+    ])
 }

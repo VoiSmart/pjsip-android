@@ -11,6 +11,8 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:7.2.1'
+        classpath 'org.jetbrains.dokka:dokka-gradle-plugin:1.9.20'
+        classpath 'org.jetbrains.dokka:versioning-plugin:1.9.20'
     }
 }
 

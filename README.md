@@ -2,6 +2,13 @@
 
 **NOTICE!** This project is experimental, so don't use it in production! No support is provided and only bug fixes and pull requests can be accepted.
 
+## Documentation
+
+API reference for the `sipservice` package is published to GitHub Pages and built automatically by Dokka on every tagged release:
+
+- Latest: https://voismart.github.io/pjsip-android/latest/
+- Versioned index: https://voismart.github.io/pjsip-android/
+
 What you need to work with this library:
 
 - An android device with Android API 24
