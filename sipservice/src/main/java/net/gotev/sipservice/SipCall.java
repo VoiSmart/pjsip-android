@@ -255,7 +255,7 @@ public class SipCall extends Call {
         setMediaParams(param);
         if (!videoCall) {
             CallSetting callSetting = param.getOpt();
-            callSetting.setFlag(pjsua_call_flag.PJSUA_CALL_INCLUDE_DISABLED_MEDIA);
+            // callSetting.setFlag(pjsua_call_flag.PJSUA_CALL_INCLUDE_DISABLED_MEDIA);
         }
         try {
             answer(param);
@@ -410,7 +410,7 @@ public class SipCall extends Call {
         setMediaParams(prm);
         if (!videoCall) {
             CallSetting callSetting = prm.getOpt();
-            callSetting.setFlag(pjsua_call_flag.PJSUA_CALL_INCLUDE_DISABLED_MEDIA);
+            // callSetting.setFlag(pjsua_call_flag.PJSUA_CALL_INCLUDE_DISABLED_MEDIA);
         }
         super.makeCall(dst_uri, prm);
     }
@@ -545,6 +545,7 @@ public class SipCall extends Call {
         CallSetting callSetting = param.getOpt();
         callSetting.setAudioCount(1);
         callSetting.setVideoCount(videoCall ? 1 : 0);
+        callSetting.setTextCount(0);
         callSetting.setReqKeyframeMethod(pjsua_vid_req_keyframe_method.PJSUA_VID_REQ_KEYFRAME_RTCP_PLI);
     }
 
