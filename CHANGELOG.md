@@ -1,6 +1,14 @@
 Change Log
 ==========
 
+### Version 2.15.0
+
+_2026-06-15_
+* **BREAKING CHANGES**
+  * The support for DND (local) has been removed
+* **Issues fixed**:
+  * #232
+
 ### Version 2.14.1
 
 _2026-06-04_
