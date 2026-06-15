@@ -549,13 +549,6 @@ public class SipServiceCommand implements SipServiceConstants {
         context.startService(intent);
     }
 
-    public static void setDND(Context context, boolean dnd) {
-        Intent intent = new Intent(context, SipService.class);
-        intent.setAction(ACTION_SET_DND);
-        intent.putExtra(PARAM_DND, dnd);
-        context.startService(intent);
-    }
-
     /**
      * Sets up the incoming video feed. If the call does not exist or has been terminated, a disconnected
      * state will be sent to
