@@ -93,6 +93,21 @@ public class BroadcastEventEmitter implements SipServiceConstants {
      * @param connectTimestamp call start timestamp
      */
     public synchronized void callState(String accountID, int callID, int callStateCode, int callStateStatus, long connectTimestamp) {
+        // Backward-compatible overload: no "completed elsewhere" information available.
+        callState(accountID, callID, callStateCode, callStateStatus, connectTimestamp, false);
+    }
+
+    /**
+     * Emit a call state broadcast intent.
+     * @param accountID call's account IdUri
+     * @param callID call ID number
+     * @param callStateCode SIP call state code
+     * @param callStateStatus SIP call state status
+     * @param connectTimestamp call start timestamp
+     * @param completedElsewhere true if the call was answered on another device
+     *                           (CANCEL carrying "Reason: SIP;cause=200")
+     */
+    public synchronized void callState(String accountID, int callID, int callStateCode, int callStateStatus, long connectTimestamp, boolean completedElsewhere) {
         final Intent intent = new Intent();
 
         intent.setAction(getAction(BroadcastAction.CALL_STATE));
@@ -101,6 +116,7 @@ public class BroadcastEventEmitter implements SipServiceConstants {
         intent.putExtra(PARAM_CALL_STATE, callStateCode);
         intent.putExtra(PARAM_CALL_STATUS, callStateStatus);
         intent.putExtra(PARAM_CONNECT_TIMESTAMP, connectTimestamp);
+        intent.putExtra(PARAM_CALL_COMPLETED_ELSEWHERE, completedElsewhere);
 
         sendBroadcast(intent);
     }

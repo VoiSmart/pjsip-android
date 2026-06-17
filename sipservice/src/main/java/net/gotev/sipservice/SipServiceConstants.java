@@ -69,6 +69,10 @@ public interface SipServiceConstants {
     String PARAM_DISPLAY_NAME = "displayName";
     String PARAM_CALL_STATE = "callState";
     String PARAM_CALL_STATUS = "callStatus";
+    // True when the incoming call was cancelled because it was answered on
+    // another device (CANCEL with RFC 3326 "Reason: SIP;cause=200"). Used to
+    // suppress the missed-call notification for shared/forked call appearances.
+    String PARAM_CALL_COMPLETED_ELSEWHERE = "callCompletedElsewhere";
     String PARAM_CONNECT_TIMESTAMP = "connectTimestamp";
     String PARAM_STACK_STARTED = "stackStarted";
     String PARAM_CODEC_PRIORITIES_LIST = "codecPrioritiesList";

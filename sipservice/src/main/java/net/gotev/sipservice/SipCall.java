@@ -16,10 +16,13 @@ import org.pjsip.pjsua2.MediaFmtChangedEvent;
 import org.pjsip.pjsua2.OnCallMediaEventParam;
 import org.pjsip.pjsua2.OnCallMediaStateParam;
 import org.pjsip.pjsua2.OnCallStateParam;
+import org.pjsip.pjsua2.OnCallTsxStateParam;
 import org.pjsip.pjsua2.OnStreamDestroyedParam;
 import org.pjsip.pjsua2.RtcpStreamStat;
+import org.pjsip.pjsua2.SipRxData;
 import org.pjsip.pjsua2.StreamInfo;
 import org.pjsip.pjsua2.StreamStat;
+import org.pjsip.pjsua2.TsxStateEvent;
 import org.pjsip.pjsua2.VideoPreview;
 import org.pjsip.pjsua2.VideoPreviewOpParam;
 import org.pjsip.pjsua2.VideoWindow;
@@ -28,6 +31,7 @@ import org.pjsip.pjsua2.pjmedia_dir;
 import org.pjsip.pjsua2.pjmedia_event_type;
 import org.pjsip.pjsua2.pjmedia_rtcp_fb_type;
 import org.pjsip.pjsua2.pjmedia_type;
+import org.pjsip.pjsua2.pjsip_event_id_e;
 import org.pjsip.pjsua2.pjsip_inv_state;
 import org.pjsip.pjsua2.pjsip_role_e;
 import org.pjsip.pjsua2.pjsip_status_code;
@@ -36,6 +40,8 @@ import org.pjsip.pjsua2.pjsua_call_flag;
 import org.pjsip.pjsua2.pjsua_call_media_status;
 import org.pjsip.pjsua2.pjsua_call_vid_strm_op;
 import org.pjsip.pjsua2.pjsua_vid_req_keyframe_method;
+
+import java.util.regex.Pattern;
 
 /**
  * Wrapper around PJSUA2 Call object.
@@ -46,7 +52,17 @@ public class SipCall extends Call {
 
     private static final String LOG_TAG = SipCall.class.getSimpleName();
 
+    // Matches the SIP cause code 200 inside an RFC 3326 Reason header value
+    // (e.g. "cause=200"). \b prevents matching 2000, 2001, etc.
+    private static final Pattern REASON_CAUSE_200 = Pattern.compile("cause\\s*=\\s*200\\b");
+
     private final SipAccount account;
+    // Set when an incoming CANCEL carries a "Reason: SIP;cause=200" header,
+    // meaning the call was answered on another device. Surfaced on the
+    // DISCONNECTED state broadcast so the app can skip the missed-call notification.
+    // volatile: written on the transaction worker thread (onCallTsxState) and read
+    // on the call-state callback (onCallState); makes the visibility explicit.
+    private volatile boolean completedElsewhere = false;
     private boolean localHold = false;
     private boolean localMute = false;
     private boolean localVideoMute = false;
@@ -149,7 +165,7 @@ public class SipCall extends Call {
             }
 
             account.getService().getBroadcastEmitter()
-                    .callState(account.getData().getIdUri(), callID, callState, callStatus, connectTimestamp);
+                    .callState(account.getData().getIdUri(), callID, callState, callStatus, connectTimestamp, completedElsewhere);
 
             if (callState == pjsip_inv_state.PJSIP_INV_STATE_DISCONNECTED) {
                 account.getService().setLastCallStatus(0);
@@ -160,6 +176,75 @@ public class SipCall extends Call {
             Logger.error(LOG_TAG, "onCallState: error while getting call info", exc);
         }
 
+    }
+
+    /**
+     * Transaction-level callback. We use it to inspect the raw incoming SIP
+     * messages for a CANCEL carrying an RFC 3326 "Reason: SIP;cause=200" header,
+     * which signals the call was answered on another device (shared/forked call
+     * appearance). PJSIP does not expose this header through {@link CallInfo}, so
+     * reading the raw message here is the only way to tell it apart from a genuine
+     * missed call (both terminate the INVITE with 487 Request Terminated).
+     * <p>
+     * Heavily guarded: not every transaction event carries an incoming message,
+     * the underlying objects are short-lived, and a failure here must never
+     * disrupt normal call handling.
+     */
+    @Override
+    public void onCallTsxState(OnCallTsxStateParam prm) {
+        try {
+            TsxStateEvent tsxState = prm.getE().getBody().getTsxState();
+            // Only an incoming-message event carries readable rdata; for timer/
+            // tx-msg/transport events there is no message to inspect, so we skip
+            // them and avoid materializing the SIP message string needlessly.
+            if (tsxState.getType() != pjsip_event_id_e.PJSIP_EVENT_RX_MSG) return;
+            SipRxData rdata = tsxState.getSrc().getRdata();
+            if (rdata == null) return;
+            if (isCompletedElsewhere(rdata.getWholeMsg())) {
+                completedElsewhere = true;
+                Logger.debug(LOG_TAG, "Incoming CANCEL with Reason cause=200 - call completed elsewhere");
+            }
+        } catch (Exception ignored) {
+            // Transaction events without an incoming message land here; nothing to do.
+        }
+    }
+
+    /**
+     * Returns true when {@code wholeMsg} is a SIP CANCEL request carrying an
+     * RFC 3326 Reason header with the SIP protocol and {@code cause=200}
+     * (e.g. {@code Reason: SIP;cause=200;text="Call completed elsewhere"}).
+     * <p>
+     * Matching is done on the SIP cause code only; the human-readable {@code text}
+     * is intentionally ignored because it may be localized or differ between servers.
+     * Package-private and static so it can be unit-tested without a live call.
+     */
+    static boolean isCompletedElsewhere(String wholeMsg) {
+        if (wholeMsg == null || wholeMsg.isEmpty()) return false;
+
+        String[] lines = wholeMsg.split("\\r?\\n");
+        if (lines.length == 0) return false;
+
+        // The first line is the request line; only an incoming CANCEL is relevant.
+        final String cancel = "CANCEL";
+        if (!lines[0].regionMatches(true, 0, cancel, 0, cancel.length())) {
+            return false;
+        }
+
+        final String reasonHeader = "Reason:";
+        for (String line : lines) {
+            if (!line.regionMatches(true, 0, reasonHeader, 0, reasonHeader.length())) {
+                continue;
+            }
+            // A single Reason header may carry multiple comma-separated reason-values.
+            String value = line.substring(reasonHeader.length());
+            for (String reason : value.split(",")) {
+                String token = reason.trim().toLowerCase();
+                if (token.startsWith("sip") && REASON_CAUSE_200.matcher(token).find()) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     @Override

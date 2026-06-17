@@ -47,7 +47,8 @@ public class BroadcastEventReceiver extends BroadcastReceiver implements SipServ
             onCallState(intent.getStringExtra(PARAM_ACCOUNT_ID),
                         intent.getIntExtra(PARAM_CALL_ID, -1),
                         callState, callStatus,
-                        intent.getLongExtra(PARAM_CONNECT_TIMESTAMP, -1));
+                        intent.getLongExtra(PARAM_CONNECT_TIMESTAMP, -1),
+                        intent.getBooleanExtra(PARAM_CALL_COMPLETED_ELSEWHERE, false));
 
         } else if (BroadcastEventEmitter.getAction(BroadcastEventEmitter.BroadcastAction.CALL_MEDIA_STATE).equals(action)) {
             onCallMediaState(intent.getStringExtra(PARAM_ACCOUNT_ID),
@@ -186,6 +187,19 @@ public class BroadcastEventReceiver extends BroadcastReceiver implements SipServ
                 ", callStateCode: " + callStateCode +
                 ", callStatusCode: " + callStatusCode +
                 ", connectTimestamp: " + connectTimestamp);
+    }
+
+    /**
+     * Overload carrying the {@code completedElsewhere} flag (true when the incoming
+     * call was canceled because it was answered on another device — CANCEL with
+     * "Reason: SIP;cause=200"). This is the variant the dispatcher invokes; its
+     * default implementation delegates to the legacy 5-argument
+     * {@link #onCallState(String, int, int, int, long)} so existing subclasses that
+     * only override the legacy callback keep receiving call-state updates unchanged.
+     * Subclasses that need the flag override this overload instead.
+     */
+    public void onCallState(String accountID, int callID, int callStateCode, int callStatusCode, long connectTimestamp, boolean completedElsewhere) {
+        onCallState(accountID, callID, callStateCode, callStatusCode, connectTimestamp);
     }
 
     public void onCallMediaState(String accountID, int callID, MediaState stateType, boolean stateValue) {
