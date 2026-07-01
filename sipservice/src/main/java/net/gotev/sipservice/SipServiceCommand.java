@@ -550,6 +550,20 @@ public class SipServiceCommand implements SipServiceConstants {
     }
 
     /**
+     * Enables or disables local Do-Not-Disturb. While enabled the service
+     * auto-declines every incoming call with 486 Busy Here (a 4XX), so the
+     * PBX keeps ringing the user's other devices — this is device-local only.
+     * @param context application context
+     * @param dnd true to enable local DND, false to disable
+     */
+    public static void setDND(Context context, boolean dnd) {
+        Intent intent = new Intent(context, SipService.class);
+        intent.setAction(ACTION_SET_DND);
+        intent.putExtra(PARAM_DND, dnd);
+        context.startService(intent);
+    }
+
+    /**
      * Sets up the incoming video feed. If the call does not exist or has been terminated, a disconnected
      * state will be sent to
      * {@link BroadcastEventReceiver#onCallState(String, int, int, int, long)}

@@ -17,7 +17,6 @@ import java.util.List;
 
 /**
  * connect
- *
  * Created by Vincenzo Esposito on 25/11/19.
  * Copyright © 2019 VoiSmart S.r.l. All rights reserved.
  */
@@ -31,8 +30,9 @@ public class SharedPreferencesHelper {
 
     private final String PREFS_KEY_ACCOUNTS = "accounts";
     private final String PREFS_KEY_CODEC_PRIORITIES = "codec_priorities";
-    // Legacy local DND flag — no longer read/written; cleared on migration. See migrateFrom().
-    private final String PREFS_KEY_LEGACY_DND = "dnd_pref";
+    // Local DND flag — when set the lib auto-declines incoming calls with 486 Busy Here
+    // (a 4XX, so the PBX keeps ringing the user's other devices). Driven by the app.
+    private final String PREFS_KEY_DND = "dnd_pref";
     private final String PREFS_KEY_ENCRYPTION_ENABLED = "encryption_enabled";
     private final String PREFS_KEY_KEYSTORE_ALIAS = "keystore_alias";
     private final String PREFS_KEY_OBFUSCATION_ENABLED = "obfuscation_enabled";
@@ -75,6 +75,14 @@ public class SharedPreferencesHelper {
 
     void persistConfiguredCodecPriorities(ArrayList<CodecPriority> codecPriorities) {
         sharedPreferences.edit().putString(PREFS_KEY_CODEC_PRIORITIES, gson.toJson(codecPriorities)).apply();
+    }
+
+    boolean isDND() {
+        return sharedPreferences.getBoolean(PREFS_KEY_DND, false);
+    }
+
+    void setDND(boolean dnd) {
+        sharedPreferences.edit().putBoolean(PREFS_KEY_DND, dnd).apply();
     }
 
     void setEncryption(Context context, boolean enableEncryption, String alias) {}
@@ -189,11 +197,6 @@ public class SharedPreferencesHelper {
         prefs.edit().remove(PREFS_KEY_ENCRYPTION_ENABLED).apply();
         prefs.edit().remove(PREFS_KEY_KEYSTORE_ALIAS).apply();
         prefs.edit().remove(PREFS_KEY_VERIFY_SIP_SERVER_CERT).apply();
-        // Wipe the orphaned legacy DND flag. It used to make the lib auto-decline
-        // every incoming call; the app now drives DND server-side via presence and
-        // never reads this anymore. Removing it recovers users who got stuck with
-        // dnd_pref=true and could no longer receive calls.
-        prefs.edit().remove(PREFS_KEY_LEGACY_DND).apply();
     }
 
     public static SharedPreferencesHelper getInstance(Context context) {

@@ -150,6 +150,22 @@ public class SipAccount extends Account {
 
         SipCall call = addIncomingCall(prm.getCallId());
 
+        // Local DND: decline with 486 Busy Here (a 4XX — NOT 603 Decline).
+        // 486 is local-only, so the PBX keeps ringing the user's other
+        // devices; a 6XX would tell the PBX to terminate the call on every
+        // device, which would defeat the "this device only" semantics.
+        if (service.isDND()) {
+            try {
+                CallerInfo contactInfo = new CallerInfo(call.getInfo());
+                service.getBroadcastEmitter().missedCall(contactInfo.getDisplayName(), contactInfo.getRemoteUri());
+                call.declineIncomingCall(pjsip_status_code.PJSIP_SC_BUSY_HERE);
+                Logger.debug(LOG_TAG, "DND - Decline call with ID: " + prm.getCallId());
+            } catch(Exception ex) {
+                Logger.error(LOG_TAG, "Error while getting -missed because declined- call info", ex);
+            }
+            return;
+        }
+
         // Send 486 Busy Here if there's an already ongoing call
         int totalCalls = 0;
         for (SipAccount _sipAccount: SipService.getActiveSipAccounts().values()) {

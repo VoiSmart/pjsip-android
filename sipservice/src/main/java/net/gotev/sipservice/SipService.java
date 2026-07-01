@@ -160,6 +160,9 @@ public class SipService extends BackgroundService implements SipServiceConstants
                 case ACTION_REFRESH_REGISTRATION:
                     handleRefreshRegistration(intent);
                     break;
+                case ACTION_SET_DND:
+                    handleSetDND(intent);
+                    break;
                 case ACTION_SET_INCOMING_VIDEO:
                     handleSetIncomingVideoFeed(intent);
                     break;
@@ -808,6 +811,15 @@ public class SipService extends BackgroundService implements SipServiceConstants
         } catch (Exception exc) {
             Logger.error(TAG, "Error while getting registration status for " + getValue(getApplicationContext(), accountID), exc);
         }
+    }
+
+    private void handleSetDND(Intent intent) {
+        boolean dnd = intent.getBooleanExtra(PARAM_DND, false);
+        mSharedPreferencesHelper.setDND(dnd);
+    }
+
+    public boolean isDND() {
+        return mSharedPreferencesHelper.isDND();
     }
 
     /***   Sip Stack Management    ***/
