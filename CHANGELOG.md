@@ -1,6 +1,16 @@
 Change Log
 ==========
 
+### Version 2.17.0
+
+_2026-06-30_
+* **Features**:
+  * Restored local DND support: `SipServiceCommand.setDND(context, dnd)` makes the
+    service auto-decline incoming calls with 486 Busy Here (4XX) while enabled, so the
+    PBX keeps ringing the user's other devices
+* **Issues fixed**:
+  * #234
+
 ### Version 2.16.0
 
 _2026-06-17_
