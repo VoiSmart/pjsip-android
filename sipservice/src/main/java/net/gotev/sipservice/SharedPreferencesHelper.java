@@ -8,8 +8,6 @@ import androidx.security.crypto.MasterKeys;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.voismart.crypto.Crypto;
-import com.voismart.crypto.EncryptionHelper;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -33,15 +31,12 @@ public class SharedPreferencesHelper {
     // Local DND flag — when set the lib auto-declines incoming calls with 486 Busy Here
     // (a 4XX, so the PBX keeps ringing the user's other devices). Driven by the app.
     private final String PREFS_KEY_DND = "dnd_pref";
-    private final String PREFS_KEY_ENCRYPTION_ENABLED = "encryption_enabled";
-    private final String PREFS_KEY_KEYSTORE_ALIAS = "keystore_alias";
     private final String PREFS_KEY_OBFUSCATION_ENABLED = "obfuscation_enabled";
     private final String PREFS_KEY_VERIFY_SIP_SERVER_CERT = "sip_server_cert_verification_enabled";
 
     private final SharedPreferences sharedPreferences;
     private final SharedPreferences encryptedSharedPreferences;
     private final Gson gson;
-    private EncryptionHelper encryptionHelper = null;
 
     private static SharedPreferencesHelper INSTANCE = null;
     private static final String TAG = "SharedPreferenceHelper";
@@ -50,7 +45,6 @@ public class SharedPreferencesHelper {
         gson = new Gson();
         sharedPreferences = context.getSharedPreferences(PREFS_FILE_NAME, Context.MODE_PRIVATE);
         encryptedSharedPreferences = initializeEncryptedSharedPreferences(context);
-        migrateFrom(sharedPreferences, context);
     }
 
     List<SipAccountData> retrieveConfiguredAccounts() {
@@ -85,8 +79,6 @@ public class SharedPreferencesHelper {
         sharedPreferences.edit().putBoolean(PREFS_KEY_DND, dnd).apply();
     }
 
-    void setEncryption(Context context, boolean enableEncryption, String alias) {}
-
     void setObfuscation(boolean obfuscate) {
         sharedPreferences.edit().putBoolean(PREFS_KEY_OBFUSCATION_ENABLED, obfuscate).apply();
     }
@@ -107,18 +99,6 @@ public class SharedPreferencesHelper {
         return sharedPreferences.getBoolean(PREFS_KEY_VERIFY_SIP_SERVER_CERT, false);
     }
 
-    /**
-     * Helpers to decrypt retrieved encrypted data
-     * @return decrypted accounts
-     */
-    private synchronized List<SipAccountData> getDecryptedConfiguredAccounts(List<SipAccountData> accounts) {
-        for (int i = 0; i < accounts.size(); i++) {
-            accounts.get(i).setUsername(decrypt(accounts.get(i).getUsername()));
-            accounts.get(i).setPassword(decrypt(accounts.get(i).getPassword()));
-        }
-        return accounts;
-    }
-
     private List<SipAccountData> getAccounts(String accounts) {
         if (accounts.isEmpty() || accounts.equals("[]")) {
             return new ArrayList<>();
@@ -126,23 +106,6 @@ public class SharedPreferencesHelper {
             Type listType = new TypeToken<ArrayList<SipAccountData>>(){}.getType();
             return gson.fromJson(accounts, listType);
         }
-    }
-
-    private synchronized boolean isEncryptionEnabled() {
-        return sharedPreferences.getBoolean(PREFS_KEY_ENCRYPTION_ENABLED, false);
-    }
-
-    private void setAlias(String alias) {
-        sharedPreferences.edit().putString(PREFS_KEY_KEYSTORE_ALIAS, alias).apply();
-    }
-
-    private String getAlias() {
-        return sharedPreferences.getString(PREFS_KEY_KEYSTORE_ALIAS, "");
-    }
-
-    private void initCrypto(Context context, String alias) {
-        Crypto.init(context, alias, false);
-        encryptionHelper = EncryptionHelper.Companion.getInstance();
     }
 
     private SharedPreferences initializeEncryptedSharedPreferences(Context context) {
@@ -159,44 +122,6 @@ public class SharedPreferencesHelper {
             Logger.error(TAG, "Exception when settings encrypted shared preferences", e);
             return context.getSharedPreferences(PREFS_ENCRYPTED_FILE_NAME, Context.MODE_PRIVATE);
         }
-    }
-
-    private String decrypt(String data) {
-        try {
-            return encryptionHelper.decrypt(data);
-        } catch (Exception e) {
-            Logger.error(TAG, "Error while deciphering the string", e);
-            return null;
-        }
-    }
-
-    private void migrateFrom(SharedPreferences prefs, Context context) {
-        List<SipAccountData> accounts =
-                getAccounts(prefs.getString(PREFS_KEY_ACCOUNTS, ""));
-        if (!accounts.isEmpty()) {
-            if (isEncryptionEnabled()) {
-                initCrypto(context, getAlias());
-                encryptedSharedPreferences
-                        .edit()
-                        .putString(PREFS_KEY_ACCOUNTS, gson.toJson(getDecryptedConfiguredAccounts(accounts)))
-                        .apply();
-            } else {
-                encryptedSharedPreferences
-                        .edit()
-                        .putString(PREFS_KEY_ACCOUNTS, gson.toJson(accounts))
-                        .apply();
-            }
-        }
-        encryptedSharedPreferences
-                .edit()
-                .putBoolean(
-                        PREFS_KEY_VERIFY_SIP_SERVER_CERT,
-                        prefs.getBoolean(PREFS_KEY_VERIFY_SIP_SERVER_CERT, false)
-                ).apply();
-        prefs.edit().remove(PREFS_KEY_ACCOUNTS).apply();
-        prefs.edit().remove(PREFS_KEY_ENCRYPTION_ENABLED).apply();
-        prefs.edit().remove(PREFS_KEY_KEYSTORE_ALIAS).apply();
-        prefs.edit().remove(PREFS_KEY_VERIFY_SIP_SERVER_CERT).apply();
     }
 
     public static SharedPreferencesHelper getInstance(Context context) {
