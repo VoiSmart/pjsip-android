@@ -102,6 +102,9 @@ public class BroadcastEventReceiver extends BroadcastReceiver implements SipServ
 
         } else if (BroadcastEventEmitter.getAction(BroadcastEventEmitter.BroadcastAction.NOTIFY_TLS_VERIFY_STATUS_FAILED).equals(action)) {
             onTlsVerifyStatusFailed();
+
+        } else if (BroadcastEventEmitter.getAction(BroadcastEventEmitter.BroadcastAction.VOICEMAIL_WAITING).equals(action)) {
+            onVoicemailWaiting(intent.getParcelableExtra(PARAM_VOICEMAIL_STATUS));
         }
     }
 
@@ -147,6 +150,8 @@ public class BroadcastEventReceiver extends BroadcastReceiver implements SipServ
                 BroadcastEventEmitter.BroadcastAction.SILENT_CALL_STATUS));
         intentFilter.addAction(BroadcastEventEmitter.getAction(
                 BroadcastEventEmitter.BroadcastAction.NOTIFY_TLS_VERIFY_STATUS_FAILED));
+        intentFilter.addAction(BroadcastEventEmitter.getAction(
+                BroadcastEventEmitter.BroadcastAction.VOICEMAIL_WAITING));
         if (Build.VERSION.SDK_INT >= 34) {
             context.registerReceiver( this, intentFilter, Context.RECEIVER_NOT_EXPORTED);
         } else {
@@ -252,5 +257,12 @@ public class BroadcastEventReceiver extends BroadcastReceiver implements SipServ
 
     protected void onTlsVerifyStatusFailed() {
         Logger.debug(LOG_TAG, "TlsVerifyStatusFailed");
+    }
+
+    /**
+     * Unsolicited MWI NOTIFY received: [status] carries the parsed voice-message counts.
+     */
+    protected void onVoicemailWaiting(VoicemailStatus status) {
+        Logger.debug(LOG_TAG, "onVoicemailWaiting - " + status);
     }
 }

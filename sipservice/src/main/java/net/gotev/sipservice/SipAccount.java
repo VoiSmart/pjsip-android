@@ -4,7 +4,9 @@ import org.pjsip.pjsua2.Account;
 import org.pjsip.pjsua2.CallInfo;
 import org.pjsip.pjsua2.CallOpParam;
 import org.pjsip.pjsua2.OnIncomingCallParam;
+import org.pjsip.pjsua2.OnMwiInfoParam;
 import org.pjsip.pjsua2.OnRegStateParam;
+import org.pjsip.pjsua2.SipRxData;
 import org.pjsip.pjsua2.pjsip_status_code;
 
 import java.util.HashMap;
@@ -143,6 +145,21 @@ public class SipAccount extends Account {
                 ", Reason: " + prm.getReason() + ", Exp: " + prm.getExpiration() + ", Status: " + prm.getStatus()
         );
         service.getBroadcastEmitter().registrationState(data.getIdUri(), prm.getCode());
+    }
+
+    @Override
+    public void onMwiInfo(OnMwiInfoParam prm) {
+        // Unsolicited MWI NOTIFY (RFC 3842). Parse the voice-message counts from the raw
+        // message body and broadcast them so the app can drive the voicemail badge.
+        try {
+            SipRxData rdata = prm.getRdata();
+            String wholeMsg = rdata != null ? rdata.getWholeMsg() : null;
+            VoicemailStatus status = VoicemailStatus.parse(wholeMsg);
+            Logger.info(LOG_TAG, "Received MWI info - " + status);
+            service.getBroadcastEmitter().voicemailWaiting(status);
+        } catch (Exception ex) {
+            Logger.error(LOG_TAG, "Error while handling MWI info", ex);
+        }
     }
 
     @Override

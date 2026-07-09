@@ -36,7 +36,8 @@ public class BroadcastEventEmitter implements SipServiceConstants {
         CALL_STATS,
         CALL_RECONNECTION_STATE,
         SILENT_CALL_STATUS,
-        NOTIFY_TLS_VERIFY_STATUS_FAILED
+        NOTIFY_TLS_VERIFY_STATUS_FAILED,
+        VOICEMAIL_WAITING
     }
 
     public BroadcastEventEmitter(Context context) {
@@ -228,6 +229,18 @@ public class BroadcastEventEmitter implements SipServiceConstants {
         final Intent intent = new Intent();
         intent.setAction(getAction(BroadcastAction.NOTIFY_TLS_VERIFY_STATUS_FAILED));
         sendExplicitBroadcast(intent);
+    }
+
+    /**
+     * Emit an unsolicited MWI (voicemail waiting) broadcast intent.
+     *
+     * @param status the parsed voice-message counts
+     */
+    void voicemailWaiting(VoicemailStatus status) {
+        final Intent intent = new Intent();
+        intent.setAction(getAction(BroadcastAction.VOICEMAIL_WAITING));
+        intent.putExtra(PARAM_VOICEMAIL_STATUS, status);
+        sendBroadcast(intent);
     }
 
     private void sendBroadcast(Intent intent) {
