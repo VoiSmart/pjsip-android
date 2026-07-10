@@ -377,6 +377,20 @@ public class Call {
   }
 
   /**
+   * Initiate attended call transfer, using the remote Contact URI of the<br>
+   * destination call instead of its AOR (falls back to AOR if unavailable).<br>
+   * Useful when the registration binding may change (e.g. network changes),<br>
+   * so the REFER/Replaces targets the actual reachable dialog.<br>
+   * <br>
+   * @param dest_call     The destination call.<br>
+   * <br>
+   * 
+   */
+  public void xferReplacesContact(Call dest_call, CallOpParam prm) throws java.lang.Exception {
+    pjsua2JNI.Call_xferReplacesContact(swigCPtr, this, Call.getCPtr(dest_call), dest_call, CallOpParam.getCPtr(prm), prm);
+  }
+
+  /**
    * Accept or reject redirection response. Application MUST call this<br>
    * function after it signaled PJSIP_REDIRECT_PENDING in the <br>
    * <i>onCallRedirected()</i> callback,<br>

@@ -446,8 +446,15 @@ public class SipService extends BackgroundService implements SipServiceConstants
             SipCall sipCallOrig = getCall(accountID, callIdOrig);
             if (sipCallOrig != null) {
                 int callIdDest = intent.getIntExtra(PARAM_CALL_ID_DEST, 0);
+                boolean useContactUri = intent.getBooleanExtra(PARAM_USE_CONTACT_URI, false);
                 SipCall sipCallDest = getCall(accountID, callIdDest);
-                sipCallOrig.xferReplaces(sipCallDest, new CallOpParam());
+                Logger.debug(TAG, "Completing attended transfer (useContactUri=" + useContactUri + ")");
+                // Target the remote Contact URI when requested; otherwise the AOR.
+                if (useContactUri) {
+                    sipCallOrig.xferReplacesContact(sipCallDest, new CallOpParam());
+                } else {
+                    sipCallOrig.xferReplaces(sipCallDest, new CallOpParam());
+                }
             }
         } catch (Exception exc) {
             Logger.error(TAG, "Error while finalizing attended transfer", exc);

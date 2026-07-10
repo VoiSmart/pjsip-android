@@ -45,6 +45,9 @@ public interface SipServiceConstants {
     String PARAM_NUMBER = "number";
     String PARAM_CALL_ID = "callId";
     String PARAM_CALL_ID_DEST = "callIdDest";
+    // When true, attended transfer completes via the remote Contact URI (xferReplacesContact)
+    // instead of the AOR (xferReplaces).
+    String PARAM_USE_CONTACT_URI = "useContactUri";
     String PARAM_DTMF = "dtmf";
     String PARAM_HOLD = "hold";
     String PARAM_MUTE = "mute";

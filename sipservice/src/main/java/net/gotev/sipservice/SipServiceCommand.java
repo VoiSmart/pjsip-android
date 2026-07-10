@@ -399,6 +399,16 @@ public class SipServiceCommand implements SipServiceConstants {
      * @param callIdDest call ID of the destination call
      */
     public static void attendedTransferCall(Context context, String accountID, int callIdOrig, int callIdDest) {
+        attendedTransferCall(context, accountID, callIdOrig, callIdDest, false);
+    }
+
+    /**
+     * Attended call transfer, selecting how the destination dialog is targeted.
+     * @param useContactUri when true, completes via the remote Contact URI (xferReplacesContact)
+     *                      instead of the AOR (xferReplaces), falling back to the AOR if the
+     *                      Contact URI is unavailable.
+     */
+    public static void attendedTransferCall(Context context, String accountID, int callIdOrig, int callIdDest, boolean useContactUri) {
         checkAccount(accountID);
 
         Intent intent = new Intent(context, SipService.class);
@@ -406,6 +416,7 @@ public class SipServiceCommand implements SipServiceConstants {
         intent.putExtra(PARAM_ACCOUNT_ID, accountID);
         intent.putExtra(PARAM_CALL_ID, callIdOrig);
         intent.putExtra(PARAM_CALL_ID_DEST, callIdDest);
+        intent.putExtra(PARAM_USE_CONTACT_URI, useContactUri);
         context.startService(intent);
     }
 

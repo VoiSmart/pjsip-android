@@ -2444,6 +2444,7 @@ public class pjsua2JNI {
   public final static native void Call_update(long jarg1, Call jarg1_, long jarg2, CallOpParam jarg2_) throws java.lang.Exception;
   public final static native void Call_xfer(long jarg1, Call jarg1_, String jarg2, long jarg3, CallOpParam jarg3_) throws java.lang.Exception;
   public final static native void Call_xferReplaces(long jarg1, Call jarg1_, long jarg2, Call jarg2_, long jarg3, CallOpParam jarg3_) throws java.lang.Exception;
+  public final static native void Call_xferReplacesContact(long jarg1, Call jarg1_, long jarg2, Call jarg2_, long jarg3, CallOpParam jarg3_) throws java.lang.Exception;
   public final static native void Call_processRedirect(long jarg1, Call jarg1_, int jarg2) throws java.lang.Exception;
   public final static native void Call_dialDtmf(long jarg1, Call jarg1_, String jarg2) throws java.lang.Exception;
   public final static native void Call_sendDtmf(long jarg1, Call jarg1_, long jarg2, CallSendDtmfParam jarg2_) throws java.lang.Exception;
