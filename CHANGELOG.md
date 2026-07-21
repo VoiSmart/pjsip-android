@@ -1,6 +1,26 @@
 Change Log
 ==========
 
+### Version 2.18.0
+
+_2026-07-21_
+* **Features**:
+  * Attended transfer via a remote Contact URI (`xferReplacesContact`)
+  * Broadcast events for voicemail-available (message-summary) notifications (RFC 3842)
+* **Fixes**:
+  * The whole PJSIP stack now runs on a single dedicated thread (`threadCnt=0` plus a
+    `libHandleEvents` pump on a background `SipThread`). This fixes a native use-after-free
+    `SIGSEGV` in `Call::onCallState` on the CANCEL-before-answer path, and removes the
+    main-thread ANRs caused by blocking registration/DNS calls running on the UI thread
+  * Additional obfuscation of sensitive values in logs
+  * Removed the now-unused voismart crypto dependency
+* **Issues fixed**:
+  * #235
+  * #236
+  * #237
+  * #238
+  * #239
+
 ### Version 2.17.0
 
 _2026-06-30_
