@@ -874,6 +874,15 @@ public class SipService extends BackgroundService implements SipServiceConstants
 
             EpConfig epConfig = new EpConfig();
             epConfig.getUaConfig().setUserAgent(AGENT_NAME);
+            // Single-thread confinement (fixes Crashlytics b4d5d850… onCallState SIGSEGV):
+            // threadCnt=0 tells PJSIP not to spawn its own worker thread, so the ONLY
+            // thread that ever fires callbacks is whoever calls libHandleEvents() — our
+            // SipThread pump (see startEventPump). mainThreadOnly=true forces any stray
+            // internal (timer/transport) callback onto that same pump thread too. With
+            // commands already posted to SipThread via enqueueJob, every access to a
+            // native SipCall is serialized on one thread → no delete()-vs-use race.
+            epConfig.getUaConfig().setThreadCnt(0);
+            epConfig.getUaConfig().setMainThreadOnly(true);
             epConfig.getMedConfig().setHasIoqueue(true);
             epConfig.getMedConfig().setClockRate(16000);
             epConfig.getMedConfig().setQuality(10);
@@ -895,6 +904,15 @@ public class SipService extends BackgroundService implements SipServiceConstants
             mEndpoint.transportCreate(pjsip_transport_type_e.PJSIP_TRANSPORT_TCP, tcpTransport);
             mEndpoint.transportCreate(pjsip_transport_type_e.PJSIP_TRANSPORT_TLS, tlsTransport);
             mEndpoint.libStart();
+
+            // the thread that calls libCreate/libStart
+            // is auto-registered as PJSIP's "main" thread, but we assert it defensively
+            // so a thread-identity surprise can never call PJSIP unregistered.
+            registerSipThreadIfNeeded();
+            // With threadCnt=0 nothing services the stack unless we pump events, so
+            // start the SipThread pump. It runs after this startStack job returns and
+            // then drives all callbacks (registration responses, incoming calls, …).
+            startEventPump();
 
             ArrayList<CodecPriority> codecPriorities = getConfiguredCodecPriorities();
             SipServiceUtils.setAudioCodecPriorities(codecPriorities, mEndpoint);
@@ -925,6 +943,10 @@ public class SipService extends BackgroundService implements SipServiceConstants
 
         try {
             Logger.debug(TAG, "Stopping PJSIP");
+            // Stop pumping events before tearing the stack down. Both this stopStack
+            // and the pump run on SipThread, so once we clear the flag and drop any
+            // pending pump repost, no further libHandleEvents call can race libDestroy.
+            stopEventPump();
             deInitPjsipToneGenerator();
 
             /*
@@ -956,6 +978,62 @@ public class SipService extends BackgroundService implements SipServiceConstants
         } finally {
             mStarted = false;
             mEndpoint = null;
+        }
+    }
+
+    /* ****************  Single-thread event pump (threadCnt=0)  **************** */
+    // With PJSIP configured for zero worker threads, the stack does nothing until we
+    // call libHandleEvents(). This pump runs that call in a loop on SipThread by
+    // re-posting itself onto the same handler, so it interleaves with SIP command
+    // jobs (enqueueJob): one thread services both callbacks and commands, which is
+    // what removes the delete()-vs-use race behind the onCallState SIGSEGV.
+
+    // Short so queued command jobs run with low latency; long enough that idle polling
+    // stays cheap (libHandleEvents blocks up to this timeout, so it's a poll, not a spin).
+    private static final long EVENT_PUMP_INTERVAL_MS = 10;
+
+    private volatile boolean mEventPumpRunning = false;
+
+    private final Runnable mEventPump = new Runnable() {
+        @Override
+        public void run() {
+            if (!mEventPumpRunning || mEndpoint == null) return;
+            try {
+                mEndpoint.libHandleEvents(EVENT_PUMP_INTERVAL_MS);
+            } catch (Exception exc) {
+                Logger.error(TAG, "Error while handling PJSIP events", exc);
+            }
+            // Re-post to the tail of the SipThread queue so any command jobs enqueued
+            // meanwhile run before the next pump tick.
+            if (mEventPumpRunning) enqueueJob(this);
+        }
+    };
+
+    private void startEventPump() {
+        if (mEventPumpRunning) return;
+        mEventPumpRunning = true;
+        Logger.debug(TAG, "Starting PJSIP event pump on " + Thread.currentThread().getName());
+        enqueueJob(mEventPump);
+    }
+
+    private void stopEventPump() {
+        if (!mEventPumpRunning) return;
+        mEventPumpRunning = false;
+        dequeueJob(mEventPump);
+        Logger.debug(TAG, "Stopped PJSIP event pump");
+    }
+
+    // never call PJSIP from a thread it doesn't know.
+    // Called from SipThread (where startStack runs), so it registers SipThread itself.
+    private void registerSipThreadIfNeeded() {
+        try {
+            if (mEndpoint != null && !mEndpoint.libIsThreadRegistered()) {
+                mEndpoint.libRegisterThread(Thread.currentThread().getName());
+                Logger.debug(TAG,
+                        "Registered thread with PJSIP: " + Thread.currentThread().getName());
+            }
+        } catch (Exception exc) {
+            Logger.error(TAG, "Error while registering thread with PJSIP", exc);
         }
     }
 
