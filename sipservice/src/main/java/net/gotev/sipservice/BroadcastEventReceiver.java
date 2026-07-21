@@ -182,8 +182,8 @@ public class BroadcastEventReceiver extends BroadcastReceiver implements SipServ
     public void onIncomingCall(String accountID, int callID, String displayName, String remoteUri, boolean isVideo) {
         Logger.debug(LOG_TAG, "onIncomingCall - accountID: " + getValue(getReceiverContext(), accountID) +
                 ", callID: " + callID +
-                ", displayName: " + displayName +
-                ", remoteUri: " + remoteUri);
+                ", displayName: " + getValue(getReceiverContext(), displayName) +
+                ", remoteUri: " + getValue(getReceiverContext(), remoteUri));
     }
 
     public void onCallState(String accountID, int callID, int callStateCode, int callStatusCode, long connectTimestamp) {
@@ -252,7 +252,9 @@ public class BroadcastEventReceiver extends BroadcastReceiver implements SipServ
     }
 
     protected void onSilentCallStatus(boolean success, String number) {
-        Logger.debug(LOG_TAG, "Success: " +success+ " for silent call: " +number);
+        Logger.debug(LOG_TAG,
+                "Success: " + success + " for silent call: " + getValue(getReceiverContext(),
+                        number));
     }
 
     protected void onTlsVerifyStatusFailed() {

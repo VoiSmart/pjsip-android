@@ -259,9 +259,11 @@ public class SipService extends BackgroundService implements SipServiceConstants
              try {
                 sipCall.dialDtmf(dtmf);
             } catch (Exception exc) {
-                Logger.error(TAG, "Error while dialing dtmf: " + dtmf + ". AccountID: "
-                             + getValue(getApplicationContext(), accountID) + ", CallID: " + callID);
-            }
+                 // DTMF digits can carry PINs / calling-card numbers / IVR passwords — mask them
+                 Logger.error(TAG,
+                         "Error while dialing dtmf: " + getValue(getApplicationContext(), dtmf) + ". AccountID: "
+                         + getValue(getApplicationContext(), accountID) + ", CallID: " + callID);
+             }
         }
     }
 
