@@ -12,23 +12,37 @@ if (isDocsBuild) {
 }
 
 android {
-    namespace 'net.gotev.sipservice'
-    compileSdk 34
+    namespace = 'net.gotev.sipservice'
+    compileSdk = 34
 
     defaultConfig {
-        minSdkVersion 24
-        targetSdkVersion 34
+        minSdk = 24
+        targetSdk = 34
         versionCode 39
         versionName "2.18.0"
+    }
+    // NDK r27d — same version pjsip-android-builder used to build the prebuilt .so files in
+    // src/main/jniLibs. Declaring it lets AGP resolve the strip tool for this module's native
+    // libs (otherwise: "Unable to strip ... missing strip tool for ABI"). Hardcoded so standalone
+    // pjsip-android builds resolve it too.
+    ndkVersion = "27.3.13750724"
+    // Java 11 source/target: matches the consuming app and silences the "source/target
+    // value 8 is obsolete" javac warnings. Hardcoded so
+    // standalone pjsip-android builds, which don't apply that map, still resolve it.
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            // AGP 9 only permits proguard-android-optimize.txt from getDefaultProguardFile()
+            // (proguard-android.txt carried -dontoptimize and is now disallowed).
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
     buildFeatures {
-        buildConfig true
+        buildConfig = true
     }
 }
 
