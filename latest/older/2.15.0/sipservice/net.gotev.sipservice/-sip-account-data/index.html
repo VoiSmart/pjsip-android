@@ -1,0 +1,476 @@
+<!doctype html>
+<html class="no-js">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>SipAccountData</title>
+    <link href="../../../images/logo-icon.svg" rel="icon" type="image/svg">
+    <script>var pathToRoot = "../../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script>
+<link href="../../../styles/multimodule.css" rel="Stylesheet">
+</head>
+<body>
+    <div class="root">
+<nav class="navigation" id="navigation-wrapper">
+    <div class="navigation--inner">
+        <div class="navigation-title">
+            <button class="menu-toggle" id="menu-toggle" type="button">toggle menu</button>
+            <div class="library-name">
+                    <a class="library-name--link" href="../../../index.html">
+                            sipservice
+                    </a>
+            </div>
+            <div class="library-version">
+<dokka-template-command data="{&quot;@class&quot;:&quot;org.jetbrains.dokka.base.templating.ReplaceVersionsCommand&quot;,&quot;location&quot;:&quot;sipservice/net.gotev.sipservice/-sip-account-data/index.html&quot;}"><div class="versions-dropdown">
+  <div class="versions-dropdown-button">2.15.0</div>
+  <div class="versions-dropdown-data"><a href="../../../../../sipservice/net.gotev.sipservice/-sip-account-data/index.html">2.18.0</a><a href="index.html">2.15.0</a><a href="../../../../2.14.0/sipservice/net.gotev.sipservice/-sip-account-data/index.html">2.14.0</a></div>
+</div>
+</dokka-template-command>            </div>
+        </div>
+        <div class="filter-section" id="filter-section">
+                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":sipservice:dokkaHtml/main">main</button>
+        </div>
+    </div>
+    <div class="navigation-controls">
+        <button class="navigation-controls--btn navigation-controls--theme" id="theme-toggle-button" type="button">switch theme</button>
+        <div class="navigation-controls--btn navigation-controls--search" id="searchBar" role="button">search in API</div>
+    </div>
+</nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="sidebar--inner" id="sideMenu"></div>
+            </div>
+            <div id="main">
+<div class="main-content" data-page-type="classlike" id="content" pageids="sipservice::net.gotev.sipservice/SipAccountData///PointingToDeclaration//-858790016">
+  <div class="breadcrumbs"><a href="../../../index.html">sipservice</a><span class="delimiter">/</span><a href="../index.html">net.gotev.sipservice</a><span class="delimiter">/</span><span class="current">SipAccountData</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Sip</span><wbr><span>Account</span><wbr><span><span>Data</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":sipservice:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">class </span><a href="index.html">SipAccountData</a></div><p class="paragraph">Contains the account's configuration data.</p><span class="kdoc-tag"><h4 class="">Author</h4><p class="paragraph">gotev (Aleksandar Gotev)</p></span></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="CONSTRUCTOR">
+        <h2 class="">Constructors</h2>
+        <div class="table"><a data-name="-1551502464%2FConstructors%2F-858790016" anchor-label="SipAccountData" id="-1551502464%2FConstructors%2F-858790016" data-filterable-set=":sipservice:dokkaHtml/main"></a>
+          <div class="table-row" data-togglable="CONSTRUCTOR" data-filterable-current=":sipservice:dokkaHtml/main" data-filterable-set=":sipservice:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-sip-account-data.html"><span>Sip</span><wbr><span>Account</span><wbr><span><span>Data</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1551502464%2FConstructors%2F-858790016"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":sipservice:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="PROPERTY">
+        <h2 class="">Properties</h2>
+        <div class="table"><a data-name="1429229867%2FProperties%2F-858790016" anchor-label="AUTH_TYPE_DIGEST" id="1429229867%2FProperties%2F-858790016" data-filterable-set=":sipservice:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":sipservice:dokkaHtml/main" data-filterable-set=":sipservice:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-u-t-h_-t-y-p-e_-d-i-g-e-s-t.html"><span><span>AUTH_TYPE_DIGEST</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1429229867%2FProperties%2F-858790016"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":sipservice:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-a-u-t-h_-t-y-p-e_-d-i-g-e-s-t.html">AUTH_TYPE_DIGEST</a><span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a><span class="token operator"> = </span><span class="token string">"digest"</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1919581281%2FProperties%2F-858790016" anchor-label="AUTH_TYPE_PLAIN" id="1919581281%2FProperties%2F-858790016" data-filterable-set=":sipservice:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":sipservice:dokkaHtml/main" data-filterable-set=":sipservice:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-u-t-h_-t-y-p-e_-p-l-a-i-n.html"><span><span>AUTH_TYPE_PLAIN</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1919581281%2FProperties%2F-858790016"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":sipservice:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-a-u-t-h_-t-y-p-e_-p-l-a-i-n.html">AUTH_TYPE_PLAIN</a><span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a><span class="token operator"> = </span><span class="token string">"plain"</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1065304491%2FProperties%2F-858790016" anchor-label="authenticationType" id="1065304491%2FProperties%2F-858790016" data-filterable-set=":sipservice:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":sipservice:dokkaHtml/main" data-filterable-set=":sipservice:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="authentication-type.html"><span>authentication</span><wbr><span><span>Type</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1065304491%2FProperties%2F-858790016"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":sipservice:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">var </span><a href="authentication-type.html">authenticationType</a><span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-538290876%2FProperties%2F-858790016" anchor-label="callId" id="-538290876%2FProperties%2F-858790016" data-filterable-set=":sipservice:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":sipservice:dokkaHtml/main" data-filterable-set=":sipservice:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="call-id.html"><span>call</span><wbr><span><span>Id</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-538290876%2FProperties%2F-858790016"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":sipservice:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">var </span><a href="call-id.html">callId</a><span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-804748885%2FProperties%2F-858790016" anchor-label="contactUriParams" id="-804748885%2FProperties%2F-858790016" data-filterable-set=":sipservice:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":sipservice:dokkaHtml/main" data-filterable-set=":sipservice:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="contact-uri-params.html"><span>contact</span><wbr><span>Uri</span><wbr><span><span>Params</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-804748885%2FProperties%2F-858790016"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":sipservice:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">var </span><a href="contact-uri-params.html">contactUriParams</a><span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1733855823%2FProperties%2F-858790016" anchor-label="CREATOR" id="-1733855823%2FProperties%2F-858790016" data-filterable-set=":sipservice:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":sipservice:dokkaHtml/main" data-filterable-set=":sipservice:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-c-r-e-a-t-o-r.html"><span><span>CREATOR</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1733855823%2FProperties%2F-858790016"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":sipservice:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-c-r-e-a-t-o-r.html">CREATOR</a><span class="token operator">: </span>Creator&lt;SipAccountData&gt;</div><div class="brief ">*** Parcelable overrides</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-494985368%2FProperties%2F-858790016" anchor-label="guestDisplayName" id="-494985368%2FProperties%2F-858790016" data-filterable-set=":sipservice:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":sipservice:dokkaHtml/main" data-filterable-set=":sipservice:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="guest-display-name.html"><span>guest</span><wbr><span>Display</span><wbr><span><span>Name</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-494985368%2FProperties%2F-858790016"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":sipservice:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">var </span><a href="guest-display-name.html">guestDisplayName</a><span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="767898261%2FProperties%2F-858790016" anchor-label="host" id="767898261%2FProperties%2F-858790016" data-filterable-set=":sipservice:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":sipservice:dokkaHtml/main" data-filterable-set=":sipservice:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="host.html"><span><span>host</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="767898261%2FProperties%2F-858790016"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":sipservice:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">var </span><a href="host.html">host</a><span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1520233214%2FProperties%2F-858790016" anchor-label="password" id="-1520233214%2FProperties%2F-858790016" data-filterable-set=":sipservice:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":sipservice:dokkaHtml/main" data-filterable-set=":sipservice:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="password.html"><span><span>password</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1520233214%2FProperties%2F-858790016"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":sipservice:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">var </span><a href="password.html">password</a><span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1056130524%2FProperties%2F-858790016" anchor-label="port" id="1056130524%2FProperties%2F-858790016" data-filterable-set=":sipservice:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":sipservice:dokkaHtml/main" data-filterable-set=":sipservice:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="port.html"><span><span>port</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1056130524%2FProperties%2F-858790016"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":sipservice:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">var </span><a href="port.html">port</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1920397170%2FProperties%2F-858790016" anchor-label="realm" id="-1920397170%2FProperties%2F-858790016" data-filterable-set=":sipservice:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":sipservice:dokkaHtml/main" data-filterable-set=":sipservice:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="realm.html"><span><span>realm</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1920397170%2FProperties%2F-858790016"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":sipservice:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">var </span><a href="realm.html">realm</a><span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1293728639%2FProperties%2F-858790016" anchor-label="regExpirationTimeout" id="1293728639%2FProperties%2F-858790016" data-filterable-set=":sipservice:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":sipservice:dokkaHtml/main" data-filterable-set=":sipservice:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="reg-expiration-timeout.html"><span>reg</span><wbr><span>Expiration</span><wbr><span><span>Timeout</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1293728639%2FProperties%2F-858790016"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":sipservice:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">var </span><a href="reg-expiration-timeout.html">regExpirationTimeout</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-int/index.html">Int</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1189900174%2FProperties%2F-858790016" anchor-label="sipInstance" id="1189900174%2FProperties%2F-858790016" data-filterable-set=":sipservice:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":sipservice:dokkaHtml/main" data-filterable-set=":sipservice:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="sip-instance.html"><span>sip</span><wbr><span><span>Instance</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1189900174%2FProperties%2F-858790016"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":sipservice:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">var </span><a href="sip-instance.html">sipInstance</a><span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-725919603%2FProperties%2F-858790016" anchor-label="srtpSecureSignalling" id="-725919603%2FProperties%2F-858790016" data-filterable-set=":sipservice:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":sipservice:dokkaHtml/main" data-filterable-set=":sipservice:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="srtp-secure-signalling.html"><span>srtp</span><wbr><span>Secure</span><wbr><span><span>Signalling</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-725919603%2FProperties%2F-858790016"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":sipservice:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">var </span><a href="srtp-secure-signalling.html">srtpSecureSignalling</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-int/index.html">Int</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1752990895%2FProperties%2F-858790016" anchor-label="srtpUse" id="-1752990895%2FProperties%2F-858790016" data-filterable-set=":sipservice:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":sipservice:dokkaHtml/main" data-filterable-set=":sipservice:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="srtp-use.html"><span>srtp</span><wbr><span><span>Use</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1752990895%2FProperties%2F-858790016"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":sipservice:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">var </span><a href="srtp-use.html">srtpUse</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-int/index.html">Int</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="816788788%2FProperties%2F-858790016" anchor-label="transport" id="816788788%2FProperties%2F-858790016" data-filterable-set=":sipservice:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":sipservice:dokkaHtml/main" data-filterable-set=":sipservice:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="transport.html"><span><span>transport</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="816788788%2FProperties%2F-858790016"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":sipservice:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">var </span><a href="transport.html">transport</a><span class="token operator">: </span>SipAccountTransport</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-862114009%2FProperties%2F-858790016" anchor-label="username" id="-862114009%2FProperties%2F-858790016" data-filterable-set=":sipservice:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":sipservice:dokkaHtml/main" data-filterable-set=":sipservice:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="username.html"><span><span>username</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-862114009%2FProperties%2F-858790016"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":sipservice:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">var </span><a href="username.html">username</a><span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="">Functions</h2>
+        <div class="table"><a data-name="1405698008%2FFunctions%2F-858790016" anchor-label="describeContents" id="1405698008%2FFunctions%2F-858790016" data-filterable-set=":sipservice:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":sipservice:dokkaHtml/main" data-filterable-set=":sipservice:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="describe-contents.html"><span>describe</span><wbr><span><span>Contents</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1405698008%2FFunctions%2F-858790016"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":sipservice:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="describe-contents.html"><span class="token function">describeContents</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-int/index.html">Int</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1105807509%2FFunctions%2F-858790016" anchor-label="equals" id="-1105807509%2FFunctions%2F-858790016" data-filterable-set=":sipservice:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":sipservice:dokkaHtml/main" data-filterable-set=":sipservice:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="equals.html"><span><span>equals</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1105807509%2FFunctions%2F-858790016"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":sipservice:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="equals.html"><span class="token function">equals</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">o<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-any/index.html">Any</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief ">*** Object overrides</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="711578498%2FFunctions%2F-858790016" anchor-label="hashCode" id="711578498%2FFunctions%2F-858790016" data-filterable-set=":sipservice:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":sipservice:dokkaHtml/main" data-filterable-set=":sipservice:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="hash-code.html"><span>hash</span><wbr><span><span>Code</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="711578498%2FFunctions%2F-858790016"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":sipservice:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="hash-code.html"><span class="token function">hashCode</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-int/index.html">Int</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1875061995%2FFunctions%2F-858790016" anchor-label="isTcpTransport" id="1875061995%2FFunctions%2F-858790016" data-filterable-set=":sipservice:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":sipservice:dokkaHtml/main" data-filterable-set=":sipservice:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="is-tcp-transport.html"><span>is</span><wbr><span>Tcp</span><wbr><span><span>Transport</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1875061995%2FFunctions%2F-858790016"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":sipservice:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="is-tcp-transport.html"><span class="token function"><strike>isTcpTransport</strike></span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief ">use <span data-unresolved-link="net.gotev.sipservice/SipAccountData/getTransport/#/PointingToDeclaration/">instead</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1046672267%2FFunctions%2F-858790016" anchor-label="isValid" id="1046672267%2FFunctions%2F-858790016" data-filterable-set=":sipservice:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":sipservice:dokkaHtml/main" data-filterable-set=":sipservice:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="is-valid.html"><span>is</span><wbr><span><span>Valid</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1046672267%2FFunctions%2F-858790016"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":sipservice:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="is-valid.html"><span class="token function">isValid</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1481603847%2FFunctions%2F-858790016" anchor-label="setTcpTransport" id="1481603847%2FFunctions%2F-858790016" data-filterable-set=":sipservice:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":sipservice:dokkaHtml/main" data-filterable-set=":sipservice:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="set-tcp-transport.html"><span>set</span><wbr><span>Tcp</span><wbr><span><span>Transport</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1481603847%2FFunctions%2F-858790016"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":sipservice:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="set-tcp-transport.html"><span class="token function"><strike>setTcpTransport</strike></span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">tcpTransport<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">SipAccountData</a></div><div class="brief ">use <span data-unresolved-link="net.gotev.sipservice/SipAccountData/setTransport/#SipAccountTransport/PointingToDeclaration/">setTransport</span> () instead}</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1598129467%2FFunctions%2F-858790016" anchor-label="writeToParcel" id="-1598129467%2FFunctions%2F-858790016" data-filterable-set=":sipservice:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":sipservice:dokkaHtml/main" data-filterable-set=":sipservice:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="write-to-parcel.html"><span>write</span><wbr><span>To</span><wbr><span><span>Parcel</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1598129467%2FFunctions%2F-858790016"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":sipservice:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="write-to-parcel.html"><span class="token function">writeToParcel</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">parcel<span class="token operator">: </span>Parcel<span class="token punctuation">, </span></span><span class="parameter ">arg1<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      <div class="footer">
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2026 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+      </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
