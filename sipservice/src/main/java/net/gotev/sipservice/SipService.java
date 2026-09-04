@@ -92,6 +92,11 @@ public class SipService extends BackgroundService implements SipServiceConstants
         enqueueJob(() -> {
             if (intent == null) return;
 
+            // Almost every handler below reaches into pjsua2. Assert once, up front,
+            // that this thread is known to pjlib — the check is a cheap no-op after the
+            // first time, and skipping it is fatal rather than merely wrong.
+            registerSipThreadIfNeeded();
+
             String action = intent.getAction();
 
             if (action == null) return;
@@ -206,7 +211,18 @@ public class SipService extends BackgroundService implements SipServiceConstants
     public void onDestroy() {
         enqueueJob(() -> {
             Logger.debug(TAG, "Destroying SipService");
+            registerSipThreadIfNeeded();
             stopStack();
+            // Released here, at the end of teardown, rather than in onDestroy() itself:
+            // onDestroy() returns as soon as it has posted this job, so releasing there
+            // let the device suspend part-way through libDestroy() — stalling a teardown
+            // that the next service start is queued behind.
+            //
+            // Not released on the restart path (handleRestartSipStack also calls
+            // stopStack), which is why this lives here and not inside stopStack().
+            // If the process is killed outright this never runs, but PowerManagerService
+            // drops the lock when the owning process dies, so nothing leaks.
+            releaseWakeLock();
         });
         super.onDestroy();
     }
@@ -865,6 +881,12 @@ public class SipService extends BackgroundService implements SipServiceConstants
     private void startStack() {
 
         if (mStarted) {
+            // The stack is up, so there is nothing to start — but this thread still has
+            // to be one pjlib knows about, and the registration below is on the path we
+            // are about to skip. pjlib aborts the process the moment an unregistered
+            // thread calls into it ("Calling pjlib from unknown/external thread"), so
+            // assert it here too rather than only after libStart().
+            registerSipThreadIfNeeded();
             Logger.info(TAG, "SipService already started");
             return;
         }
