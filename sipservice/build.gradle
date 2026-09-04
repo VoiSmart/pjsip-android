@@ -18,8 +18,8 @@ android {
     defaultConfig {
         minSdk = 24
         targetSdk = 34
-        versionCode 39
-        versionName "2.18.0"
+        versionCode 40
+        versionName "2.18.1"
     }
     // NDK r27d — same version pjsip-android-builder used to build the prebuilt .so files in
     // src/main/jniLibs. Declaring it lets AGP resolve the strip tool for this module's native

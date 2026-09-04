@@ -1,6 +1,15 @@
 Change Log
 ==========
 
+### Version 2.18.1
+
+_2026-09-04_
+* **Fixes**:
+  * The dedicated PJSIP thread added in 2.18.0 is now process-global instead of
+    per service instance, so a stack teardown can no longer race the next start
+* **Issues fixed**:
+  * #238
+
 ### Version 2.18.0
 
 _2026-07-21_
