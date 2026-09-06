@@ -24,14 +24,14 @@ public class CallerInfo {
             return;
         }
 
-        Pattern displayNameAndRemoteUriPattern = Pattern.compile("^\"([^\"]+).*?sip:(.*?)>$");
+        Pattern displayNameAndRemoteUriPattern = Pattern.compile("^\"([^\"]+).*?sips?:(.*?)>$");
         Matcher completeInfo = displayNameAndRemoteUriPattern.matcher(temp);
         if (completeInfo.matches()) {
             displayName = completeInfo.group(1);
             remoteUri = completeInfo.group(2);
 
         } else {
-            Pattern remoteUriPattern = Pattern.compile("^.*?sip:(.*?)>$");
+            Pattern remoteUriPattern = Pattern.compile("^.*?sips?:(.*?)>$");
             Matcher remoteUriInfo = remoteUriPattern.matcher(temp);
             if (remoteUriInfo.matches()) {
                 displayName = remoteUri = remoteUriInfo.group(1);
