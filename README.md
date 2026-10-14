@@ -54,6 +54,9 @@ Native PJSIP library for Android is compiled using [PJSIP Android Builder](https
 - TLS and SRTP support
   - with server certificate verification option (enabled via SipServiceCommand#setVerifySipServerCert but to make it work, it is necessary to add a `ca-bundle.crt` file in the sip`./sipservice/src/main/assets/` directory; without that the verification will not be enabled)
 - Silent Calls
+- DNS SRV resolution of the SIP server (RFC 3263)
+  - opt-in via SipServiceCommand#setDnsSrvLookup, applied on the next stack (re)start: the port comes from the SRV records of the account host (`_sips._tcp` for TLS, `_sip._tcp` for TCP), queried through the active network's DNS servers; falls back to `host:port` when the device DNS can't be used (no servers, or strict Private DNS); without SRV records PJSIP uses the host's A record on the transport's default port (5060 TCP, 5061 TLS), so enable it only where the records exist
+  - the domain looked up can be set per account via SipAccountData#setSrvDomain (defaults to the host), for setups whose SRV records live under another domain, e.g. the realm; over TLS it is also the certificate identity (RFC 5922)
 
 ### What is missing (contributions are welcome)
 

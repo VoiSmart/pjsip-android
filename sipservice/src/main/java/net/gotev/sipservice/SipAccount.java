@@ -42,7 +42,7 @@ public class SipAccount extends Account {
     }
 
     public void create() throws Exception {
-        create(data.getAccountConfig());
+        create(data.getAccountConfig(service.isSrvActiveForAccounts()));
     }
 
     public void createGuest() throws Exception {

@@ -40,6 +40,7 @@ public class SipAccountData implements Parcelable {
     private int srtpSecureSignalling = 0; // not required
     private SipAccountTransport transport = SipAccountTransport.UDP;
     private String sipInstance;
+    private String srvDomain;
 
     public SipAccountData() { }
 
@@ -74,6 +75,7 @@ public class SipAccountData implements Parcelable {
         parcel.writeInt(srtpSecureSignalling);
         parcel.writeInt(transport.ordinal());
         parcel.writeString(sipInstance);
+        parcel.writeString(srvDomain);
     }
 
     private SipAccountData(Parcel in) {
@@ -92,6 +94,7 @@ public class SipAccountData implements Parcelable {
         srtpSecureSignalling = in.readInt();
         transport = SipAccountTransport.getTransportByCode(in.readInt());
         sipInstance = in.readString();
+        srvDomain = in.readString();
     }
 
     @Override
@@ -246,6 +249,28 @@ public class SipAccountData implements Parcelable {
         this.sipInstance = sipInstance;
         return this;
     }
+
+    public String getSrvDomain() {
+        return srvDomain;
+    }
+
+    /**
+     * The domain whose SIP SRV records locate the server when DNS SRV resolution is active
+     * (see {@link SipServiceCommand#setDnsSrvLookup}). It is used as given, as the host of the
+     * registrar and proxy URIs, so it can differ from {@link #getHost()}. Null or empty means
+     * {@link #getHost()}. Ignored when DNS SRV resolution isn't active.
+     * <p>
+     * Over TLS the server certificate identity is this domain, not the SRV target host
+     * (RFC 5922), so with {@link SipServiceCommand#setVerifySipServerCert} on, the certificate
+     * must cover it.
+     *
+     * @param srvDomain the domain to look up SRV records for
+     * @return this object
+     */
+    public SipAccountData setSrvDomain(String srvDomain) {
+        this.srvDomain = srvDomain;
+        return this;
+    }
     /*          Getters and Setters end        */
 
     /*****          Utilities        ******/
@@ -261,12 +286,31 @@ public class SipAccountData implements Parcelable {
         return "sip:" + username + "@" + realm;
     }
 
-    String getProxyUri() {
-        return "sip:" + host + ":" + port + getTransportString();
+    /**
+     * @param srv whether the stack resolves through DNS SRV: any port in the URI makes PJSIP
+     *            skip the SRV lookup (A record only), so in SRV mode the port is left out and
+     *            comes from the records. The transport param stays: it picks the SRV service
+     *            ({@code _sips._tcp} for TLS, {@code _sip._tcp} for TCP).
+     */
+    String getProxyUri(boolean srv) {
+        return "sip:" + getSipServerDomain(srv) + portSuffix(srv) + getTransportString();
     }
 
-    String getRegistrarUri() {
-        return "sip:" + host + ":" + port;
+    /** See {@link #getProxyUri(boolean)}. REGISTER is routed through the proxy. */
+    String getRegistrarUri(boolean srv) {
+        return "sip:" + getSipServerDomain(srv) + portSuffix(srv);
+    }
+
+    /**
+     * The host of the registrar and proxy URIs, which is also the name the server's TLS
+     * certificate is checked against: the SRV domain in SRV mode when set, otherwise the host.
+     */
+    String getSipServerDomain(boolean srv) {
+        return srv && srvDomain != null && !srvDomain.isEmpty() ? srvDomain : host;
+    }
+
+    private String portSuffix(boolean srv) {
+        return srv ? "" : ":" + port;
     }
 
     String getTransportString() {
@@ -300,7 +344,8 @@ public class SipAccountData implements Parcelable {
                 && (realm != null) && !realm.isEmpty());
     }
 
-    AccountConfig getAccountConfig() {
+    /** @param srv see {@link #getProxyUri(boolean)} */
+    AccountConfig getAccountConfig(boolean srv) {
         AccountConfig accountConfig = new AccountConfig();
 
         // account configs
@@ -310,13 +355,13 @@ public class SipAccountData implements Parcelable {
         if (callId != null && !callId.isEmpty()) {
             accountConfig.getRegConfig().setCallID(callId);
         }
-        accountConfig.getRegConfig().setRegistrarUri(getRegistrarUri());
+        accountConfig.getRegConfig().setRegistrarUri(getRegistrarUri(srv));
         accountConfig.getRegConfig().setTimeoutSec(regExpirationTimeout);
         accountConfig.getRegConfig().setContactUriParams(contactUriParams);
 
         // account sip stuff configs
         accountConfig.getSipConfig().getAuthCreds().add(getAuthCredInfo());
-        accountConfig.getSipConfig().getProxies().add(getProxyUri());
+        accountConfig.getSipConfig().getProxies().add(getProxyUri(srv));
 
         // NAT configs
         String sipInst = getValidSipInstance();
@@ -346,7 +391,7 @@ public class SipAccountData implements Parcelable {
                 ? getIdUri()
                 : "\""+getGuestDisplayName()+"\" <"+getIdUri()+">";
         accountConfig.setIdUri(idUri);
-        accountConfig.getSipConfig().getProxies().add(getProxyUri());
+        accountConfig.getSipConfig().getProxies().add(getProxyUri(false));
         accountConfig.getRegConfig().setRegisterOnAdd(false);
         accountConfig.getCallConfig().setTimerSessExpiresSec(sessionTimerExpireSec);
         setVideoConfig(accountConfig);
@@ -382,6 +427,7 @@ public class SipAccountData implements Parcelable {
         if (srtpSecureSignalling != that.srtpSecureSignalling) return false;
         if (!Objects.equals(transport, that.transport)) return false;
         if (!Objects.equals(sipInstance, that.sipInstance)) return false;
+        if (!Objects.equals(srvDomain, that.srvDomain)) return false;
 
         return getIdUri().equals(that.getIdUri());
 
@@ -402,6 +448,7 @@ public class SipAccountData implements Parcelable {
         result = 31 * result + srtpSecureSignalling;
         result = 31 * result + transport.hashCode();
         result = 31 * result + sipInstance.hashCode();
+        result = 31 * result + Objects.hashCode(srvDomain);
         return result;
     }
 

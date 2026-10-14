@@ -33,6 +33,8 @@ public class SharedPreferencesHelper {
     private final String PREFS_KEY_DND = "dnd_pref";
     private final String PREFS_KEY_OBFUSCATION_ENABLED = "obfuscation_enabled";
     private final String PREFS_KEY_VERIFY_SIP_SERVER_CERT = "sip_server_cert_verification_enabled";
+    // Stack-wide: read once per stack start (the nameserver can only be set before libInit).
+    private final String PREFS_KEY_DNS_SRV_LOOKUP = "dns_srv_lookup_enabled";
 
     private final SharedPreferences sharedPreferences;
     private final SharedPreferences encryptedSharedPreferences;
@@ -97,6 +99,14 @@ public class SharedPreferencesHelper {
 
     boolean isVerifySipServerCert() {
         return sharedPreferences.getBoolean(PREFS_KEY_VERIFY_SIP_SERVER_CERT, false);
+    }
+
+    void setDnsSrvLookup(boolean enabled) {
+        sharedPreferences.edit().putBoolean(PREFS_KEY_DNS_SRV_LOOKUP, enabled).apply();
+    }
+
+    boolean isDnsSrvLookup() {
+        return sharedPreferences.getBoolean(PREFS_KEY_DNS_SRV_LOOKUP, false);
     }
 
     private List<SipAccountData> getAccounts(String accounts) {

@@ -726,6 +726,34 @@ public class SipServiceCommand implements SipServiceConstants {
     }
 
     /**
+     * Enables or disables resolving the SIP server through DNS SRV records (RFC 3263).
+     * <p>
+     * When enabled, PJSIP's own resolver is configured with the active network's DNS servers
+     * and the registrar/proxy URIs carry no port, so the port comes from the SRV records of the
+     * account's SRV domain (see {@link SipAccountData#setSrvDomain(String)}), or of its host when
+     * unset (looked up as {@code _sips._tcp} for TLS, {@code _sip._tcp} for TCP). If
+     * the device DNS can't be used by PJSIP (no servers, or strict Private DNS), the stack falls
+     * back to {@code host:port} as if this were disabled.
+     * <p>
+     * Stack-wide and read once per stack start: the change takes effect on the next start, so
+     * call {@link #restartSipStack(Context)} if the stack is already running.
+     *
+     * @param context the context
+     * @param enabled true to resolve the SIP server through DNS SRV records
+     */
+    public static void setDnsSrvLookup(Context context, boolean enabled) {
+        SharedPreferencesHelper.getInstance(context).setDnsSrvLookup(enabled);
+    }
+
+    /**
+     * @param context the context
+     * @return whether DNS SRV resolution is enabled, see {@link #setDnsSrvLookup(Context, boolean)}
+     */
+    public static boolean isDnsSrvLookupEnabled(Context context) {
+        return SharedPreferencesHelper.getInstance(context).isDnsSrvLookup();
+    }
+
+    /**
      * Checks whether the sip stack is started and at least a sip account is active
      */
     public static boolean isSipServiceRunning() {

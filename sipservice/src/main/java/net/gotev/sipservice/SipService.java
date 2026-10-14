@@ -17,6 +17,7 @@ import org.pjsip.pjsua2.CodecInfo;
 import org.pjsip.pjsua2.CodecInfoVector2;
 import org.pjsip.pjsua2.EpConfig;
 import org.pjsip.pjsua2.IpChangeParam;
+import org.pjsip.pjsua2.StringVector;
 import org.pjsip.pjsua2.ToneDesc;
 import org.pjsip.pjsua2.ToneDescVector;
 import org.pjsip.pjsua2.ToneGenerator;
@@ -57,6 +58,10 @@ public class SipService extends BackgroundService implements SipServiceConstants
 
     private SharedPreferencesHelper mSharedPreferencesHelper;
     private static volatile boolean mStarted;
+    // DNS SRV resolution in effect for the running stack: requested and the device DNS is usable
+    // by PJSIP. Decided once per start, because the nameserver can only be set before libInit;
+    // the account URIs follow it, so the two can never disagree.
+    private volatile boolean mSrvActive;
     private int callStatus;
 
     private ToneGenerator pjsipLocalRingbackGenerator;
@@ -731,7 +736,7 @@ public class SipService extends BackgroundService implements SipServiceConstants
                 if (refresh) {
                     sipAccount.setRegistration(true);
                 } else {
-                    sipAccount.modify(sipAccount.getData().getAccountConfig());
+                    sipAccount.modify(sipAccount.getData().getAccountConfig(isSrvActiveForAccounts()));
                     sipAccount.getData().setRegExpirationTimeout(100);
                 }
             } catch (Exception ex) {
@@ -914,6 +919,7 @@ public class SipService extends BackgroundService implements SipServiceConstants
             epConfig.getMedConfig().setEcTailLen(200);
             epConfig.getMedConfig().setThreadCnt(2);
             SipServiceUtils.setSipLogger(epConfig);
+            configureDnsSrv(epConfig);
             mEndpoint.libInit(epConfig);
 
             TransportConfig udpTransport = new TransportConfig();
@@ -1001,8 +1007,36 @@ public class SipService extends BackgroundService implements SipServiceConstants
 
         } finally {
             mStarted = false;
+            mSrvActive = false;
             mEndpoint = null;
         }
+    }
+
+    /**
+     * Points PJSIP's own resolver at the device DNS servers when DNS SRV is enabled. Without a
+     * nameserver PJSIP resolves through getaddrinfo (A records only), so this is what makes the
+     * SRV lookup happen. When the device DNS can't be used, the stack stays on host:port, exactly
+     * as with SRV disabled.
+     */
+    private void configureDnsSrv(EpConfig epConfig) {
+        mSrvActive = false;
+        if (!mSharedPreferencesHelper.isDnsSrvLookup()) {
+            Logger.debug(TAG, "DNS SRV disabled");
+            return;
+        }
+        List<String> nameservers = SipDnsUtils.resolveNameservers(this);
+        if (nameservers.isEmpty()) {
+            Logger.warning(TAG, "DNS SRV enabled but not usable, falling back to host:port");
+            return;
+        }
+        epConfig.getUaConfig().setNameserver(new StringVector(nameservers));
+        mSrvActive = true;
+        Logger.info(TAG, "DNS SRV active");
+    }
+
+    /** Whether configured (registered) accounts resolve their server through DNS SRV. */
+    boolean isSrvActiveForAccounts() {
+        return mSrvActive;
     }
 
     /* ****************  Single-thread event pump (threadCnt=0)  **************** */
