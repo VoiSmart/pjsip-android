@@ -1,6 +1,26 @@
 Change Log
 ==========
 
+### Version 2.19.0
+
+_2026-10-14_
+* **Features**:
+  * DNS SRV resolution of the SIP server (RFC 3263), opt-in via
+    `SipServiceCommand.setDnsSrvLookup`: PJSIP's resolver uses the active network's DNS
+    servers and the registrar/proxy URIs carry no port, so the port comes from the SRV
+    records. Stack-wide, applied on the next stack (re)start. Falls back to `host:port` when
+    the device DNS can't be used (no servers, or strict Private DNS). Without SRV records PJSIP
+    uses the host's A record on the transport's default port (5060 TCP, 5061 TLS), so enable it
+    only where the records exist
+  * `SipAccountData.setSrvDomain`: the domain whose SRV records are looked up, used as given
+    (defaults to the host). Over TLS it is also the certificate identity (RFC 5922), so a
+    verified certificate must cover it
+  * Direct calls can opt into DNS SRV too, via `SipServiceCommand.makeDirectCall(..., srvLookup)`:
+    a port-less destination is resolved through SRV when the call starts the stack (the resolver
+    can only be set then), otherwise it goes to the URI host on the default port as before
+* **Issues fixed**:
+  * #242
+
 ### Version 2.18.1
 
 _2026-09-04_
