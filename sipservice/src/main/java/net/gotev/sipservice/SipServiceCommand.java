@@ -200,7 +200,34 @@ public class SipServiceCommand implements SipServiceConstants {
             boolean isVideoConference,
             SipAccountTransport transport
     ) {
+        makeDirectCall(context, guestName, sipUri, host, isVideo, isVideoConference, transport, false);
+    }
+
+    /**
+     * Makes a Direct call, optionally resolving the destination through DNS SRV (RFC 3263).
+     * <p>
+     * With {@code srvLookup} set, a call with no {@code host} and no port in {@code sipUri} looks
+     * up the SRV records of the URI host ({@code _sip._tcp} for TCP, {@code _sips._tcp} for TLS).
+     * That needs PJSIP's resolver, which is configured only when the stack starts: if the stack is
+     * not running it is started with it; if it is already running without it, or the device DNS
+     * can't be used, the call goes to the URI host on the default port. Without SRV records PJSIP
+     * uses the host's A record on the transport's default port.
+     *
+     * @param srvLookup resolve the destination through DNS SRV when possible
+     * @see #makeDirectCall(Context, String, Uri, String, boolean, boolean, SipAccountTransport)
+     */
+    public static void makeDirectCall(
+            Context context,
+            String guestName,
+            Uri sipUri,
+            String host,
+            boolean isVideo,
+            boolean isVideoConference,
+            SipAccountTransport transport,
+            boolean srvLookup
+    ) {
         Intent intent = new Intent(context, SipService.class);
+        intent.putExtra(PARAM_DIRECT_CALL_SRV_LOOKUP, srvLookup);
         intent.setAction(ACTION_MAKE_DIRECT_CALL);
         intent.putExtra(PARAM_GUEST_NAME, guestName);
         intent.putExtra(PARAM_DIRECT_CALL_URI, sipUri);

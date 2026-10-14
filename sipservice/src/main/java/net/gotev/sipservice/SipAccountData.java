@@ -384,14 +384,15 @@ public class SipAccountData implements Parcelable {
         return accountConfig;
     }
 
-    AccountConfig getGuestAccountConfig() {
+    /** @param srv see {@link #getProxyUri(boolean)} */
+    AccountConfig getGuestAccountConfig(boolean srv) {
         AccountConfig accountConfig = new AccountConfig();
         accountConfig.getMediaConfig().getTransportConfig().setQosType(pj_qos_type.PJ_QOS_TYPE_VIDEO);
         String idUri = getGuestDisplayName().isEmpty()
                 ? getIdUri()
                 : "\""+getGuestDisplayName()+"\" <"+getIdUri()+">";
         accountConfig.setIdUri(idUri);
-        accountConfig.getSipConfig().getProxies().add(getProxyUri(false));
+        accountConfig.getSipConfig().getProxies().add(getProxyUri(srv));
         accountConfig.getRegConfig().setRegisterOnAdd(false);
         accountConfig.getCallConfig().setTimerSessExpiresSec(sessionTimerExpireSec);
         setVideoConfig(accountConfig);

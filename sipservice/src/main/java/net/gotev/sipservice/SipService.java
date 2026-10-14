@@ -642,13 +642,20 @@ public class SipService extends BackgroundService implements SipServiceConstants
         SipAccountTransport transport = SipAccountTransport.getTransportByCode(
                 intent.getIntExtra(PARAM_DIRECT_CALL_TRANSPORT, 0)
         );
+        // SRV only applies without an explicit server or port (RFC 3263). It needs the resolver,
+        // which can only be set when the stack starts: a stack already running without it keeps
+        // the host:port fallback rather than restarting under a registered account.
+        boolean wantSrv = intent.getBooleanExtra(PARAM_DIRECT_CALL_SRV_LOOKUP, false)
+                && sipServer == null && uri.getPort() <= 0;
 
         Logger.debug(TAG, "Making call to " + getValue(getApplicationContext(), uri.getUserInfo()));
         String accountID = "sip:"+name+"@"+uri.getHost();
         String sipUri = "sip:" + uri.getUserInfo()+"@"+uri.getHost();
 
         try {
-            startStack();
+            startStack(wantSrv);
+            boolean guestSrv = wantSrv && mSrvActive;
+            Logger.debug(TAG, "Direct call DNS SRV: requested=" + wantSrv + ", active=" + guestSrv);
             SipAccountData sipAccountData = new SipAccountData()
                     .setHost(sipServer != null ? sipServer : uri.getHost())
                     .setUsername(name)
@@ -659,7 +666,7 @@ public class SipService extends BackgroundService implements SipServiceConstants
             /* .setUsername("guest") */
             /* .setGuestDisplayName(name)*/
             SipAccount pjSipAndroidAccount = new SipAccount(this, sipAccountData);
-            pjSipAndroidAccount.createGuest();
+            pjSipAndroidAccount.createGuest(guestSrv);
             mConfiguredGuestAccount = pjSipAndroidAccount.getData();
 
             // Overwrite the old value if present
@@ -884,6 +891,15 @@ public class SipService extends BackgroundService implements SipServiceConstants
      * Starts PJSIP Stack.
      */
     private void startStack() {
+        startStack(false);
+    }
+
+    /**
+     * Starts PJSIP Stack.
+     * @param forceDnsSrv configure the DNS SRV resolver even if {@link SipServiceCommand#setDnsSrvLookup}
+     *                    is off (port-less direct calls). Ignored when the stack is already running.
+     */
+    private void startStack(boolean forceDnsSrv) {
 
         if (mStarted) {
             // The stack is up, so there is nothing to start — but this thread still has
@@ -919,7 +935,7 @@ public class SipService extends BackgroundService implements SipServiceConstants
             epConfig.getMedConfig().setEcTailLen(200);
             epConfig.getMedConfig().setThreadCnt(2);
             SipServiceUtils.setSipLogger(epConfig);
-            configureDnsSrv(epConfig);
+            configureDnsSrv(epConfig, forceDnsSrv);
             mEndpoint.libInit(epConfig);
 
             TransportConfig udpTransport = new TransportConfig();
@@ -1018,9 +1034,9 @@ public class SipService extends BackgroundService implements SipServiceConstants
      * SRV lookup happen. When the device DNS can't be used, the stack stays on host:port, exactly
      * as with SRV disabled.
      */
-    private void configureDnsSrv(EpConfig epConfig) {
+    private void configureDnsSrv(EpConfig epConfig, boolean force) {
         mSrvActive = false;
-        if (!mSharedPreferencesHelper.isDnsSrvLookup()) {
+        if (!mSharedPreferencesHelper.isDnsSrvLookup() && !force) {
             Logger.debug(TAG, "DNS SRV disabled");
             return;
         }
@@ -1034,9 +1050,13 @@ public class SipService extends BackgroundService implements SipServiceConstants
         Logger.info(TAG, "DNS SRV active");
     }
 
-    /** Whether configured (registered) accounts resolve their server through DNS SRV. */
+    /**
+     * Whether configured (registered) accounts resolve their server through DNS SRV. Needs both
+     * the resolver and the setting: a stack started with the resolver for a direct call must not
+     * change how the accounts of a non-SRV setup register.
+     */
     boolean isSrvActiveForAccounts() {
-        return mSrvActive;
+        return mSrvActive && mSharedPreferencesHelper.isDnsSrvLookup();
     }
 
     /* ****************  Single-thread event pump (threadCnt=0)  **************** */

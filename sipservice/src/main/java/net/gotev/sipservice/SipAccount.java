@@ -46,8 +46,16 @@ public class SipAccount extends Account {
     }
 
     public void createGuest() throws Exception {
+        createGuest(false);
+    }
+
+    /**
+     * @param srv resolve the call's server through DNS SRV (no port in the proxy URI); decided
+     *            per direct call by the service
+     */
+    public void createGuest(boolean srv) throws Exception {
         isGuest = true;
-        create(data.getGuestAccountConfig());
+        create(data.getGuestAccountConfig(srv));
     }
 
     protected void removeCall(int callId) {

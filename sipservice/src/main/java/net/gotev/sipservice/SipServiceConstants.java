@@ -63,6 +63,7 @@ public interface SipServiceConstants {
     String PARAM_DIRECT_CALL_URI = "sipUri";
     String PARAM_DIRECT_CALL_SIP_SERVER = "sipServer";
     String PARAM_DIRECT_CALL_TRANSPORT = "directTransport";
+    String PARAM_DIRECT_CALL_SRV_LOOKUP = "directSrvLookup";
     String PARAM_IS_TRANSFER = "isTransfer";
     String PARAM_HANGUP_STATUS = "hangupStatus";
 
