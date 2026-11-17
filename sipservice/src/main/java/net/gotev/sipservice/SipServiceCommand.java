@@ -756,11 +756,11 @@ public class SipServiceCommand implements SipServiceConstants {
      * Enables or disables resolving the SIP server through DNS SRV records (RFC 3263).
      * <p>
      * When enabled, PJSIP's own resolver is configured with the active network's DNS servers
-     * and the registrar/proxy URIs carry no port, so the port comes from the SRV records of the
-     * account's SRV domain (see {@link SipAccountData#setSrvDomain(String)}), or of its host when
-     * unset (looked up as {@code _sips._tcp} for TLS, {@code _sip._tcp} for TCP). If
-     * the device DNS can't be used by PJSIP (no servers, or strict Private DNS), the stack falls
-     * back to {@code host:port} as if this were disabled.
+     * and the registrar/proxy URIs are the account's realm, which must then be a SIP domain,
+     * with no port, so the port comes from the realm's SRV records (looked up as
+     * {@code _sips._tcp} for TLS, {@code _sip._tcp} for TCP). If the device DNS can't be used by
+     * PJSIP (no servers, or strict Private DNS), the stack falls back to {@code host:port} as if
+     * this were disabled.
      * <p>
      * Stack-wide and read once per stack start: the change takes effect on the next start, so
      * call {@link #restartSipStack(Context)} if the stack is already running.

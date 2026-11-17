@@ -40,7 +40,6 @@ public class SipAccountData implements Parcelable {
     private int srtpSecureSignalling = 0; // not required
     private SipAccountTransport transport = SipAccountTransport.UDP;
     private String sipInstance;
-    private String srvDomain;
 
     public SipAccountData() { }
 
@@ -75,7 +74,6 @@ public class SipAccountData implements Parcelable {
         parcel.writeInt(srtpSecureSignalling);
         parcel.writeInt(transport.ordinal());
         parcel.writeString(sipInstance);
-        parcel.writeString(srvDomain);
     }
 
     private SipAccountData(Parcel in) {
@@ -94,7 +92,6 @@ public class SipAccountData implements Parcelable {
         srtpSecureSignalling = in.readInt();
         transport = SipAccountTransport.getTransportByCode(in.readInt());
         sipInstance = in.readString();
-        srvDomain = in.readString();
     }
 
     @Override
@@ -158,7 +155,7 @@ public class SipAccountData implements Parcelable {
     }
 
     /**
-     * use {@link SipAccountData#setTransport(SipAccountTransport)} () instead}
+     * use {@link SipAccountData#setTransport(SipAccountTransport)} () instead
      */
     @Deprecated
     public SipAccountData setTcpTransport(boolean tcpTransport) {
@@ -249,28 +246,6 @@ public class SipAccountData implements Parcelable {
         this.sipInstance = sipInstance;
         return this;
     }
-
-    public String getSrvDomain() {
-        return srvDomain;
-    }
-
-    /**
-     * The domain whose SIP SRV records locate the server when DNS SRV resolution is active
-     * (see {@link SipServiceCommand#setDnsSrvLookup}). It is used as given, as the host of the
-     * registrar and proxy URIs, so it can differ from {@link #getHost()}. Null or empty means
-     * {@link #getHost()}. Ignored when DNS SRV resolution isn't active.
-     * <p>
-     * Over TLS the server certificate identity is this domain, not the SRV target host
-     * (RFC 5922), so with {@link SipServiceCommand#setVerifySipServerCert} on, the certificate
-     * must cover it.
-     *
-     * @param srvDomain the domain to look up SRV records for
-     * @return this object
-     */
-    public SipAccountData setSrvDomain(String srvDomain) {
-        this.srvDomain = srvDomain;
-        return this;
-    }
     /*          Getters and Setters end        */
 
     /*****          Utilities        ******/
@@ -303,10 +278,12 @@ public class SipAccountData implements Parcelable {
 
     /**
      * The host of the registrar and proxy URIs, which is also the name the server's TLS
-     * certificate is checked against: the SRV domain in SRV mode when set, otherwise the host.
+     * certificate is checked against (RFC 5922): in SRV mode the realm, the domain of the
+     * account's address of record whose records are looked up (RFC 3261 10.2.6), so it must be
+     * a SIP domain and not "*"; otherwise the host.
      */
     String getSipServerDomain(boolean srv) {
-        return srv && srvDomain != null && !srvDomain.isEmpty() ? srvDomain : host;
+        return srv ? realm : host;
     }
 
     private String portSuffix(boolean srv) {
@@ -428,7 +405,6 @@ public class SipAccountData implements Parcelable {
         if (srtpSecureSignalling != that.srtpSecureSignalling) return false;
         if (!Objects.equals(transport, that.transport)) return false;
         if (!Objects.equals(sipInstance, that.sipInstance)) return false;
-        if (!Objects.equals(srvDomain, that.srvDomain)) return false;
 
         return getIdUri().equals(that.getIdUri());
 
@@ -449,7 +425,6 @@ public class SipAccountData implements Parcelable {
         result = 31 * result + srtpSecureSignalling;
         result = 31 * result + transport.hashCode();
         result = 31 * result + sipInstance.hashCode();
-        result = 31 * result + Objects.hashCode(srvDomain);
         return result;
     }
 
