@@ -1,9 +1,11 @@
 Change Log
 ==========
 
-### Version 2.19.0
+### Version 2.19.1
 
-_2026-10-14_
+_2026-11-18_
+
+2.19.0 was never released: its changes ship here.
 * **Features**:
   * DNS SRV resolution of the SIP server (RFC 3263), opt-in via
     `SipServiceCommand.setDnsSrvLookup`: PJSIP's resolver uses the active network's DNS
@@ -16,8 +18,14 @@ _2026-10-14_
   * Direct calls can opt into DNS SRV too, via `SipServiceCommand.makeDirectCall(..., srvLookup)`:
     a port-less destination is resolved through SRV when the call starts the stack (the resolver
     can only be set then), otherwise it goes to the URI host on the default port as before
+  * Optional per-account outbound proxy, via `SipAccountData.setOutboundProxy`: every request
+    goes to the proxy on the account port and transport, the registrar stays the account host,
+    and over TLS the proxy's certificate is checked. With DNS SRV active the proxy is resolved
+    through its own SRV records and the registrar is the realm, so keep SRV off for a proxy on a
+    custom port. Accounts without a proxy are unchanged
 * **Issues fixed**:
   * #242
+  * #243
 
 ### Version 2.18.1
 
