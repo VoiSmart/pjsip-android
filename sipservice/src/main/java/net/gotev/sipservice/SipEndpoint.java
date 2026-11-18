@@ -32,9 +32,9 @@ public class SipEndpoint extends Endpoint {
             int binIdentityNotMatchMsg = pj_ssl_cert_verify_flag_t.PJ_SSL_CERT_EIDENTITY_NOT_MATCH;
             boolean isSuccess = verifyMsg == binSuccessMsg;
             boolean isIdentityMismatch = verifyMsg == binIdentityNotMatchMsg;
-            // The name the connection was made to: the realm when SRV resolution applies.
+            // The name the connection was made to.
             String domain = SipService.getActiveSipAccounts().elements().nextElement().getData()
-                    .getSipServerDomain(service.isSrvActiveForAccounts());
+                    .getConnectionHost(service.isSrvActiveForAccounts());
             if (!(isSuccess || (isIdentityMismatch && SipTlsUtils.isWildcardValid(getCertNames(prm), domain)))) {
                 Logger.error(TAG, "The Sip Certificate is not valid");
                 service.getBroadcastEmitter().notifyTlsVerifyStatusFailed();

@@ -40,12 +40,13 @@ public class SipAccountData implements Parcelable {
     private int srtpSecureSignalling = 0; // not required
     private SipAccountTransport transport = SipAccountTransport.UDP;
     private String sipInstance;
+    private String outboundProxy;
 
     public SipAccountData() { }
 
     /*****          Parcelable overrides        ******/
     public static final Parcelable.Creator<SipAccountData> CREATOR =
-            new Parcelable.Creator<SipAccountData>() {
+            new Parcelable.Creator<>() {
                 @Override
                 public SipAccountData createFromParcel(final Parcel in) {
                     return new SipAccountData(in);
@@ -74,6 +75,7 @@ public class SipAccountData implements Parcelable {
         parcel.writeInt(srtpSecureSignalling);
         parcel.writeInt(transport.ordinal());
         parcel.writeString(sipInstance);
+        parcel.writeString(outboundProxy);
     }
 
     private SipAccountData(Parcel in) {
@@ -92,6 +94,7 @@ public class SipAccountData implements Parcelable {
         srtpSecureSignalling = in.readInt();
         transport = SipAccountTransport.getTransportByCode(in.readInt());
         sipInstance = in.readString();
+        outboundProxy = in.readString();
     }
 
     @Override
@@ -246,6 +249,28 @@ public class SipAccountData implements Parcelable {
         this.sipInstance = sipInstance;
         return this;
     }
+
+    public String getOutboundProxy() {
+        return outboundProxy;
+    }
+
+    /**
+     * The outbound proxy every request of the account is sent to, on the account's port and
+     * transport; the registrar stays {@link #getHost()}. Over TLS the certificate checked is the
+     * proxy's, the host the connection goes to.
+     * <p>
+     * With DNS SRV active (see {@link SipServiceCommand#setDnsSrvLookup}) the proxy is resolved
+     * through its own SRV records, so the account's port doesn't apply (without records, its 'A
+     * record' on the transport's default port), and the registrar is the realm (RFC 3263): keep
+     * SRV off for a proxy on a custom port.
+     *
+     * @param outboundProxy the proxy host (an IPv6 address in brackets), null for none
+     * @return this object
+     */
+    public SipAccountData setOutboundProxy(String outboundProxy) {
+        this.outboundProxy = outboundProxy;
+        return this;
+    }
     /*          Getters and Setters end        */
 
     /*****          Utilities        ******/
@@ -268,21 +293,22 @@ public class SipAccountData implements Parcelable {
      *            ({@code _sips._tcp} for TLS, {@code _sip._tcp} for TCP).
      */
     String getProxyUri(boolean srv) {
-        return "sip:" + getSipServerDomain(srv) + portSuffix(srv) + getTransportString();
+        return "sip:" + getConnectionHost(srv) + portSuffix(srv) + getTransportString();
     }
 
     /** See {@link #getProxyUri(boolean)}. REGISTER is routed through the proxy. */
     String getRegistrarUri(boolean srv) {
-        return "sip:" + getSipServerDomain(srv) + portSuffix(srv);
+        return "sip:" + (srv ? realm : host) + portSuffix(srv);
     }
 
     /**
-     * The host of the registrar and proxy URIs, which is also the name the server's TLS
-     * certificate is checked against (RFC 5922): in SRV mode the realm, the domain of the
-     * account's address of record whose records are looked up (RFC 3261 10.2.6), so it must be
-     * a SIP domain and not "*"; otherwise the host.
+     * The host the connection goes to, which is also the name the server's TLS certificate is
+     * checked against (RFC 5922): the outbound proxy when set; otherwise in SRV mode the realm,
+     * the domain of the account's address of record whose records are looked up
+     * (RFC 3261 10.2.6), so it must be a SIP domain and not "*"; otherwise the host.
      */
-    String getSipServerDomain(boolean srv) {
+    String getConnectionHost(boolean srv) {
+        if (outboundProxy != null) return outboundProxy;
         return srv ? realm : host;
     }
 
@@ -405,6 +431,7 @@ public class SipAccountData implements Parcelable {
         if (srtpSecureSignalling != that.srtpSecureSignalling) return false;
         if (!Objects.equals(transport, that.transport)) return false;
         if (!Objects.equals(sipInstance, that.sipInstance)) return false;
+        if (!Objects.equals(outboundProxy, that.outboundProxy)) return false;
 
         return getIdUri().equals(that.getIdUri());
 
@@ -425,6 +452,7 @@ public class SipAccountData implements Parcelable {
         result = 31 * result + srtpSecureSignalling;
         result = 31 * result + transport.hashCode();
         result = 31 * result + sipInstance.hashCode();
+        result = 31 * result + Objects.hashCode(outboundProxy);
         return result;
     }
 

@@ -58,6 +58,7 @@ Native PJSIP library for Android is compiled using [PJSIP Android Builder](https
   - opt-in via SipServiceCommand#setDnsSrvLookup, applied on the next stack (re)start: the registrar and proxy are the account realm, which must be a SIP domain, and the port comes from its SRV records (`_sips._tcp` for TLS, `_sip._tcp` for TCP), queried through the active network's DNS servers; falls back to `host:port` when the device DNS can't be used (no servers, or strict Private DNS); without SRV records PJSIP uses the realm's A record on the transport's default port (5060 TCP, 5061 TLS), so enable it only where the records exist
   - over TLS the realm is also the certificate identity (RFC 5922)
   - direct calls can opt in per call via SipServiceCommand#makeDirectCall(..., srvLookup): a destination without a port is resolved through SRV when the call starts the stack, otherwise it goes to the URI host on the default port
+- Outbound proxy, per account via SipAccountData#setOutboundProxy: every request goes to the proxy on the account port and transport, the registrar stays the account host, and over TLS the proxy's certificate is checked. With DNS SRV active the proxy is resolved through its own SRV records (the account port doesn't apply) and the registrar is the realm, so keep SRV off for a proxy on a custom port
 
 ### What is missing (contributions are welcome)
 
@@ -79,10 +80,10 @@ Native PJSIP library for Android is compiled using [PJSIP Android Builder](https
 
 ## Logging
 
-This library ships with a default logger which logs with the default Android `Log` class and a default `DEBUG` loglevel.
-You can customize such behaviour by either:
+This library ships with a default logger which logs with the default Android `Log` class and a default `DEBUG` log level.
+You can customize such behavior by either:
 
-1. Setting a specific loglevel (see Logger#setLogLevel)
+1. Setting a specific log level (see Logger#setLogLevel)
 2. Setting your own LoggerDelegate. E.g.:
 
     ```java

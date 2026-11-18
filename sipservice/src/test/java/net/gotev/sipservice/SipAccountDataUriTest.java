@@ -1,6 +1,7 @@
 package net.gotev.sipservice;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 import org.junit.Test;
 
@@ -50,10 +51,41 @@ public class SipAccountDataUriTest {
 
     // The TLS certificate is checked against the realm, never the SRV target (RFC 5922).
     @Test
-    public void srvModeUsesTheRealmAsTheServerDomain() {
+    public void srvModeConnectsToTheRealm() {
         SipAccountData data = account(SipAccountTransport.TLS);
 
-        assertEquals("example.com", data.getSipServerDomain(true));
-        assertEquals("apps.sip.example.com", data.getSipServerDomain(false));
+        assertEquals("example.com", data.getConnectionHost(true));
+        assertEquals("apps.sip.example.com", data.getConnectionHost(false));
+    }
+
+    @Test
+    public void outboundProxyCarriesTheTrafficAndTheRegistrarStaysTheHost() {
+        SipAccountData data = account(SipAccountTransport.TLS).setOutboundProxy("proxy.example.com");
+
+        assertEquals("sip:proxy.example.com:5070;transport=tls", data.getProxyUri(false));
+        assertEquals("sip:apps.sip.example.com:5070", data.getRegistrarUri(false));
+    }
+
+    // The TLS connection goes to the proxy, so the certificate checked is the proxy's.
+    @Test
+    public void outboundProxyIsTheConnectionHost() {
+        SipAccountData data = account(SipAccountTransport.TLS).setOutboundProxy("proxy.example.com");
+
+        assertEquals("proxy.example.com", data.getConnectionHost(false));
+        assertEquals("proxy.example.com", data.getConnectionHost(true));
+    }
+
+    // A changed proxy must re-create the account through the modify path.
+    @Test
+    public void outboundProxyTakesPartInEquality() {
+        SipAccountData plain = account(SipAccountTransport.TCP).setPassword("pwd").setSipInstance("id");
+        SipAccountData same = account(SipAccountTransport.TCP).setPassword("pwd").setSipInstance("id");
+        SipAccountData withProxy = account(SipAccountTransport.TCP).setPassword("pwd").setSipInstance("id")
+                .setOutboundProxy("proxy.example.com");
+
+        assertEquals(plain, same);
+        assertEquals(plain.hashCode(), same.hashCode());
+        assertNotEquals(plain, withProxy);
+        assertNotEquals(plain.hashCode(), withProxy.hashCode());
     }
 }
