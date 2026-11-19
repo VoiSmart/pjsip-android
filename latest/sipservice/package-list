@@ -141,6 +141,7 @@ $dokka.location:net.gotev.sipservice/SipAccount/addOutgoingCall/#java.lang.Strin
 $dokka.location:net.gotev.sipservice/SipAccount/addOutgoingCall/#java.lang.String/PointingToDeclaration/sipservice/net.gotev.sipservice/-sip-account/add-outgoing-call.html
 $dokka.location:net.gotev.sipservice/SipAccount/create/#/PointingToDeclaration/sipservice/net.gotev.sipservice/-sip-account/create.html
 $dokka.location:net.gotev.sipservice/SipAccount/createGuest/#/PointingToDeclaration/sipservice/net.gotev.sipservice/-sip-account/create-guest.html
+$dokka.location:net.gotev.sipservice/SipAccount/createGuest/#boolean/PointingToDeclaration/sipservice/net.gotev.sipservice/-sip-account/create-guest.html
 $dokka.location:net.gotev.sipservice/SipAccount/data/#/PointingToDeclaration/sipservice/net.gotev.sipservice/-sip-account/data.html
 $dokka.location:net.gotev.sipservice/SipAccount/equals/#java.lang.Object/PointingToDeclaration/sipservice/net.gotev.sipservice/-sip-account/equals.html
 $dokka.location:net.gotev.sipservice/SipAccount/getCall/#int/PointingToDeclaration/sipservice/net.gotev.sipservice/-sip-account/get-call.html
@@ -165,6 +166,7 @@ $dokka.location:net.gotev.sipservice/SipAccountData/hashCode/#/PointingToDeclara
 $dokka.location:net.gotev.sipservice/SipAccountData/host/#/PointingToDeclaration/sipservice/net.gotev.sipservice/-sip-account-data/host.html
 $dokka.location:net.gotev.sipservice/SipAccountData/isTcpTransport/#/PointingToDeclaration/sipservice/net.gotev.sipservice/-sip-account-data/is-tcp-transport.html
 $dokka.location:net.gotev.sipservice/SipAccountData/isValid/#/PointingToDeclaration/sipservice/net.gotev.sipservice/-sip-account-data/is-valid.html
+$dokka.location:net.gotev.sipservice/SipAccountData/outboundProxy/#/PointingToDeclaration/sipservice/net.gotev.sipservice/-sip-account-data/outbound-proxy.html
 $dokka.location:net.gotev.sipservice/SipAccountData/password/#/PointingToDeclaration/sipservice/net.gotev.sipservice/-sip-account-data/password.html
 $dokka.location:net.gotev.sipservice/SipAccountData/port/#/PointingToDeclaration/sipservice/net.gotev.sipservice/-sip-account-data/port.html
 $dokka.location:net.gotev.sipservice/SipAccountData/realm/#/PointingToDeclaration/sipservice/net.gotev.sipservice/-sip-account-data/realm.html
@@ -263,11 +265,13 @@ $dokka.location:net.gotev.sipservice/SipServiceCommand/hangUpActiveCalls/#Contex
 $dokka.location:net.gotev.sipservice/SipServiceCommand/hangUpCall/#Context#java.lang.String#int#int/PointingToDeclaration/sipservice/net.gotev.sipservice/-sip-service-command/hang-up-call.html
 $dokka.location:net.gotev.sipservice/SipServiceCommand/hangUpCall/#Context#java.lang.String#int/PointingToDeclaration/sipservice/net.gotev.sipservice/-sip-service-command/hang-up-call.html
 $dokka.location:net.gotev.sipservice/SipServiceCommand/holdActiveCalls/#Context#java.lang.String/PointingToDeclaration/sipservice/net.gotev.sipservice/-sip-service-command/hold-active-calls.html
+$dokka.location:net.gotev.sipservice/SipServiceCommand/isDnsSrvLookupEnabled/#Context/PointingToDeclaration/sipservice/net.gotev.sipservice/-sip-service-command/is-dns-srv-lookup-enabled.html
 $dokka.location:net.gotev.sipservice/SipServiceCommand/isSipServiceRunning/#/PointingToDeclaration/sipservice/net.gotev.sipservice/-sip-service-command/is-sip-service-running.html
 $dokka.location:net.gotev.sipservice/SipServiceCommand/makeCall/#Context#java.lang.String#java.lang.String#boolean#boolean#boolean/PointingToDeclaration/sipservice/net.gotev.sipservice/-sip-service-command/make-call.html
 $dokka.location:net.gotev.sipservice/SipServiceCommand/makeCall/#Context#java.lang.String#java.lang.String#boolean#boolean/PointingToDeclaration/sipservice/net.gotev.sipservice/-sip-service-command/make-call.html
 $dokka.location:net.gotev.sipservice/SipServiceCommand/makeCall/#Context#java.lang.String#java.lang.String#boolean/PointingToDeclaration/sipservice/net.gotev.sipservice/-sip-service-command/make-call.html
 $dokka.location:net.gotev.sipservice/SipServiceCommand/makeCall/#Context#java.lang.String#java.lang.String/PointingToDeclaration/sipservice/net.gotev.sipservice/-sip-service-command/make-call.html
+$dokka.location:net.gotev.sipservice/SipServiceCommand/makeDirectCall/#Context#java.lang.String#Uri#java.lang.String#boolean#boolean#SipAccountTransport#boolean/PointingToDeclaration/sipservice/net.gotev.sipservice/-sip-service-command/make-direct-call.html
 $dokka.location:net.gotev.sipservice/SipServiceCommand/makeDirectCall/#Context#java.lang.String#Uri#java.lang.String#boolean#boolean#SipAccountTransport/PointingToDeclaration/sipservice/net.gotev.sipservice/-sip-service-command/make-direct-call.html
 $dokka.location:net.gotev.sipservice/SipServiceCommand/makeDirectCall/#Context#java.lang.String#Uri#java.lang.String#boolean#boolean/PointingToDeclaration/sipservice/net.gotev.sipservice/-sip-service-command/make-direct-call.html
 $dokka.location:net.gotev.sipservice/SipServiceCommand/makeSilentCall/#Context#java.lang.String#java.lang.String/PointingToDeclaration/sipservice/net.gotev.sipservice/-sip-service-command/make-silent-call.html
@@ -283,6 +287,7 @@ $dokka.location:net.gotev.sipservice/SipServiceCommand/setCallMute/#Context#java
 $dokka.location:net.gotev.sipservice/SipServiceCommand/setCameraManager/#CameraManager/PointingToDeclaration/sipservice/net.gotev.sipservice/-sip-service-command/set-camera-manager.html
 $dokka.location:net.gotev.sipservice/SipServiceCommand/setCodecPriorities/#Context#java.util.ArrayList<CodecPriority>/PointingToDeclaration/sipservice/net.gotev.sipservice/-sip-service-command/set-codec-priorities.html
 $dokka.location:net.gotev.sipservice/SipServiceCommand/setDND/#Context#boolean/PointingToDeclaration/sipservice/net.gotev.sipservice/-sip-service-command/set-d-n-d.html
+$dokka.location:net.gotev.sipservice/SipServiceCommand/setDnsSrvLookup/#Context#boolean/PointingToDeclaration/sipservice/net.gotev.sipservice/-sip-service-command/set-dns-srv-lookup.html
 $dokka.location:net.gotev.sipservice/SipServiceCommand/setVerifySipServerCert/#Context#boolean/PointingToDeclaration/sipservice/net.gotev.sipservice/-sip-service-command/set-verify-sip-server-cert.html
 $dokka.location:net.gotev.sipservice/SipServiceCommand/setVideoMute/#Context#java.lang.String#int#boolean/PointingToDeclaration/sipservice/net.gotev.sipservice/-sip-service-command/set-video-mute.html
 $dokka.location:net.gotev.sipservice/SipServiceCommand/setupIncomingVideoFeed/#Context#java.lang.String#int#Surface/PointingToDeclaration/sipservice/net.gotev.sipservice/-sip-service-command/setup-incoming-video-feed.html
@@ -355,6 +360,7 @@ $dokka.location:net.gotev.sipservice/SipServiceConstants/PARAM_CODEC_PRIORITIES/
 $dokka.location:net.gotev.sipservice/SipServiceConstants/PARAM_CODEC_PRIORITIES_LIST/#/PointingToDeclaration/sipservice/net.gotev.sipservice/-sip-service-constants/-p-a-r-a-m_-c-o-d-e-c_-p-r-i-o-r-i-t-i-e-s_-l-i-s-t.html
 $dokka.location:net.gotev.sipservice/SipServiceConstants/PARAM_CONNECT_TIMESTAMP/#/PointingToDeclaration/sipservice/net.gotev.sipservice/-sip-service-constants/-p-a-r-a-m_-c-o-n-n-e-c-t_-t-i-m-e-s-t-a-m-p.html
 $dokka.location:net.gotev.sipservice/SipServiceConstants/PARAM_DIRECT_CALL_SIP_SERVER/#/PointingToDeclaration/sipservice/net.gotev.sipservice/-sip-service-constants/-p-a-r-a-m_-d-i-r-e-c-t_-c-a-l-l_-s-i-p_-s-e-r-v-e-r.html
+$dokka.location:net.gotev.sipservice/SipServiceConstants/PARAM_DIRECT_CALL_SRV_LOOKUP/#/PointingToDeclaration/sipservice/net.gotev.sipservice/-sip-service-constants/-p-a-r-a-m_-d-i-r-e-c-t_-c-a-l-l_-s-r-v_-l-o-o-k-u-p.html
 $dokka.location:net.gotev.sipservice/SipServiceConstants/PARAM_DIRECT_CALL_TRANSPORT/#/PointingToDeclaration/sipservice/net.gotev.sipservice/-sip-service-constants/-p-a-r-a-m_-d-i-r-e-c-t_-c-a-l-l_-t-r-a-n-s-p-o-r-t.html
 $dokka.location:net.gotev.sipservice/SipServiceConstants/PARAM_DIRECT_CALL_URI/#/PointingToDeclaration/sipservice/net.gotev.sipservice/-sip-service-constants/-p-a-r-a-m_-d-i-r-e-c-t_-c-a-l-l_-u-r-i.html
 $dokka.location:net.gotev.sipservice/SipServiceConstants/PARAM_DISPLAY_NAME/#/PointingToDeclaration/sipservice/net.gotev.sipservice/-sip-service-constants/-p-a-r-a-m_-d-i-s-p-l-a-y_-n-a-m-e.html
