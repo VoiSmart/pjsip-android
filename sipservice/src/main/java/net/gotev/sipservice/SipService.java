@@ -371,11 +371,12 @@ public class SipService extends BackgroundService implements SipServiceConstants
         String accountID = intent.getStringExtra(PARAM_ACCOUNT_ID);
         int callID = intent.getIntExtra(PARAM_CALL_ID, 0);
         int hangupStatus = intent.getIntExtra(PARAM_HANGUP_STATUS, pjsip_status_code.PJSIP_SC_DECLINE);
+        String reason = intent.getStringExtra(PARAM_DECLINE_REASON);
 
         SipCall sipCall = getCall(accountID, callID);
         if (sipCall != null) {
             try {
-                sipCall.declineIncomingCall(hangupStatus);
+                sipCall.declineIncomingCall(hangupStatus, reason);
             } catch (Exception exc) {
                 Logger.error(TAG, "Error while declining incoming call. AccountID: "
                         + getValue(getApplicationContext(), accountID) + ", CallID: " + callID);

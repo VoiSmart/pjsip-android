@@ -386,6 +386,22 @@ public class SipServiceCommand implements SipServiceConstants {
      * @param statusCode the status code to be used for decline action. See {@link pjsip_status_code}
      */
     public static void declineIncomingCall(Context context, String accountID, int callID, int statusCode) {
+        declineIncomingCall(context, accountID, callID, statusCode, null);
+    }
+
+    /**
+     * Decline an incoming call, telling the server why. If the call does not exist or has been
+     * terminated, a disconnected state will be sent to
+     * {@link BroadcastEventReceiver#onCallState(String, int, int, int, long)}
+     * @param context application context
+     * @param accountID account ID
+     * @param callID call ID to hang up
+     * @param statusCode the status code to be used for decline action. See {@link pjsip_status_code}
+     * @param reason short English text sent in an RFC 3326 Reason header
+     *               ({@code SIP;cause=<statusCode>;text="<reason>"}); null or empty for none
+     */
+    public static void declineIncomingCall(Context context, String accountID, int callID, int statusCode,
+                                           String reason) {
         checkAccount(accountID);
 
         Intent intent = new Intent(context, SipService.class);
@@ -393,6 +409,7 @@ public class SipServiceCommand implements SipServiceConstants {
         intent.putExtra(PARAM_ACCOUNT_ID, accountID);
         intent.putExtra(PARAM_CALL_ID, callID);
         intent.putExtra(PARAM_HANGUP_STATUS, statusCode);
+        intent.putExtra(PARAM_DECLINE_REASON, reason);
         context.startService(intent);
     }
 

@@ -19,6 +19,8 @@ import org.pjsip.pjsua2.OnCallStateParam;
 import org.pjsip.pjsua2.OnCallTsxStateParam;
 import org.pjsip.pjsua2.OnStreamDestroyedParam;
 import org.pjsip.pjsua2.RtcpStreamStat;
+import org.pjsip.pjsua2.SipHeader;
+import org.pjsip.pjsua2.SipHeaderVector;
 import org.pjsip.pjsua2.SipRxData;
 import org.pjsip.pjsua2.StreamInfo;
 import org.pjsip.pjsua2.StreamStat;
@@ -354,15 +356,43 @@ public class SipCall extends Call {
     }
 
     public void declineIncomingCall(int statusCode) {
+        declineIncomingCall(statusCode, null);
+    }
+
+    /**
+     * Declines the incoming call with {@code statusCode}. When {@code reason} isn't empty, the
+     * response carries it in an RFC 3326 Reason header ({@code SIP;cause=<code>;text="<reason>"}),
+     * so the server can tell why the call was declined. The status line keeps its standard phrase.
+     */
+    public void declineIncomingCall(int statusCode, String reason) {
         CallOpParam param = new CallOpParam();
         param.setStatusCode(statusCode);
 
+        if (reason != null && !reason.isEmpty()) {
+            SipHeader header = new SipHeader();
+            header.setHName("Reason");
+            header.setHValue(reasonHeaderValue(statusCode, reason));
+            SipHeaderVector headers = new SipHeaderVector();
+            headers.add(header);
+            param.getTxOption().setHeaders(headers);
+        }
+
         try {
-            Logger.info(LOG_TAG, "Declining call with status code: " + statusCode);
+            Logger.info(LOG_TAG, "Declining call with status code: " + statusCode
+                    + (reason != null ? ", reason: " + reason : ""));
             answer(param);
         } catch (Exception exc) {
             Logger.error(LOG_TAG, "Failed to decline incoming call with code: " + statusCode, exc);
         }
+    }
+
+    // The text is a quoted-string: quotes and backslashes are escaped, and line breaks are
+    // dropped so the text can't end the header and inject others
+    static String reasonHeaderValue(int statusCode, String text) {
+        String quoted = text.replaceAll("[\r\n]", "")
+                .replace("\\", "\\\\")
+                .replace("\"", "\\\"");
+        return "SIP;cause=" + statusCode + ";text=\"" + quoted + "\"";
     }
 
     public void hangUpWithCode() {

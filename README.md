@@ -39,6 +39,7 @@ Native PJSIP library for Android is compiled using [PJSIP Android Builder](https
 - Accept an incoming call
 - Answer with video an incoming call
 - Decline an incoming call
+  - optionally with a reason, sent in an RFC 3326 Reason header (`SIP;cause=<code>;text="<reason>"`) via SipServiceCommand#declineIncomingCall(..., statusCode, reason)
 - Get/Set codec priorities
 - Hang up all active calls
 - Hold all active calls

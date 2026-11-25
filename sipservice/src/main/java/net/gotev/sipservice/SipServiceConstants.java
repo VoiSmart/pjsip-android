@@ -52,6 +52,7 @@ public interface SipServiceConstants {
     String PARAM_HOLD = "hold";
     String PARAM_MUTE = "mute";
     String PARAM_CODEC_PRIORITIES = "codecPriorities";
+    String PARAM_DECLINE_REASON = "declineReason";
     String PARAM_REG_EXP_TIMEOUT = "regExpTimeout";
     String PARAM_REG_CONTACT_PARAMS = "regContactParams";
     String PARAM_DND = "dnd";
