@@ -191,6 +191,7 @@ $dokka.location:net.gotev.sipservice/SipCall/SipCall/#SipAccount/PointingToDecla
 $dokka.location:net.gotev.sipservice/SipCall/acceptIncomingCall/#/PointingToDeclaration/sipservice/net.gotev.sipservice/-sip-call/accept-incoming-call.html
 $dokka.location:net.gotev.sipservice/SipCall/connectTimestamp/#/PointingToDeclaration/sipservice/net.gotev.sipservice/-sip-call/connect-timestamp.html
 $dokka.location:net.gotev.sipservice/SipCall/declineIncomingCall/#/PointingToDeclaration/sipservice/net.gotev.sipservice/-sip-call/decline-incoming-call.html
+$dokka.location:net.gotev.sipservice/SipCall/declineIncomingCall/#int#java.lang.String/PointingToDeclaration/sipservice/net.gotev.sipservice/-sip-call/decline-incoming-call.html
 $dokka.location:net.gotev.sipservice/SipCall/declineIncomingCall/#int/PointingToDeclaration/sipservice/net.gotev.sipservice/-sip-call/decline-incoming-call.html
 $dokka.location:net.gotev.sipservice/SipCall/getCurrentState/#/PointingToDeclaration/sipservice/net.gotev.sipservice/-sip-call/get-current-state.html
 $dokka.location:net.gotev.sipservice/SipCall/getVideoPreview/#/PointingToDeclaration/sipservice/net.gotev.sipservice/-sip-call/get-video-preview.html
@@ -255,6 +256,7 @@ $dokka.location:net.gotev.sipservice/SipServiceCommand/acceptIncomingCall/#Conte
 $dokka.location:net.gotev.sipservice/SipServiceCommand/attendedTransferCall/#Context#java.lang.String#int#int#boolean/PointingToDeclaration/sipservice/net.gotev.sipservice/-sip-service-command/attended-transfer-call.html
 $dokka.location:net.gotev.sipservice/SipServiceCommand/attendedTransferCall/#Context#java.lang.String#int#int/PointingToDeclaration/sipservice/net.gotev.sipservice/-sip-service-command/attended-transfer-call.html
 $dokka.location:net.gotev.sipservice/SipServiceCommand/changeVideoOrientation/#Context#java.lang.String#int#int/PointingToDeclaration/sipservice/net.gotev.sipservice/-sip-service-command/change-video-orientation.html
+$dokka.location:net.gotev.sipservice/SipServiceCommand/declineIncomingCall/#Context#java.lang.String#int#int#java.lang.String/PointingToDeclaration/sipservice/net.gotev.sipservice/-sip-service-command/decline-incoming-call.html
 $dokka.location:net.gotev.sipservice/SipServiceCommand/declineIncomingCall/#Context#java.lang.String#int#int/PointingToDeclaration/sipservice/net.gotev.sipservice/-sip-service-command/decline-incoming-call.html
 $dokka.location:net.gotev.sipservice/SipServiceCommand/declineIncomingCall/#Context#java.lang.String#int/PointingToDeclaration/sipservice/net.gotev.sipservice/-sip-service-command/decline-incoming-call.html
 $dokka.location:net.gotev.sipservice/SipServiceCommand/enableSipDebugLogging/#boolean/PointingToDeclaration/sipservice/net.gotev.sipservice/-sip-service-command/enable-sip-debug-logging.html
@@ -359,6 +361,7 @@ $dokka.location:net.gotev.sipservice/SipServiceConstants/PARAM_CALL_STATUS/#/Poi
 $dokka.location:net.gotev.sipservice/SipServiceConstants/PARAM_CODEC_PRIORITIES/#/PointingToDeclaration/sipservice/net.gotev.sipservice/-sip-service-constants/-p-a-r-a-m_-c-o-d-e-c_-p-r-i-o-r-i-t-i-e-s.html
 $dokka.location:net.gotev.sipservice/SipServiceConstants/PARAM_CODEC_PRIORITIES_LIST/#/PointingToDeclaration/sipservice/net.gotev.sipservice/-sip-service-constants/-p-a-r-a-m_-c-o-d-e-c_-p-r-i-o-r-i-t-i-e-s_-l-i-s-t.html
 $dokka.location:net.gotev.sipservice/SipServiceConstants/PARAM_CONNECT_TIMESTAMP/#/PointingToDeclaration/sipservice/net.gotev.sipservice/-sip-service-constants/-p-a-r-a-m_-c-o-n-n-e-c-t_-t-i-m-e-s-t-a-m-p.html
+$dokka.location:net.gotev.sipservice/SipServiceConstants/PARAM_DECLINE_REASON/#/PointingToDeclaration/sipservice/net.gotev.sipservice/-sip-service-constants/-p-a-r-a-m_-d-e-c-l-i-n-e_-r-e-a-s-o-n.html
 $dokka.location:net.gotev.sipservice/SipServiceConstants/PARAM_DIRECT_CALL_SIP_SERVER/#/PointingToDeclaration/sipservice/net.gotev.sipservice/-sip-service-constants/-p-a-r-a-m_-d-i-r-e-c-t_-c-a-l-l_-s-i-p_-s-e-r-v-e-r.html
 $dokka.location:net.gotev.sipservice/SipServiceConstants/PARAM_DIRECT_CALL_SRV_LOOKUP/#/PointingToDeclaration/sipservice/net.gotev.sipservice/-sip-service-constants/-p-a-r-a-m_-d-i-r-e-c-t_-c-a-l-l_-s-r-v_-l-o-o-k-u-p.html
 $dokka.location:net.gotev.sipservice/SipServiceConstants/PARAM_DIRECT_CALL_TRANSPORT/#/PointingToDeclaration/sipservice/net.gotev.sipservice/-sip-service-constants/-p-a-r-a-m_-d-i-r-e-c-t_-c-a-l-l_-t-r-a-n-s-p-o-r-t.html
