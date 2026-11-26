@@ -1,6 +1,21 @@
 Change Log
 ==========
 
+### Version 2.20.0
+
+_2026-11-26_
+* **Features**:
+  * Decline an incoming call telling the server why, via
+    `SipServiceCommand.declineIncomingCall(..., statusCode, reason)`: the final response carries
+    an RFC 3326 Reason header, `SIP;cause=<statusCode>;text="<reason>"`. The status line keeps its
+    standard phrase. Without a reason the response is unchanged
+* **Fixes**:
+  * Caller info of a `sips:` remote party: its display name and URI were "Unknown", now they're
+    read as for `sip:` (thanks to @darwvin-dev)
+* **Issues fixed**:
+  * #241
+  * #244
+
 ### Version 2.19.1
 
 _2026-11-18_
